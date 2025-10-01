@@ -26,7 +26,7 @@ The table below highlights various challanges that coder members will be assigne
 |Input Hardware | Output Hardware | Expected Outcome | Target Owner | Owner |
 |--|--|--|--|--|
 | Mag sensor | bag motor on/off in a single direction | Every time a beam break sensor is broken turn motor on, otherwise turn off motor | 2nd year | ??  |
-| Tof/Distance sensor | Small neo | As something comes into view of the sensor closer and closer motor speed increases.  When nothing is in view the motor is off | 2nd year | ??  |
+| Tof/Distance sensor | Small neo | As something comes into view of the sensor closer and closer motor speed increases.  When nothing is in view the motor is off | 2nd year | Jasper  |
 | Pigeon various movements | LED colors| Every time an axis movement on the pigeon occurs one of 6 colors is displayed on the LEDs. | 2nd year | ??  |
 | XBox Controller joystick. If left trigger not pressed, full speed. If left trigger pressed, 1/4 speed.  | Talon motor | Use the input of BOTH the left and right triggers as double/floating point value to control the speed of the motor (where left is negative and right is positive).  | 2nd year | ??  |
 | Sendable chooser and smart dashboard button | Neo Motor | Implement sendable chooser w/ motor slow/fast/backwards. Button on smart dashboard engages the selected mode. | 2nd year | ??  |
