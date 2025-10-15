@@ -36,7 +36,7 @@ public class UpdateMotorSpeedCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double speed = 5 - this.tofSensor.getRangeInches();
+        double speed = Math.max(Math.min(1 - this.tofSensor.getRangeInches() / 5, 1), 0);
         this.motorSubsystem.setSpeed(speed);
     }
 

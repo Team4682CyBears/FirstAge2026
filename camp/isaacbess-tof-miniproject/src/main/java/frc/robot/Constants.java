@@ -21,6 +21,6 @@ public final class Constants {
         public static final int kDriverControllerPort = 0;
     }
 
-    public static final int kNeoMotorPort = 1;
-    public static final int kToFSensorPort = 2;
+    public static final int kNeoMotorPort = 23;
+    public static final int kToFSensorPort = 20;
 }

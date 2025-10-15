@@ -31,7 +31,7 @@ public class NeoSubsystem extends SubsystemBase {
     }
 
     public void setSpeed(double speed) {
-        neoMotor.set(Math.max(Math.min(speed, 1), -1));
+        neoMotor.set(Math.max(Math.min(speed / 2, 0.5), -0.5));
     }
 
     public void stop() {
