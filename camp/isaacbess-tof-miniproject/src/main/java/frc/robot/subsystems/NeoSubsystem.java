@@ -30,10 +30,13 @@ public class NeoSubsystem extends SubsystemBase {
         neoMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
+    // Set the motor speed to the clamped speed
+
     public void setSpeed(double speed) {
         neoMotor.set(speed);
     }
 
+    // Stop the motor
     public void stop() {
         neoMotor.stopMotor();
     }

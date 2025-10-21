@@ -9,46 +9,48 @@ import frc.robot.subsystems.NeoSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
-/** An example command that uses an example subsystem. */
+// Simple command: set motor speed from ToF reading (speed = 5 - inches).
 public class UpdateMotorSpeedCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+
+    // Motor subsystem
     private final NeoSubsystem motorSubsystem;
 
+    // ToF sensor (getRangeInches returns inches)
     private final ToFSensor tofSensor;
 
-    /**
-     * Creates a new ExampleCommand.
-     *
-     * @param subsystem The subsystem used by this command.
-     */
+    // Create command with subsystem and sensor
     public UpdateMotorSpeedCommand(NeoSubsystem motorSubsystem, ToFSensor tofSensor) {
+        // Store references to the subsystem and sensor.
         this.motorSubsystem = motorSubsystem;
         this.tofSensor = tofSensor;
 
+        // Declare subsystem dependencies for the scheduler.
         addRequirements(motorSubsystem);
     }
 
-    // Called when the command is initially scheduled.
+    // Stop motor when starting
     @Override
     public void initialize() {
+        // Ensure motor is stopped on start.
         this.motorSubsystem.stop();
     }
 
-    // Called every time the scheduler runs while the command is scheduled.
+    // Each loop: read inches, compute speed, set motor
     @Override
     public void execute() {
         SmartDashboard.putNumber("ToF Range", this.tofSensor.getRangeInches());
         double speed = Math.max(Math.min(1 - this.tofSensor.getRangeInches() / 7, 1), 0);
-        this.motorSubsystem.setSpeed(speed * (3.0/4.0));
+        this.motorSubsystem.setSpeed(speed * (3.0 / 4.0));
     }
 
-    // Called once the command ends or is interrupted.
+    // Stop motor when ending
     @Override
     public void end(boolean interrupted) {
         this.motorSubsystem.stop();
     }
 
-    // Returns true when the command should end.
+    // Never finishes on its own
     @Override
     public boolean isFinished() {
         return false;
