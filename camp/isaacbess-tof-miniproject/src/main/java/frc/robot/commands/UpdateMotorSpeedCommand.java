@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.common.ToFSensor;
 import frc.robot.subsystems.NeoSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
@@ -36,8 +37,9 @@ public class UpdateMotorSpeedCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double speed = Math.max(Math.min(1 - this.tofSensor.getRangeInches() / 5, 1), 0);
-        this.motorSubsystem.setSpeed(speed);
+        SmartDashboard.putNumber("ToF Range", this.tofSensor.getRangeInches());
+        double speed = Math.max(Math.min(1 - this.tofSensor.getRangeInches() / 7, 1), 0);
+        this.motorSubsystem.setSpeed(speed * (3.0/4.0));
     }
 
     // Called once the command ends or is interrupted.
