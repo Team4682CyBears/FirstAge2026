@@ -1,3 +1,12 @@
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - First Age - 2026
+// File: ToFSensor.java
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
+
 package frc.robot.common;
 
 import com.playingwithfusion.TimeOfFlight;
@@ -7,8 +16,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 
 /**
- * Forms a class for the TofSubsystem that detects when an object is present
- * within the detection threshold.
+ * Simple wrapper for a Time-of-Flight (ToF) sensor.
  */
 public class ToFSensor {
 
@@ -19,15 +27,11 @@ public class ToFSensor {
     private String displayName;
 
     /**
-     * Constructor for ToFSensor class.
-     * Initializes a Time of Flight sensor with specified CAN ID and detection
-     * threshold.
-     * Sets the sensor to short ranging mode with 20ms sample time to match robot
-     * update rate.
-     * 
-     * @param canId                    The CAN ID of the Time of Flight sensor
-     * @param detectionThresholdInches The threshold distance (in inches) for object
-     *                                 detection
+     * Construct a ToFSensor.
+     *
+     * @param canId                           CAN ID for the sensor
+     * @param maximumDetectionThresholdInches maximum detection distance in inches
+     * @param minimumDetectionThresholdInches minimum detection distance in inches
      */
     public ToFSensor(int canId, double maximumDetectionThresholdInches, double minimumDetectionThresholdInches) {
         tofSensor = new TimeOfFlight(canId);
@@ -42,33 +46,33 @@ public class ToFSensor {
     }
 
     /**
-     * A method to flash the sensor
+     * Flash the sensor LED to identify it.
      */
     public void blinkSensor() {
         tofSensor.identifySensor();
     }
 
     /**
-     * A method to return the display name
-     * 
-     * @return - the display name
+     * Get a short display name for the sensor.
+     *
+     * @return display name string
      */
     public String getDisplayName() {
         return displayName;
     }
 
     /**
-     * A method to get the sensor range in inches
-     * 
-     * @return - the current range in inches
+     * Get the current measured range in inches.
+     *
+     * @return range in inches
      */
     public double getRangeInches() {
         return Units.metersToInches(tofSensor.getRange() / 1000);
     }
 
     /**
-     * A method to return the standard deviation of the measurement
-     * 
+     * Get the range measurement standard deviation (mm).
+     *
      * @return standard deviation in millimeters
      */
     public final double getRangeSigma() {
@@ -76,9 +80,9 @@ public class ToFSensor {
     }
 
     /**
-     * A method to detect the presence of an object
-     * 
-     * @return true if an object is detected
+     * Check if an object is detected within thresholds.
+     *
+     * @return true if detected
      */
     public boolean isDetected() {
         if (this.isRangeValid()) {
@@ -92,9 +96,9 @@ public class ToFSensor {
     }
 
     /**
-     * A method to return the sensor status
-     * 
-     * @return true if the sensor correctly measured the distance
+     * Check whether the current range reading is valid.
+     *
+     * @return true if the sensor reports a valid range
      */
     public boolean isRangeValid() {
         return tofSensor.isRangeValid();
