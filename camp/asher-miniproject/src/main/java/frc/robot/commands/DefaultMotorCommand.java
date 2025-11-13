@@ -30,12 +30,13 @@ public class DefaultMotorCommand extends Command {
   @Override
   public void execute() {
     double encoderValue = encoderSupplier.getAsDouble();
+    System.out.println(encoderValue);
 
     if (Math.abs(encoderValue - targetAngle) > encoderDeadband) {
       if (encoderValue < targetAngle) {
-        motorSubsystem.setMotorSpeed(0.5); // Move forward
+        motorSubsystem.setMotorSpeed(0.1); // Move forward
       } else {
-        motorSubsystem.setMotorSpeed(-0.5); // Move backward
+        motorSubsystem.setMotorSpeed(-0.1); // Move backward
       }
     } else {
       motorSubsystem.setMotorSpeed(0.0); // Stop motor

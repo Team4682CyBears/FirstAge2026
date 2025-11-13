@@ -46,7 +46,7 @@ public class MotorSubsystem extends SubsystemBase{
      * Get the current position of the endodger in degrees.
      */
     public double getEndodgerPositionDegrees(){
-        return motorEncoder.getPosition().getValueAsDouble()*360;
+        return wrapDegrees(motorEncoder.getPosition().getValueAsDouble()*360);
     }
 
     public static double clamp(double value, double min, double max) {
@@ -61,6 +61,7 @@ public class MotorSubsystem extends SubsystemBase{
         // Config CanCoder
         CANcoderConfiguration encoderConfigs = new CANcoderConfiguration();
         encoderConfigs.MagnetSensor.MagnetOffset = degreesToRotations(Constants.encoderAbsoluteOffsetDegrees);
+        encoderConfigs.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
         encoderConfigs.MagnetSensor.SensorDirection = Constants.shooterAngleSensorDirection;
         // apply configs
         StatusCode response = motorEncoder.getConfigurator().apply(encoderConfigs);
@@ -95,5 +96,9 @@ public class MotorSubsystem extends SubsystemBase{
     private double degreesToRotations(double degrees)
     {
       return degrees/360;
+    }
+
+    private double wrapDegrees(double degrees){
+        return (degrees % 360 + 540) % 360 - 180;
     }
 }

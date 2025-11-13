@@ -59,7 +59,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     motorSubsystem.setDefaultCommand(
-      new DefaultMotorCommand(motorSubsystem));
+      new DefaultMotorCommand(motorSubsystem, 90));
   }
 
   /**
