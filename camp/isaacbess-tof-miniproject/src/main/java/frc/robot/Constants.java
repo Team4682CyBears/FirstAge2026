@@ -1,14 +1,15 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - First Age - 2026
+// File: Constants.java
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
 
 package frc.robot;
 
 public final class Constants {
-    public static class OperatorConstants {
-        public static final int kDriverControllerPort = 0;
-    }
-
     public static final int kNeoMotorPort = 23;
     public static final int kToFSensorPort = 20;
 }

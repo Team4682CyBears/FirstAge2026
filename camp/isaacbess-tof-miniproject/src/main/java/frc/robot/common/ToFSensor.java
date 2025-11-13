@@ -20,11 +20,11 @@ import edu.wpi.first.wpilibj.DataLogManager;
  */
 public class ToFSensor {
 
+    private int canId;
     private double maximumDetectionThresholdInches;
     private double minimumDetectionThresholdInches;
-    private TimeOfFlight tofSensor;
-    private int canId;
     private String displayName;
+    private TimeOfFlight tofSensor;
 
     /**
      * Construct a ToFSensor.
@@ -34,11 +34,11 @@ public class ToFSensor {
      * @param minimumDetectionThresholdInches minimum detection distance in inches
      */
     public ToFSensor(int canId, double maximumDetectionThresholdInches, double minimumDetectionThresholdInches) {
-        tofSensor = new TimeOfFlight(canId);
+        this.canId = canId;
         this.maximumDetectionThresholdInches = maximumDetectionThresholdInches;
         this.minimumDetectionThresholdInches = minimumDetectionThresholdInches;
-        this.canId = canId;
         this.displayName = "TOF ID " + this.canId;
+        tofSensor = new TimeOfFlight(canId);
         // short mode is accurate to 1.3m
         // 20ms sample time matches robot update rate
         tofSensor.setRangingMode(RangingMode.Short, 20);
@@ -67,7 +67,7 @@ public class ToFSensor {
      * @return range in inches
      */
     public double getRangeInches() {
-        return Units.metersToInches(tofSensor.getRange() / 1000);
+        return Units.metersToInches(tofSensor.getRange() / 1000.0);
     }
 
     /**
@@ -75,7 +75,7 @@ public class ToFSensor {
      *
      * @return standard deviation in millimeters
      */
-    public final double getRangeSigma() {
+    public double getRangeSigma() {
         return tofSensor.getRangeSigma();
     }
 

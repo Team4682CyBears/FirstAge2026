@@ -2,7 +2,7 @@
 // Bishop Blanchet Robotics
 // Home of the Cybears
 // FRC - First Age - 2026
-// File: UpdateMotorSpeedCommand.java
+// File: DefaultUpdateMotorSpeedCommand.java
 // ************************************************************
 
 // ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
@@ -11,7 +11,7 @@ package frc.robot.commands;
 
 import frc.robot.common.ToFSensor;
 import frc.robot.subsystems.NeoSubsystem;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
@@ -20,9 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * The computed speed is clamped between 0 and 1 and scaled before being applied
  * to the motor subsystem.
  */
-public class UpdateMotorSpeedCommand extends Command {
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-
+public class DefaultUpdateMotorSpeedCommand extends Command {
     /**
      * Motor subsystem controlled by this command.
      */
@@ -39,7 +37,7 @@ public class UpdateMotorSpeedCommand extends Command {
      * @param motorSubsystem the subsystem that controls the motor
      * @param tofSensor      the ToF sensor providing range in inches
      */
-    public UpdateMotorSpeedCommand(NeoSubsystem motorSubsystem, ToFSensor tofSensor) {
+    public DefaultUpdateMotorSpeedCommand(NeoSubsystem motorSubsystem, ToFSensor tofSensor) {
         // Store references to the subsystem and sensor.
         this.motorSubsystem = motorSubsystem;
         this.tofSensor = tofSensor;
@@ -54,9 +52,22 @@ public class UpdateMotorSpeedCommand extends Command {
      */
     @Override
     public void execute() {
-        SmartDashboard.putNumber("ToF Range", this.tofSensor.getRangeInches());
-        double speed = Math.max(Math.min(1 - this.tofSensor.getRangeInches() / 7, 1), 0);
-        this.motorSubsystem.setSpeed(speed * (3.0 / 4.0));
+        // If the range is not valid then set the speed to 0
+        if (tofSensor.isRangeValid()) {
+            double maxDetectionRange = 7.0;
+            // Maximum detection range is 7 inches for my program (i randomly chose this
+            // number), this code right here is making it so that when an object is closer,
+            // its faster.
+            // 0 inches is when the speed is the fastest, 7 inches or higher is when it is
+            // the slowest. This is why the clamping is needed
+            double speed = MathUtil.clamp(1 - tofSensor.getRangeInches() / maxDetectionRange, 0, 1);
+            // 3/4 is used to scale the speed down to between [0, 0.75] because 1 was way
+            // too fast for the test board (this was also randomly chosen after trial and
+            // error)
+            motorSubsystem.setSpeed(speed * (3.0 / 4.0));
+        } else {
+            motorSubsystem.setSpeed(0.0);
+        }
     }
 
     /**
@@ -66,7 +77,7 @@ public class UpdateMotorSpeedCommand extends Command {
      */
     @Override
     public void end(boolean interrupted) {
-        this.motorSubsystem.stop();
+        motorSubsystem.stop();
     }
 
     /**
@@ -76,7 +87,7 @@ public class UpdateMotorSpeedCommand extends Command {
     @Override
     public void initialize() {
         // Ensure motor is stopped on start.
-        this.motorSubsystem.stop();
+        motorSubsystem.stop();
     }
 
     /**

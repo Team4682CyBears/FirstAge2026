@@ -16,6 +16,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -32,7 +33,7 @@ public class NeoSubsystem extends SubsystemBase {
      * @param canID the CAN ID of the Neo motor controller
      */
     public NeoSubsystem(int canID) {
-        this.neoMotor = new SparkMax(canID, MotorType.kBrushless);
+        neoMotor = new SparkMax(canID, MotorType.kBrushless);
 
         neoMotor.set(0.0);
 
@@ -50,7 +51,7 @@ public class NeoSubsystem extends SubsystemBase {
      * @param speed motor output in range [-1.0, 1.0]
      */
     public void setSpeed(double speed) {
-        neoMotor.set(speed);
+        neoMotor.set(MathUtil.clamp(speed, -1, 1));
     }
 
     // Stop the motor

@@ -1,16 +1,17 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - First Age - 2026
+// File: RobotContainer.java
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.UpdateMotorSpeedCommand;
+import frc.robot.commands.DefaultUpdateMotorSpeedCommand;
 import frc.robot.common.ToFSensor;
 import frc.robot.subsystems.NeoSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -23,16 +24,15 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
-    private final NeoSubsystem m_neoSubsystem = new NeoSubsystem(Constants.kNeoMotorPort);
+    private final NeoSubsystem neoSubsystem = new NeoSubsystem(Constants.kNeoMotorPort);
 
-    private final ToFSensor toFSensor;
+    private final ToFSensor toFSensor = new ToFSensor(Constants.kToFSensorPort, 5.0, 0);
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
-        this.toFSensor = new ToFSensor(Constants.kToFSensorPort, 5.0, 0);
-        m_neoSubsystem.setDefaultCommand(new UpdateMotorSpeedCommand(this.m_neoSubsystem, this.toFSensor));
+        neoSubsystem.setDefaultCommand(new DefaultUpdateMotorSpeedCommand(this.neoSubsystem, this.toFSensor));
     }
 
 }
