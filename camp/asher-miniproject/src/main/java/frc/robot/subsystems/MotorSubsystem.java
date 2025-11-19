@@ -16,14 +16,32 @@ import static java.lang.Math.min;
 
 import frc.robot.Constants;
 
+/**
+ * The MotorSubsystem is responsible for controlling a motor and its associated encoder.
+ * It provides methods to set motor speed, retrieve the position of the encoder, and configure
+ * the motor and encoder settings.
+ *
+ * <p>This subsystem uses a TalonFX motor controller and a CANcoder encoder. The motor speed
+ * is clamped to a range of -1 to 1, and the encoder position is returned in degrees.
+ *
+ * <p>Key features:
+ * - Configures motor settings such as neutral mode, voltage limits, and current limits.
+ * - Configures encoder settings such as magnet offset and sensor direction.
+ * - Provides utility methods for clamping values and wrapping degrees.
+ */
 public class MotorSubsystem extends SubsystemBase{
-    //I stole magic numbers from ted
     private final TalonFX motor;
         private final DutyCycleOut eeDutyCycle = new DutyCycleOut(0.0);
 
     private final CANcoder motorEncoder;
 
 
+    /**
+     * Constructs a MotorSubsystem with a motor and an encoder.
+     *
+     * @param motorCan The CAN ID of the motor controller (TalonFX).
+     * @param encoderCan The CAN ID of the encoder (CANcoder).
+     */
     public MotorSubsystem(int motorCan, int encoderCan){
         this.motor = new TalonFX(motorCan);
         configureMotor();
@@ -32,6 +50,11 @@ public class MotorSubsystem extends SubsystemBase{
         configureAngleEncoder();
     }
 
+    /**
+     * Sets the speed of the motor within the allowed range of -1 to 1.
+     *
+     * @param motorSpeed The desired speed of the motor. Values are clamped between -1 (full reverse) and 1 (full forward).
+     */
     public void setMotorSpeed(double motorSpeed){
         eeDutyCycle.withOutput(clamp(motorSpeed, -1, 1));
         motor.setControl(eeDutyCycle);
@@ -42,13 +65,33 @@ public class MotorSubsystem extends SubsystemBase{
         // This method will be called once per scheduler run
     }
 
+
     /**
-     * Get the current position of the endodger in degrees.
+     * Retrieves the position of the endodger in degrees.
+     * <p>
+     * This method calculates the position of the endodger by converting the
+     * encoder's position value (in rotations) to degrees and wrapping it
+     * within a valid range of degrees (e.g., 0 to 360).
+     * </p>
+     *
+     * @return The position of the endodger in degrees, wrapped within a valid range.
      */
     public double getEndodgerPositionDegrees(){
         return wrapDegrees(motorEncoder.getPosition().getValueAsDouble()*360);
     }
 
+    /**
+     * Clamps a given value within the specified range [min, max].
+     * If the value is less than the minimum, the minimum is returned.
+     * If the value is greater than the maximum, the maximum is returned.
+     * Otherwise, the value itself is returned.
+     *
+     * @param value The value to be clamped.
+     * @param min   The minimum allowable value.
+     * @param max   The maximum allowable value.
+     * @return The clamped value within the range [min, max].
+     * @throws IllegalArgumentException if the minimum value is greater than the maximum value.
+     */
     public static double clamp(double value, double min, double max) {
         if (min > max) {
             throw new IllegalArgumentException("min must not be greater than max");
@@ -61,7 +104,7 @@ public class MotorSubsystem extends SubsystemBase{
         // Config CanCoder
         CANcoderConfiguration encoderConfigs = new CANcoderConfiguration();
         encoderConfigs.MagnetSensor.MagnetOffset = degreesToRotations(Constants.encoderAbsoluteOffsetDegrees);
-        encoderConfigs.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
+        encoderConfigs.MagnetSensor.AbsoluteSensorDiscontinuityPoint = Constants.absoluteSensorDiscontinuityPoint;
         encoderConfigs.MagnetSensor.SensorDirection = Constants.shooterAngleSensorDirection;
         // apply configs
         StatusCode response = motorEncoder.getConfigurator().apply(encoderConfigs);

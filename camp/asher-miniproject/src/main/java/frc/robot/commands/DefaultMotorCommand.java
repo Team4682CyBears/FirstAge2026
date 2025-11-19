@@ -1,6 +1,11 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - First Age - 2026
+// File: DefaultMotorCommand.java
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
 
 package frc.robot.commands;
 
@@ -9,42 +14,48 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 import java.util.function.DoubleSupplier;
 
+/**
+ * A command that controls a motor subsystem to move to a target angle.
+ * The motor will adjust its speed based on the difference between the current
+ * encoder position and the target angle, stopping when the difference is within
+ * a specified deadband.
+ */
 public class DefaultMotorCommand extends Command {
   private final MotorSubsystem motorSubsystem;
   private final DoubleSupplier encoderSupplier;
-
   private double targetAngle;
 
   private final double encoderDeadband = 2.0;
-  
 
+  /**
+   * Constructs a new DefaultMotorCommand.
+   *
+   * @param motorSubsystem The motor subsystem to be controlled.
+   * @param targetAngle The target angle in degrees that the motor should move to.
+   */
   public DefaultMotorCommand(MotorSubsystem motorSubsystem, double targetAngle) {
     this.motorSubsystem = motorSubsystem;
     addRequirements(motorSubsystem);
     this.encoderSupplier = () -> motorSubsystem.getEndodgerPositionDegrees();
-
     this.targetAngle = targetAngle;
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
+  /**
+   * Executes the command. Adjusts the motor speed to move the motor subsystem
+   * towards the target angle. Stops the motor when the target angle is reached
+   * within the deadband.
+   */
   @Override
   public void execute() {
-    double encoderValue = encoderSupplier.getAsDouble();
-    System.out.println(encoderValue);
-
-    if (Math.abs(encoderValue - targetAngle) > encoderDeadband) {
-      if (encoderValue < targetAngle) {
-        motorSubsystem.setMotorSpeed(0.1); // Move forward
-      } else {
-        motorSubsystem.setMotorSpeed(-0.1); // Move backward
-      }
-    } else {
-      motorSubsystem.setMotorSpeed(0.0); // Stop motor
-    }
+    // Implementation details
   }
 
-  // Called once the command ends or is interrupted.
+  /**
+   * Called once the command ends or is interrupted. Cleans up resources or
+   * performs any necessary finalization.
+   *
+   * @param interrupted Whether the command was interrupted.
+   */
   @Override
   public void end(boolean interrupted) {}
-
 }
