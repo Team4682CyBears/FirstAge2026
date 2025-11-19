@@ -32,13 +32,13 @@ public class DefaultUpdateMotorSpeedCommand extends Command {
     private final ToFSensor tofSensor;
 
     /**
-     * Maximum range in inches that the motor will run
+     * Maximum range in inches that the motor will run. (this was randomly chosen after trial and error)
      */
 
     private static final double maxDetectionRange = 7.0;
 
     /**
-     * Maximum range in inches that the motor will run
+     * Multiplies the speed by this before sending it to the motor. (this was randomly chosen after trial and error)
      */
 
     private static final double speedDeratingFactor = 0.75;
@@ -66,15 +66,11 @@ public class DefaultUpdateMotorSpeedCommand extends Command {
     public void execute() {
         // If the range is not valid then set the speed to 0
         if (tofSensor.isRangeValid()) {
-            // Maximum detection range is 7 inches for my program (i randomly chose this
-            // number), this code right here is making it so that when an object is closer,
-            // its faster.
-            // 0 inches is when the speed is the fastest, 7 inches or higher is when it is
+            // 0 inches is when the speed is the fastest, `maxDetectionRange` inches or higher is when it is
             // the slowest. This is why the clamping is needed
             double speed = MathUtil.clamp(1 - tofSensor.getRangeInches() / maxDetectionRange, 0, 1);
-            // 3/4 is used to scale the speed down to between [0, 0.75] because 1 was way
-            // too fast for the test board (this was also randomly chosen after trial and
-            // error)
+            // `speedDeratingFactor` is used to scale the speed down because 1 was way
+            // too fast for the test board
             motorSubsystem.setSpeed(speed * speedDeratingFactor);
         } else {
             motorSubsystem.setSpeed(0.0);
