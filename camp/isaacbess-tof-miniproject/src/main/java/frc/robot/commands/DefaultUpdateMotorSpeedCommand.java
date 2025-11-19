@@ -35,13 +35,13 @@ public class DefaultUpdateMotorSpeedCommand extends Command {
      * Maximum range in inches that the motor will run
      */
 
-    double maxDetectionRange = 7.0;
+    private static final double maxDetectionRange = 7.0;
 
     /**
      * Maximum range in inches that the motor will run
      */
 
-    double speedDeratingFactor = 0.75;
+    private static final double speedDeratingFactor = 0.75;
 
     /**
      * Create a new UpdateMotorSpeedCommand.
