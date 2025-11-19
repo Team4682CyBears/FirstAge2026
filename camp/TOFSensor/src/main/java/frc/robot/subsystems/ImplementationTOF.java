@@ -1,10 +1,10 @@
-package frc.theRobot.subsystems;
+package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.theRobot.common.TofSensor;
-import frc.theRobot.Constants;
+import frc.robot.Constants;
+import frc.robot.common.TofSensor;
 
 public class ImplementationTOF extends SubsystemBase {
-    private TofSensor reefCoralSensor = null;
+    private TofSensor tofSensor = null;
     private Spinner spinner  = null;
     private double speed = 0;
 
@@ -19,7 +19,7 @@ public class ImplementationTOF extends SubsystemBase {
             this.tofSensor.publishTelemetery();
         }
         if(this.tofSensor != null && this.spinner != null){
-            speed = (16.0 - tofSensor.getRangeInches) * 4;
+            speed = (16.0 - tofSensor.getRangeInches()) *4;
             spinner.spin(speed);
         }
     }

@@ -1,33 +1,44 @@
-package frc.theRobot.subsystems;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.theRobot.common.TofSensor;
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
-public class ImplementationTOF extends SubsystemBase{
-    private TofSensor reefCoralSensor;
-    private TofSensor reefCoralSensor2;
+package frc.robot;
 
-    public ImplementationTOF(int CANId, int CANId2){
-        this.reefCoralSensor = new TofSensor(CANId);
-        this.reefCoralSensor2 = new TofSensor(CANId2);
-        System.out.print("Implemenetation tof attempted to configure!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    }
+import frc.robot.subsystems.ImplementationTOF;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.commands.RunExperimentCommand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.Spinner;
 
-    public boolean isCoralDetected(){
-        return reefCoralSensor.isCoralDetected();
-    }
 
-    public boolean isCoralDetected2(){
-        return reefCoralSensor2.isCoralDetected();
-    }
 
-    @Override
-    public void periodic() {
-        if(this.reefCoralSensor != null){
-            this.reefCoralSensor.publishTelemetery();
-        }
-        if(this.reefCoralSensor2 != null){
-            this.reefCoralSensor2.publishTelemetery();
-        }
-    }
+/**
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * subsystems, commands, and trigger mappings) should be declared here.
+ */
+public class RobotContainer {
+  // The robot's subsystems and commands are defined here...
+  private final Spinner spinnerMotor = new Spinner();
+  ImplementationTOF tof = new ImplementationTOF(Constants.reefTofSensorCanID);
 
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  public RobotContainer() {
+    /*double motorSpeed = 140; //rpm
+    SmartDashboard.putData( "Run Experiment Command",
+        new runMiniprojCommand(motorSpeed, spinnerMotor, tof, 20)
+     );*/
+  }
+
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    // An example command will be run in autonomous
+    return new InstantCommand();
+  }
 }

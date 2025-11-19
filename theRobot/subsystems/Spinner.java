@@ -42,7 +42,7 @@ public class Spinner extends SubsystemBase {
 
     public void motorStop(){
         //stop voltage
-        speedRpm = 0;
+        this.speedRpm = 0;
         motorTalon.setControl(this.motorTalonVoltageController.withOutput(0));
         System.out.println("Motor stopped");
     }
