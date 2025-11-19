@@ -32,6 +32,18 @@ public class DefaultUpdateMotorSpeedCommand extends Command {
     private final ToFSensor tofSensor;
 
     /**
+     * Maximum range in inches that the motor will run
+     */
+
+    double maxDetectionRange = 7.0;
+
+    /**
+     * Maximum range in inches that the motor will run
+     */
+
+    double speedDeratingFactor = 0.75;
+
+    /**
      * Create a new UpdateMotorSpeedCommand.
      *
      * @param motorSubsystem the subsystem that controls the motor
@@ -54,7 +66,6 @@ public class DefaultUpdateMotorSpeedCommand extends Command {
     public void execute() {
         // If the range is not valid then set the speed to 0
         if (tofSensor.isRangeValid()) {
-            double maxDetectionRange = 7.0;
             // Maximum detection range is 7 inches for my program (i randomly chose this
             // number), this code right here is making it so that when an object is closer,
             // its faster.
@@ -64,7 +75,7 @@ public class DefaultUpdateMotorSpeedCommand extends Command {
             // 3/4 is used to scale the speed down to between [0, 0.75] because 1 was way
             // too fast for the test board (this was also randomly chosen after trial and
             // error)
-            motorSubsystem.setSpeed(speed * (3.0 / 4.0));
+            motorSubsystem.setSpeed(speed * speedDeratingFactor);
         } else {
             motorSubsystem.setSpeed(0.0);
         }
