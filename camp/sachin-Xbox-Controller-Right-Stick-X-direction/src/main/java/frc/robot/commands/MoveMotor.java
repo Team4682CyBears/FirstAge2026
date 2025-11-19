@@ -7,9 +7,6 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.MotorSubsystem;
-
-import java.nio.charset.MalformedInputException;
-
 import edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX;
 import edu.wpi.first.wpilibj.motorcontrol.PWMTalonSRX;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -54,5 +51,8 @@ public class MoveMotor extends Command {
   public void end(boolean interrupted) {
     m_subsystem.setMotorSpeed(0);
   }
-
+  @Override
+  public boolean isFinished(){
+    return false;
+  }
 }

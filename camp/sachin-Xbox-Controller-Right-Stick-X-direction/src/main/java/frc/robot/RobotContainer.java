@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final MotorSubsystem m_MotorSubsystem = new MotorSubsystem();
+  private final CommandXboxController m_controller = new CommandXboxController(OperatorConstants.kDriverControllerPort); 
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
@@ -30,6 +31,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+    m_MotorSubsystem.setDefaultCommand(new MoveMotor(m_MotorSubsystem, m_controller));
   }
   
   /**
@@ -42,14 +44,7 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `MoveMotor` when `exampleCondition` changes to `true`
-    new Trigger(m_MotorSubsystem::exampleCondition)
-    .onTrue(new MoveMotor(m_MotorSubsystem, m_driverController));
-
-
-
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
+    // Schedule `MoveMotor` as default command
     m_driverController.b().whileTrue(m_MotorSubsystem.exampleMethodCommand());
   }
 
