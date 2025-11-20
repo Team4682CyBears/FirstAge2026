@@ -4,13 +4,14 @@
 
 package frc.robot.subsystems;
 
+import frc.robot.Constants.OperatorConstants;
 import edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class MotorSubsystem extends SubsystemBase {
 
-  private final PWMTalonFX m_motor = new PWMTalonFX(0); // Port 0
+  private final PWMTalonFX m_motor = new PWMTalonFX(OperatorConstants.talonFXCANID);
 
   public MotorSubsystem() {}
 

@@ -15,6 +15,9 @@ package frc.robot;
 public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
-    
+    public static final int talonFXCANID = 4;
+    public static final int talonSRXCANRIO = 15;
+    public static final int CanCoder = 2;
+    public static final int PDP = 2;
   }
 }
