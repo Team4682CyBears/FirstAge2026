@@ -21,11 +21,11 @@ import java.util.function.DoubleSupplier;
  * a specified deadband.
  */
 public class DefaultMotorCommand extends Command {
-  private final MotorSubsystem motorSubsystem;
-  private final DoubleSupplier encoderSupplier;
+  private MotorSubsystem motorSubsystem;
+  private DoubleSupplier encoderSupplier;
   private double targetAngle;
 
-  private final double encoderDeadband = 2.0;
+  private final double encoderDeadbandDegrees = 2.0;
 
   /**
    * Constructs a new DefaultMotorCommand.
@@ -47,7 +47,15 @@ public class DefaultMotorCommand extends Command {
    */
   @Override
   public void execute() {
-    // Implementation details
+    double currentAngle = encoderSupplier.getAsDouble();
+    double angleDifference = targetAngle - currentAngle;
+
+    if (Math.abs(angleDifference) <= encoderDeadbandDegrees) {
+      motorSubsystem.setMotorSpeed(0);
+    } else {
+      double motorSpeed = angleDifference > 0 ? 0.5 : -0.5;
+      motorSubsystem.setMotorSpeed(motorSpeed);
+    }
   }
 
   /**
@@ -57,5 +65,7 @@ public class DefaultMotorCommand extends Command {
    * @param interrupted Whether the command was interrupted.
    */
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    motorSubsystem.setMotorSpeed(motorSpeed);
+  }
 }
