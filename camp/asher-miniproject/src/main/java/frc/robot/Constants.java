@@ -28,7 +28,6 @@ public final class Constants {
   public static final double motorSupplyVoltageTimeConstant = Constants.ctreSupplyVoltageTimeConstant;
   public static final double ctreSupplyCurrentMaximumAmps = 50.0;
   public static final double ctreSupplyVoltageTimeConstant = 0.02;
-  public static final double joystickDeadband = 0.1;
 
   public static final double falconMaxVoltage = 12.0;
   public static final double motorStatorCurrentMaximumAmps = 100.0;
@@ -36,8 +35,4 @@ public final class Constants {
   public static final SensorDirectionValue shooterAngleSensorDirection = SensorDirectionValue.CounterClockwise_Positive;
   public static final double encoderAbsoluteOffsetDegrees = 0;
   public static final double absoluteSensorDiscontinuityPoint = 0.5;
-
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
-  }
 }
