@@ -23,10 +23,6 @@ public class RobotContainer {
   private final MotorSubsystem m_MotorSubsystem = new MotorSubsystem();
   private final CommandXboxController m_controller = new CommandXboxController(OperatorConstants.kDriverControllerPort); 
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
@@ -45,7 +41,7 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `MoveMotor` as default command
-    m_driverController.b().whileTrue(m_MotorSubsystem.exampleMethodCommand());
+    m_controller.b().whileTrue(m_MotorSubsystem.exampleMethodCommand());
   }
 
   /**
