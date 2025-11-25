@@ -1,4 +1,10 @@
-
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - FirstAge - 2026
+// File: RobotContainer.java
+// Intent: Defines the structure of the robot
+// ************************************************************
 
 package frc.robot;
 

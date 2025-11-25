@@ -1,6 +1,13 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - FirstAge - 2026
+// File: Constants.java
+// Intent: Forms key constants required for this robot
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
+
 
 package frc.robot;
 
@@ -28,6 +35,7 @@ public final class Constants {
 
   public static final SensorDirectionValue shooterAngleSensorDirection = SensorDirectionValue.CounterClockwise_Positive;
   public static final double encoderAbsoluteOffsetDegrees = 0;
+  public static final double absoluteSensorDiscontinuityPoint = 0.5;
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
