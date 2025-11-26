@@ -45,6 +45,7 @@ public class MoveMotorCommand extends Command {
   @Override
   public void execute() {
     m_subsystem.setMotorSpeed(joystickInput.getAsDouble()); //check this
+    System.out.println("!!!!!! SETTINGS SPEED !!!!!!!!");
   }
   
 

@@ -5,15 +5,20 @@
 package frc.robot.subsystems;
 
 import frc.robot.Constants.OperatorConstants;
-import edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class MotorSubsystem extends SubsystemBase {
 
-  private final PWMTalonFX m_motor = new PWMTalonFX(OperatorConstants.talonFXCANID);
+  private final TalonFX m_motor = new TalonFX(OperatorConstants.talonFXCANID);
 
-  public MotorSubsystem() {}
+  public MotorSubsystem() {
+    //configure motor
+    m_motor.setNeutralMode(NeutralModeValue.Brake);
+    m_motor.setInverted(false);
+  }
 
   public void setMotorSpeed(double speed){
     if (speed == 0){
