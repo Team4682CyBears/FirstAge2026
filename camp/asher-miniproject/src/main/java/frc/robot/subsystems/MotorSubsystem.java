@@ -19,7 +19,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.MathUtil.clamp;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -128,6 +127,14 @@ public class MotorSubsystem extends SubsystemBase{
             System.out.println(
                     "TalonFX ID " + motor.getDeviceID() + " failed config with error " + response.toString());
         }
+    }
+
+    public static double clamp(double value, double min, double max) {
+        if (min > max) {
+            return max(max, min(value, min));
+        }
+
+        return max(min, min(value, max));
     }
 
     private double degreesToRotations(double degrees)
