@@ -54,17 +54,6 @@ public class TofSensor {
     public double getRangeInches(){
         return Units.metersToInches(tofSensor.getRange()/1000);   
     }
-/**
- * returns weather or not the tof sensor has an object which it can detect
- * 
- */
-    public boolean isCoralDetected(){
-        double currentRangeInches = this.getRangeInches();
-        if(this.isRangeValid() && (currentRangeInches < noteDetectionThreshold)){
-            return true;
-        }
-        return false;
-    }
 
 /**
  * Returns true if an object is in range
@@ -79,7 +68,6 @@ public class TofSensor {
  */
     public void publishTelemetery(){
         SmartDashboard.putNumber(displayName + " Range Inches" , this.getRangeInches());
-        SmartDashboard.putBoolean(displayName + " Item Detected", this.isCoralDetected());
         SmartDashboard.putBoolean(displayName + " Range Is Valid", this.isRangeValid());
         SmartDashboard.putString(displayName + " TOF Status", this.tofSensor.getStatus().toString());
         //System.out.println("TOF telemtry published!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");

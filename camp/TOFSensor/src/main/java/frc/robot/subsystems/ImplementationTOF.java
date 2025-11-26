@@ -20,6 +20,10 @@ public class ImplementationTOF extends SubsystemBase {
     private TofSensor tofSensor;
     private Spinner spinner;
     private double speed = 0;
+    // when the distance is 16 inches, the motor is slowest
+    private double maxDistance = 16.0;
+    // reduce max speed for the test board
+    private double speedDeratingFactor = 0.75;
 
     /**
      * The constructor for ImplementationTOF it has no parameters 
@@ -44,11 +48,11 @@ public class ImplementationTOF extends SubsystemBase {
             this.spinner.publishTelemetery();
         }
         if(this.tofSensor != null && this.spinner != null && tofSensor.isRangeValid()){
-            speed = (16.0 - tofSensor.getRangeInches());
+            speed = (maxDistance - tofSensor.getRangeInches())/maxDistance;
             if(speed < 0){
                 speed = 0;
             }
-            spinner.spin(speed);
+            spinner.spin(speed * speedDeratingFactor);
         }else{
             spinner.spin(0);
         }
