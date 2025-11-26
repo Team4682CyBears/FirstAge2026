@@ -31,14 +31,6 @@ import frc.robot.Constants;
  * The MotorSubsystem is responsible for controlling a motor and its associated encoder.
  * It provides methods to set motor speed, retrieve the position of the encoder, and configure
  * the motor and encoder settings.
- *
- * <p>This subsystem uses a TalonFX motor controller and a CANcoder encoder. The motor speed
- * is clamped to a range of -1 to 1, and the encoder position is returned in degrees.
- *
- * <p>Key features:
- * - Configures motor settings such as neutral mode, voltage limits, and current limits.
- * - Configures encoder settings such as magnet offset and sensor direction.
- * - Provides utility methods for clamping values and wrapping degrees.
  */
 public class MotorSubsystem extends SubsystemBase {
     private final TalonFX motor;
@@ -90,7 +82,6 @@ public class MotorSubsystem extends SubsystemBase {
             eeDutyCycle.withOutput(MathUtil.clamp(motorSpeed, -1, 1));
             motor.setControl(eeDutyCycle);
         }
-    }
 
     private void configureAngleEncoder() {
         // Config CanCoder
