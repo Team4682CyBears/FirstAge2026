@@ -6,7 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
-import frc.robot.commands.MoveMotor;
+import frc.robot.commands.MoveMotorCommand;
 import frc.robot.subsystems.MotorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -23,11 +23,13 @@ public class RobotContainer {
   private final MotorSubsystem m_MotorSubsystem = new MotorSubsystem();
   private final CommandXboxController m_controller = new CommandXboxController(OperatorConstants.kDriverControllerPort); 
 
+
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
-    m_MotorSubsystem.setDefaultCommand(new MoveMotor(m_MotorSubsystem, m_controller));
+    m_MotorSubsystem.setDefaultCommand(new MoveMotorCommand(m_MotorSubsystem, () -> m_controller.getRightX()));
   }
   
   /**

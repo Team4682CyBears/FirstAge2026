@@ -6,6 +6,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.MotorSubsystem;
 import edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX;
@@ -14,19 +16,19 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /** An example command that uses an example subsystem. */
-public class MoveMotor extends Command {
+public class MoveMotorCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final MotorSubsystem m_subsystem;
-  private final CommandXboxController m_controller;
+  private final DoubleSupplier joystickInput;
 
   /**
    * Creates a new MoveMotor.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public MoveMotor(MotorSubsystem subsystem, CommandXboxController controller) {
+  public MoveMotorCommand(MotorSubsystem subsystem, DoubleSupplier joystickInput) {
     m_subsystem = subsystem;
-    m_controller = controller;
+    this.joystickInput = joystickInput;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
   }
@@ -42,8 +44,7 @@ public class MoveMotor extends Command {
   
   @Override
   public void execute() {
-    double stickY = m_controller.getRightY();
-    m_subsystem.setMotorSpeed(stickY); //check this
+    m_subsystem.setMotorSpeed(joystickInput.getAsDouble()); //check this
   }
   
 

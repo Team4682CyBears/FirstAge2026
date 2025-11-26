@@ -16,8 +16,12 @@ public class MotorSubsystem extends SubsystemBase {
   public MotorSubsystem() {}
 
   public void setMotorSpeed(double speed){
-    speed = Math.max(-1.0, Math.min(1.0, speed));
-    m_motor.set(speed);
+    if (speed == 0){
+      m_motor.stopMotor();
+    } else {
+      speed = Math.max(-1.0, Math.min(1.0, speed));
+      m_motor.set(speed);
+    }
   }
   
   public Command exampleMethodCommand() {
