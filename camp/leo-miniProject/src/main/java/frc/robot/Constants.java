@@ -15,7 +15,15 @@ package frc.robot;
 public final class Constants {
   public static final int talonCanID = 5;
 
-  public double motorSpeed;
+  public static final double motorStatorCurrentMaximumAmps = 0;
+
+  public static final double motorSupplyCurrentMaximumAmps = 0;
+
+  public static double falconMaxVoltage;
+
+  public static double motorSupplyVoltageTimeConstant;
+
+  public static double motorSpeed;
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;

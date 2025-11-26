@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.StatusCode;
@@ -34,7 +36,31 @@ public class TalonMotorSubsystem extends SubsystemBase {
   public TalonMotorSubsystem(int canId ) {
 
     this.motor = new TalonFX(canId);
+    configureMotor();
+
   }
+
+
+  private void configureMotor() {
+    TalonFXConfiguration config = new TalonFXConfiguration();
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    config.Voltage.PeakForwardVoltage = Constants.falconMaxVoltage;
+    config.Voltage.PeakReverseVoltage = -Constants.falconMaxVoltage;
+    config.Voltage.SupplyVoltageTimeConstant = Constants.motorSupplyVoltageTimeConstant;
+
+    config.CurrentLimits.StatorCurrentLimit = Constants.motorStatorCurrentMaximumAmps;
+    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    StatusCode response = motor.getConfigurator().apply(config);
+    if (!response.isOK()) {
+        System.out.println("TalonFX ID " + motor.getDeviceID() + " failed config with error " + response.toString());
+    }
+}
 
   public void setMotorSpeed(double motorSpeed){
     if(motorSpeed == 0){
