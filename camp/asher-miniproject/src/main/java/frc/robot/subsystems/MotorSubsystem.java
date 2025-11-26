@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import edu.wpi.first.math.MathUtil.*;
+
 import frc.robot.Constants;
 
 /**
@@ -68,7 +70,7 @@ public class MotorSubsystem extends SubsystemBase{
         if(motorSpeed == 0){
             motor.stopMotor();
         } else {
-            eeDutyCycle.withOutput(clamp(motorSpeed, -1, 1));
+            eeDutyCycle.withOutput(MathUtil.clamp(motorSpeed, -1, 1));
             motor.setControl(eeDutyCycle);
         }
     }
@@ -129,20 +131,12 @@ public class MotorSubsystem extends SubsystemBase{
         }
     }
 
-    public static double clamp(double value, double min, double max) {
-        if (min > max) {
-            return max(max, min(value, min));
-        }
-
-        return max(min, min(value, max));
-    }
-
     private double degreesToRotations(double degrees)
     {
       return degrees/360;
     }
 
     private double wrapDegrees(double degrees){
-        return (degrees % 360 + 540) % 360 - 180;
+        return (degrees + 540) % 360 - 180;
     }
 }
