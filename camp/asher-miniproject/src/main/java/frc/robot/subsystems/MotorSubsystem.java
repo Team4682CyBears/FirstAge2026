@@ -40,12 +40,10 @@ import frc.robot.Constants;
  * - Configures encoder settings such as magnet offset and sensor direction.
  * - Provides utility methods for clamping values and wrapping degrees.
  */
-public class MotorSubsystem extends SubsystemBase{
+public class MotorSubsystem extends SubsystemBase {
     private final TalonFX motor;
     private final DutyCycleOut eeDutyCycle = new DutyCycleOut(0.0);
-
     private final CANcoder motorEncoder;
-
 
     /**
      * Constructs a MotorSubsystem with a motor and an encoder.
@@ -53,33 +51,13 @@ public class MotorSubsystem extends SubsystemBase{
      * @param motorCan The CAN ID of the motor controller (TalonFX).
      * @param encoderCan The CAN ID of the encoder (CANcoder).
      */
-    public MotorSubsystem(int motorCan, int encoderCan){
+    public MotorSubsystem(int motorCan, int encoderCan) {
         this.motor = new TalonFX(motorCan);
         configureMotor();
 
         this.motorEncoder = new CANcoder(encoderCan);
         configureAngleEncoder();
     }
-
-    /**
-     * Sets the speed of the motor within the allowed range of -1 to 1.
-     *
-     * @param motorSpeed The desired speed of the motor. Values are clamped between -1 (full reverse) and 1 (full forward).
-     */
-    public void setMotorSpeed(double motorSpeed){
-        if(motorSpeed == 0){
-            motor.stopMotor();
-        } else {
-            eeDutyCycle.withOutput(MathUtil.clamp(motorSpeed, -1, 1));
-            motor.setControl(eeDutyCycle);
-        }
-    }
-
-    @Override
-    public void periodic() {
-        // This method will be called once per scheduler run
-    }
-
 
     /**
      * Retrieves the position of the endodger in degrees.
@@ -91,8 +69,27 @@ public class MotorSubsystem extends SubsystemBase{
      *
      * @return The position of the endodger in degrees, wrapped within a valid range.
      */
-    public double getEndodgerPositionDegrees(){
-        return wrapDegrees(motorEncoder.getPosition().getValueAsDouble()*360);
+    public double getEndodgerPositionDegrees() {
+        return wrapDegrees(motorEncoder.getPosition().getValueAsDouble() * 360);
+    }
+
+    @Override
+    public void periodic() {
+        // This method will be called once per scheduler run
+    }
+
+    /**
+     * Sets the speed of the motor within the allowed range of -1 to 1.
+     *
+     * @param motorSpeed The desired speed of the motor. Values are clamped between -1 (full reverse) and 1 (full forward).
+     */
+    public void setMotorSpeed(double motorSpeed) {
+        if (motorSpeed == 0) {
+            motor.stopMotor();
+        } else {
+            eeDutyCycle.withOutput(MathUtil.clamp(motorSpeed, -1, 1));
+            motor.setControl(eeDutyCycle);
+        }
     }
 
     private void configureAngleEncoder() {
@@ -104,8 +101,8 @@ public class MotorSubsystem extends SubsystemBase{
         // apply configs
         StatusCode response = motorEncoder.getConfigurator().apply(encoderConfigs);
         if (!response.isOK()) {
-        DataLogManager.log(
-            "CANcoder ID " + motorEncoder.getDeviceID() + " failed config with error " + response.toString());
+            DataLogManager.log(
+                    "CANcoder ID " + motorEncoder.getDeviceID() + " failed config with error " + response.toString());
         }
     }
 
@@ -127,16 +124,15 @@ public class MotorSubsystem extends SubsystemBase{
         StatusCode response = motor.getConfigurator().apply(config);
         if (!response.isOK()) {
             System.out.println(
-                    "TalonFX ID " + motor.getDeviceID() + " failed config with error " + response.toString());
+                "TalonFX ID " + motor.getDeviceID() + " failed config with error " + response.toString());
         }
     }
 
-    private double degreesToRotations(double degrees)
-    {
-      return degrees/360;
+    private double degreesToRotations(double degrees) {
+        return degrees / 360;
     }
 
-    private double wrapDegrees(double degrees){
+    private double wrapDegrees(double degrees) {
         return (degrees + 540) % 360 - 180;
     }
 }
