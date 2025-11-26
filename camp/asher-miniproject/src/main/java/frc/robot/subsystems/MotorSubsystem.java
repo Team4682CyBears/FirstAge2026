@@ -10,6 +10,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.MathUtil.clamp;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -31,7 +32,7 @@ import frc.robot.Constants;
  */
 public class MotorSubsystem extends SubsystemBase{
     private final TalonFX motor;
-        private final DutyCycleOut eeDutyCycle = new DutyCycleOut(0.0);
+    private final DutyCycleOut eeDutyCycle = new DutyCycleOut(0.0);
 
     private final CANcoder motorEncoder;
 
@@ -56,8 +57,12 @@ public class MotorSubsystem extends SubsystemBase{
      * @param motorSpeed The desired speed of the motor. Values are clamped between -1 (full reverse) and 1 (full forward).
      */
     public void setMotorSpeed(double motorSpeed){
-        eeDutyCycle.withOutput(clamp(motorSpeed, -1, 1));
-        motor.setControl(eeDutyCycle);
+        if(motorSpeed == 0){
+            motor.stopMotor();
+        } else {
+            eeDutyCycle.withOutput(clamp(motorSpeed, -1, 1));
+            motor.setControl(eeDutyCycle);
+        }
     }
 
     @Override
@@ -78,26 +83,6 @@ public class MotorSubsystem extends SubsystemBase{
      */
     public double getEndodgerPositionDegrees(){
         return wrapDegrees(motorEncoder.getPosition().getValueAsDouble()*360);
-    }
-
-    /**
-     * Clamps a given value within the specified range [min, max].
-     * If the value is less than the minimum, the minimum is returned.
-     * If the value is greater than the maximum, the maximum is returned.
-     * Otherwise, the value itself is returned.
-     *
-     * @param value The value to be clamped.
-     * @param min   The minimum allowable value.
-     * @param max   The maximum allowable value.
-     * @return The clamped value within the range [min, max].
-     * @throws IllegalArgumentException if the minimum value is greater than the maximum value.
-     */
-    public static double clamp(double value, double min, double max) {
-        if (min > max) {
-            throw new IllegalArgumentException("min must not be greater than max");
-        }
-
-        return max(min, min(value, max));
     }
 
     private void configureAngleEncoder() {

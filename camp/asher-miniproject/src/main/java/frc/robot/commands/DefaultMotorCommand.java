@@ -66,6 +66,6 @@ public class DefaultMotorCommand extends Command {
    */
   @Override
   public void end(boolean interrupted) {
-    motorSubsystem.setMotorSpeed(motorSpeed);
+    motorSubsystem.setMotorSpeed(0);
   }
 }
