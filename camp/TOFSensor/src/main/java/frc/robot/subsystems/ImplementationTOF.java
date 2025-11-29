@@ -29,7 +29,7 @@ public class ImplementationTOF extends SubsystemBase {
      * The constructor for ImplementationTOF it has no parameters 
     */
     public ImplementationTOF(){
-        tofSensor = new TofSensor(Constants.TofSensorCanID);
+        tofSensor = new TofSensor(Constants.tofSensorCanID);
         spinner = new Spinner();
     }
 
@@ -48,6 +48,12 @@ public class ImplementationTOF extends SubsystemBase {
             this.spinner.publishTelemetery();
         }
         if(this.tofSensor != null && this.spinner != null && tofSensor.isRangeValid()){
+            /**
+             * This math finds uses the max range of the tof sensor and how close an object 
+             * is from the TOF sensor. It then uses those two numbers to find a inverse of
+             * the sensed distance. The number is then divided by the max distance as the 
+             * spark max only takes in numbers from 0.0 - 1.0.
+             */
             speed = (maxDistance - tofSensor.getRangeInches())/maxDistance;
             if(speed < 0){
                 speed = 0;
