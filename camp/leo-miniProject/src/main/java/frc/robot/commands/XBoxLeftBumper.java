@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.commands;
-
+import frc.robot.Constants;
 import frc.robot.subsystems.TalonMotorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -31,7 +31,9 @@ public class XBoxLeftBumper extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.setMotorSpeed(-.2);
+    m_subsystem.setMotorSpeed(-Constants.motorSpeed);
+    System.out.println("Setting motorSpeed to: " + Constants.motorSpeed );
+
     //Dont do setMotorSpeed(1);
 
   }

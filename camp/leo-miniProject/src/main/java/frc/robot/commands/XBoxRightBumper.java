@@ -4,7 +4,10 @@
 
 package frc.robot.commands;
 
+import frc.robot.Constants;
+
 import frc.robot.subsystems.TalonMotorSubsystem;
+
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
@@ -30,7 +33,9 @@ public class XBoxRightBumper extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.setMotorSpeed(.2);
+
+    m_subsystem.setMotorSpeed(Constants.motorSpeed);
+    System.out.println("Setting motorSpeed to: " + Constants.motorSpeed );
   }
 
   // Called once the command ends or is interrupted.

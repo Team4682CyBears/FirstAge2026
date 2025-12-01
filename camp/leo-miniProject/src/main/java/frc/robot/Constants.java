@@ -23,7 +23,7 @@ public final class Constants {
 
   public static double motorSupplyVoltageTimeConstant;
 
-  public static double motorSpeed;
+  public static double motorSpeed = 0.2;
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;

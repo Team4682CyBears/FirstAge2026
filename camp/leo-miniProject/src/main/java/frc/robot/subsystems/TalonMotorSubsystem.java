@@ -60,11 +60,14 @@ public class TalonMotorSubsystem extends SubsystemBase {
     if (!response.isOK()) {
         System.out.println("TalonFX ID " + motor.getDeviceID() + " failed config with error " + response.toString());
     }
-}
+  }
+
+  
 
   public void setMotorSpeed(double motorSpeed){
     if(motorSpeed == 0){
       motor.stopMotor();
+      System.out.println("Stopping Motor");
     } else {
       eeDutyCycle.withOutput(MathUtil.clamp(motorSpeed, -1.0 , 1.0));
       motor.setControl(eeDutyCycle);
@@ -75,4 +78,5 @@ public class TalonMotorSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
   }
+  
 }
