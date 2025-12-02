@@ -1,6 +1,10 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - FirstAge - 2026
+// File: MotorSubsystem.java
+// Intent: Subsystem to control a single TalonFX motor
+// ************************************************************
 
 package frc.robot.subsystems;
 
@@ -10,41 +14,44 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * Subsystem for controlling a single TalonFX motor with joystick input.
+ * Handles motor configuration, speed control, and safety features.
+ */
 public class MotorSubsystem extends SubsystemBase {
 
-  private final TalonFX m_motor = new TalonFX(OperatorConstants.talonFXCANID);
+  private final TalonFX motor = new TalonFX(OperatorConstants.talonFXCANID);
 
+  /**
+   * Constructs a MotorSubsystem and configures the motor.
+   */
   public MotorSubsystem() {
-    //configure motor
-    m_motor.setNeutralMode(NeutralModeValue.Brake);
-    m_motor.setInverted(false);
-  }
-
-  public void setMotorSpeed(double speed){
-    if (speed == 0){
-      m_motor.stopMotor();
-    } else {
-      speed = Math.max(-1.0, Math.min(1.0, speed));
-      m_motor.set(speed);
-    }
-  }
-  
-  public Command exampleMethodCommand() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
+    motor.setNeutralMode(NeutralModeValue.Brake);
+    motor.setInverted(false);
   }
 
   /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
-   *
-   * @return value of some boolean subsystem state, such as a digital sensor.
+   * Sets the motor speed.
+   * @param speed Motor speed from -1.0 to 1.0
+   */
+  public void setMotorSpeed(double speed) {
+    speed = Math.max(-1.0, Math.min(1.0, speed));
+    motor.set(speed);
+  }
+  
+  /**
+   * Creates an example command.
+   * @return A command that runs once
+   */
+  public Command exampleMethodCommand() {
+    return runOnce(() -> {/* one-time action goes here */});
+  }
+
+  /**
+   * Queries a boolean state of the subsystem.
+   * @return The current state
    */
   public boolean exampleCondition() {
-    // Query some boolean state, such as a digital sensor.
     return false;
   }
 

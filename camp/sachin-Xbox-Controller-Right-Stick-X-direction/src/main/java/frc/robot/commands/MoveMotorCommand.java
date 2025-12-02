@@ -1,61 +1,74 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-//use this as the command class to execute the code to move the motor
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - FirstAge - 2026
+// File: MoveMotorCommand.java
+// Intent: Command to move motor based on joystick input
+// ************************************************************
 
 package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
-
-import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.MotorSubsystem;
-import edu.wpi.first.wpilibj.motorcontrol.PWMTalonFX;
-import edu.wpi.first.wpilibj.motorcontrol.PWMTalonSRX;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-/** An example command that uses an example subsystem. */
+/**
+ * Command that moves a motor based on joystick input from a DoubleSupplier.
+ * The command continuously reads joystick input and applies it to the motor.
+ * The command never finishes on its own and will run until interrupted.
+ */
 public class MoveMotorCommand extends Command {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final MotorSubsystem m_subsystem;
-  private final DoubleSupplier joystickInput;
+  private final MotorSubsystem motorSubsystem;
+  private final DoubleSupplier joystickInputSupplier;
 
   /**
-   * Creates a new MoveMotor.
+   * Constructs a MoveMotorCommand.
    *
-   * @param subsystem The subsystem used by this command.
+   * @param motorSubsystem the MotorSubsystem to control
+   * @param joystickInputSupplier a DoubleSupplier that provides joystick input (-1.0 to 1.0)
    */
-  public MoveMotorCommand(MotorSubsystem subsystem, DoubleSupplier joystickInput) {
-    m_subsystem = subsystem;
-    this.joystickInput = joystickInput;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
+  public MoveMotorCommand(MotorSubsystem motorSubsystem, DoubleSupplier joystickInputSupplier) {
+    this.motorSubsystem = motorSubsystem;
+    this.joystickInputSupplier = joystickInputSupplier;
+    addRequirements(motorSubsystem);
   }
-  
 
-  // Called when the command is initially scheduled.
+  /**
+   * Initializes the command. Called when the command is initially scheduled.
+   */
   @Override
   public void initialize() {
+    // No initialization needed
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
-
-  
+  /**
+   * Executes the command. Called every time the scheduler runs while the command is scheduled.
+   * Reads joystick input and applies it to the motor.
+   */
   @Override
   public void execute() {
-    m_subsystem.setMotorSpeed(joystickInput.getAsDouble()); //check this
-    System.out.println("!!!!!! SETTINGS SPEED !!!!!!!!");
+    motorSubsystem.setMotorSpeed(joystickInputSupplier.getAsDouble());
   }
-  
 
-  // Called once the command ends or is interrupted.
+  /**
+   * Called once the command ends or is interrupted.
+   * Stops the motor when the command ends.
+   *
+   * @param interrupted whether the command was interrupted
+   */
   @Override
   public void end(boolean interrupted) {
-    m_subsystem.setMotorSpeed(0);
+    motorSubsystem.setMotorSpeed(0);
   }
+
+  /**
+   * Returns whether this command has finished.
+   * This command never finishes on its own.
+   *
+   * @return false - command never finishes
+   */
   @Override
-  public boolean isFinished(){
+  public boolean isFinished() {
     return false;
   }
 }
