@@ -2,8 +2,8 @@
 // Bishop Blanchet Robotics
 // Home of the Cybears
 // FRC - Reefscape - 2025
-// File: RobotContainer.java
-// Intent: Xbox left bumpers
+// File: TalonMotorSubsystem.java
+// Intent: Talon motors
 // ************************************************************
 
 

@@ -2,7 +2,7 @@
 // Bishop Blanchet Robotics
 // Home of the Cybears
 // FRC - Reefscape - 2025
-// File: RobotContainer.java
+// File: XboxRightBumper.java
 // Intent: Xbox right bumpers
 // ************************************************************
 package frc.robot.commands;
