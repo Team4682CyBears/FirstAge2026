@@ -31,7 +31,7 @@ The table below highlights various challanges that coder members will be assigne
 | XBox Controller joystick. If left trigger not pressed, full speed. If left trigger pressed, 1/4 speed.  | Talon motor | Use the input of BOTH the left and right triggers as double/floating point value to control the speed of the motor (where left is negative and right is positive).  | 2nd year | ??  |
 | Sendable chooser and smart dashboard button | Neo Motor | Implement sendable chooser w/ motor slow/fast/backwards. Button on smart dashboard engages the selected mode. | 2nd year | ??  |
 | XBox controller button, Limelight and April Tag | Chassis + 4-wheel Swerve | Add feature to do April Tag following.  Robot should be able to center itself on an April tag that is within the field of vision. | 2nd year | ?? |
-
+| CTRE throughbore encoder | Faclon/Kraken motor | motor goes forward if encoder output is less than the target angle and vice versa, stops when at target | 2nd year | Asher |
 
 # Expected Activity Breakdown
 
