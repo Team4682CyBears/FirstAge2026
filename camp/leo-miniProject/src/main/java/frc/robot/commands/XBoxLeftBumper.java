@@ -1,7 +1,10 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Reefscape - 2025
+// File: RobotContainer.java
+// Intent: Xbox left bumpers
+// ************************************************************
 package frc.robot.commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.TalonMotorSubsystem;
@@ -9,19 +12,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
 public class XBoxLeftBumper extends Command {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final TalonMotorSubsystem m_subsystem;
+  private final TalonMotorSubsystem motorSubsystem;
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
+
+
+  //creates a new xbox left bumper command
+   
   public XBoxLeftBumper(TalonMotorSubsystem subsystem) {
-    this.m_subsystem = subsystem;
+    this.motorSubsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
-    execute();
   }
 
   // Called when the command is initially scheduled.
@@ -31,21 +31,21 @@ public class XBoxLeftBumper extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_subsystem.setMotorSpeed(-Constants.motorSpeed);
+    motorSubsystem.setMotorSpeed(-Constants.motorSpeed);
     System.out.println("Setting motorSpeed to: " + Constants.motorSpeed );
-
-    //Dont do setMotorSpeed(1);
 
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_subsystem.setMotorSpeed(0);
+    motorSubsystem.setMotorSpeed(0);
   
   }
   // Returns true when the command should end.
   @Override
+  
+  // when button is pressed it will stop the command
   public boolean isFinished() {
     return false;
   }

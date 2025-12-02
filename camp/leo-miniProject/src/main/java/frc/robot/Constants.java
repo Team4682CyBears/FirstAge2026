@@ -1,7 +1,10 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Reefscape - 2025
+// File: RobotContainer.java
+// Intent: Place for constants
+// ************************************************************
 package frc.robot;
 
 /**
@@ -15,17 +18,14 @@ package frc.robot;
 public final class Constants {
   public static final int talonCanID = 5;
 
-  public static final double motorStatorCurrentMaximumAmps = 0;
+  public static final double motorSupplyCurrentMaximumAmps = 50.0;
+  public static final double motorSupplyVoltageTimeConstant = 0.2;
+  public static final double falconMaxVoltage = 12.0;
+  public static final double motorStatorCurrentMaximumAmps = 100.0;
 
-  public static final double motorSupplyCurrentMaximumAmps = 0;
+  public static final double motorSpeed = 0.2;
 
-  public static double falconMaxVoltage;
 
-  public static double motorSupplyVoltageTimeConstant;
-
-  public static double motorSpeed = 0.2;
-
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
-  }
+  public static final int kDriverControllerPort = 0;
+  
 }

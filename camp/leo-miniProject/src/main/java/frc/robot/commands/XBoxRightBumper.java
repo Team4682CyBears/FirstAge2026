@@ -1,7 +1,10 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Reefscape - 2025
+// File: RobotContainer.java
+// Intent: Xbox right bumpers
+// ************************************************************
 package frc.robot.commands;
 
 import frc.robot.Constants;
@@ -15,11 +18,8 @@ public class XBoxRightBumper extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final TalonMotorSubsystem m_subsystem;
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
+  //creates a new xbox right bumper
+
   public XBoxRightBumper(TalonMotorSubsystem subsystem) {
     this.m_subsystem = subsystem;
     // Use addRequirements() here to declare subsystem dependencies.
