@@ -52,16 +52,16 @@ public class MotorSubsystem extends SubsystemBase {
     }
 
     /**
-     * Retrieves the position of the endodger in degrees.
+     * Retrieves the position of the encoder in degrees.
      * <p>
-     * This method calculates the position of the endodger by converting the
+     * This method calculates the position of the encoder by converting the
      * encoder's position value (in rotations) to degrees and wrapping it
-     * within a valid range of degrees (e.g., 0 to 360).
+     * within a valid range of degrees (-180 to 180).
      * </p>
      *
-     * @return The position of the endodger in degrees, wrapped within a valid range.
+     * @return The position of the encoder in degrees, wrapped within a valid range.
      */
-    public double getEndodgerPositionDegrees() {
+    public double getEncoderPositionDegrees() {
         return wrapDegrees(motorEncoder.getPosition().getValueAsDouble() * 360);
     }
 
@@ -82,6 +82,7 @@ public class MotorSubsystem extends SubsystemBase {
             eeDutyCycle.withOutput(MathUtil.clamp(motorSpeed, -1, 1));
             motor.setControl(eeDutyCycle);
         }
+    }
 
     private void configureAngleEncoder() {
         // Config CanCoder

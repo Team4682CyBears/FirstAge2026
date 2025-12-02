@@ -27,6 +27,8 @@ public class DefaultMotorCommand extends Command {
 
   private final double encoderDeadbandDegrees = 2.0;
 
+  private final double motorSpeed = 0.5;
+
   /**
    * Constructs a new DefaultMotorCommand.
    *
@@ -36,7 +38,7 @@ public class DefaultMotorCommand extends Command {
   public DefaultMotorCommand(MotorSubsystem motorSubsystem, double targetAngle) {
     this.motorSubsystem = motorSubsystem;
     addRequirements(motorSubsystem);
-    this.encoderSupplier = () -> motorSubsystem.getEndodgerPositionDegrees();
+    this.encoderSupplier = () -> motorSubsystem.getEncoderPositionDegrees();
     this.targetAngle = targetAngle;
   }
 
@@ -53,7 +55,7 @@ public class DefaultMotorCommand extends Command {
     if (Math.abs(angleDifference) <= encoderDeadbandDegrees) {
       motorSubsystem.setMotorSpeed(0);
     } else {
-      double motorSpeed = angleDifference > 0 ? 0.5 : -0.5;
+      double motorSpeed = angleDifference > 0 ? motorSpeed : -motorSpeed;
       motorSubsystem.setMotorSpeed(motorSpeed);
     }
   }
