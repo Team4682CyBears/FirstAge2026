@@ -24,7 +24,7 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     
     /** CAN ID for the TalonFX motor */
-    public static final int talonFXCANID = 0; // TODO: Update to actual CAN ID
+    public static final int talonFXCANID = 4;
   }
 
   private Constants() {
