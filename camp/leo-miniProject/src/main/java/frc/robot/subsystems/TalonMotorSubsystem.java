@@ -11,6 +11,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.StatusCode;
@@ -50,11 +52,12 @@ public class TalonMotorSubsystem extends SubsystemBase {
     }
   }
 
+
   public void stopMotor(){
     motor.stopMotor();
   }
 
-  private void configureMotor() {
+  private void configureMotor(){
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 

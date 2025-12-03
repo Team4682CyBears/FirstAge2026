@@ -11,6 +11,7 @@ package frc.robot;
 import frc.robot.commands.XBoxLeftBumper;
 import frc.robot.commands.XBoxRightBumper;
 import frc.robot.subsystems.TalonMotorSubsystem;
+import edu.wpi.first.networktables.TableListener;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -28,7 +29,7 @@ public class RobotContainer {
   private final TalonMotorSubsystem talonSubsystem;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
+  private final CommandXboxController mDrivercontroller =
       new CommandXboxController(Constants.kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -47,11 +48,13 @@ public class RobotContainer {
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
+  
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    m_driverController.leftBumper().onTrue(new XBoxLeftBumper(talonSubsystem));
-    m_driverController.rightBumper().onTrue(new XBoxRightBumper(talonSubsystem));
-
+    mDrivercontroller.b().onTrue(
+      new InstantCommand(talonSubsystem::stopMotor)
+    );
+    mDrivercontroller.leftBumper().onTrue(new XBoxLeftBumper(talonSubsystem));
+    mDrivercontroller.rightBumper().onTrue(new XBoxRightBumper(talonSubsystem));
   }
 
   /**
