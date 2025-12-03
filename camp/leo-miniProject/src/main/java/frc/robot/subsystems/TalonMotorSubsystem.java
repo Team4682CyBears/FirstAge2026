@@ -11,8 +11,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.RobotContainer;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.StatusCode;
@@ -24,36 +22,36 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
 
-
-
 public class TalonMotorSubsystem extends SubsystemBase {
 
   private TalonFX motor;
   private final DutyCycleOut eeDutyCycle = new DutyCycleOut(0.0);
-
-
+  private double motorSpeed = 0.0;
 
   // contstructer method that takes in a int can id and sets motor to a new TalonFX set to the imput of canId
   public TalonMotorSubsystem(int canId ) {
-
     this.motor = new TalonFX(canId);
     configureMotor();
-
   }
-  
-  // sets the motor speed to the double imput and clamps that from -1 <> 1 and if the motor speed set to 0 it stops the motor
-  public void setMotorSpeed(double motorSpeed){
+
+  @Override
+  public void periodic(){
     if(motorSpeed == 0){
       motor.stopMotor();
-      System.out.println("Stopping Motor");
     } else {
       eeDutyCycle.withOutput(MathUtil.clamp(motorSpeed, -1.0 , 1.0));
       motor.setControl(eeDutyCycle);
     }
   }
+  
+  // sets the motor speed to the double imput and clamps that from -1 <> 1 and if the motor speed set to 0 it stops the motor
+  public void setMotorSpeed(double motorSpeed){
+    this.motorSpeed = motorSpeed;
+  }
 
 
   public void stopMotor(){
+    System.out.println("Stopping Motor");
     motor.stopMotor();
   }
 

@@ -51,10 +51,10 @@ public class RobotContainer {
   
   private void configureBindings() {
     mDrivercontroller.b().onTrue(
-      new InstantCommand(talonSubsystem::stopMotor)
+      new InstantCommand(talonSubsystem::stopMotor, talonSubsystem)
     );
-    mDrivercontroller.leftBumper().onTrue(new XBoxLeftBumper(talonSubsystem));
-    mDrivercontroller.rightBumper().onTrue(new XBoxRightBumper(talonSubsystem));
+    mDrivercontroller.leftBumper().whileTrue(new XBoxLeftBumper(talonSubsystem));
+    mDrivercontroller.rightBumper().whileTrue(new XBoxRightBumper(talonSubsystem));
   }
 
   /**
