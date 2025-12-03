@@ -38,10 +38,6 @@ public class TalonMotorSubsystem extends SubsystemBase {
     configureMotor();
 
   }
-
-
-
-
   
   // sets the motor speed to the double imput and clamps that from -1 <> 1 and if the motor speed set to 0 it stops the motor
   public void setMotorSpeed(double motorSpeed){
@@ -52,6 +48,10 @@ public class TalonMotorSubsystem extends SubsystemBase {
       eeDutyCycle.withOutput(MathUtil.clamp(motorSpeed, -1.0 , 1.0));
       motor.setControl(eeDutyCycle);
     }
+  }
+
+  public void stopMotor(){
+    motor.stopMotor();
   }
 
   private void configureMotor() {

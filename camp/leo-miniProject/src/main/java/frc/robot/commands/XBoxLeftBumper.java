@@ -32,8 +32,7 @@ public class XBoxLeftBumper extends Command {
   @Override
   public void execute() {
     motorSubsystem.setMotorSpeed(-Constants.motorSpeed);
-    System.out.println("Setting motorSpeed to: " + Constants.motorSpeed );
-
+    System.out.println("Setting motorSpeed to: -" + Constants.motorSpeed );
   }
 
   // Called once the command ends or is interrupted.
