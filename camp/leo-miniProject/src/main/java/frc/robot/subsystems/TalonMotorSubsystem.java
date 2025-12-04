@@ -44,7 +44,7 @@ public class TalonMotorSubsystem extends SubsystemBase {
     }
   }
   
-  // sets the motor speed to the double imput and clamps that from -1 <> 1 and if the motor speed set to 0 it stops the motor
+  // sets the motor speed to the double motor speed and the motor speed is set in th periodic which checks eveyr ticks
   public void setMotorSpeed(double motorSpeed){
     this.motorSpeed = motorSpeed;
   }
