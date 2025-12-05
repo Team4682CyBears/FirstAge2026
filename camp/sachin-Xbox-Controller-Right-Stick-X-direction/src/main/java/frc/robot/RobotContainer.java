@@ -10,11 +10,12 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants;
 import frc.robot.commands.MoveMotorCommand;
 import frc.robot.subsystems.MotorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /**
@@ -27,7 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
   private final MotorSubsystem motorSubsystem = new MotorSubsystem();
   private final CommandXboxController driverController = 
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+      new CommandXboxController(Constants.kDriverControllerPort);
 
   /**
    * Constructs the RobotContainer and configures trigger->command mappings.
@@ -55,6 +56,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return new InstantCommand();
   }
 }

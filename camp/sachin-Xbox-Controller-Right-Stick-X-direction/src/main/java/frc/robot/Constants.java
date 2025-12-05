@@ -8,6 +8,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean constants. This class should not be instantiated by any
@@ -15,19 +17,12 @@ package frc.robot;
  * constants' names to the log.
  */
 public final class Constants {
-  
-  /**
-   * Constants related to operator input devices.
-   */
-  public static class OperatorConstants {
-    /** Port for the driver's Xbox controller */
-    public static final int kDriverControllerPort = 0;
-    
-    /** CAN ID for the TalonFX motor */
-    public static final int talonFXCANID = 4;
-  }
+  public static final int kDriverControllerPort = 0;
+  public static final int talonFXCANID = 4;
 
-  private Constants() {
-    throw new UnsupportedOperationException("This is a utility class!");
-  }
+  public static final double motorSupplyCurrentMaximumAmps = 50.02;
+  public static final double motorSupplyVoltageTimeConstant = 0.02;
+
+  public static final double falconMaxVoltage = 12.0;
+  public static final double motorStatorCurrentMaximumAmps = 100.0;
 }
