@@ -17,6 +17,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.MathUtil;
 
 /**
  * Subsystem for controlling a single TalonFX motor with joystick input.
@@ -34,25 +35,13 @@ public class MotorSubsystem extends SubsystemBase {
   }
 
   /**
-   * Sets the motor speed.
+   * Sets the motor speed.s
    * @param speed Motor speed from -1.0 to 1.0
    */
   public void setMotorSpeed(double speed) {
-    speed = Math.max(-1.0, Math.min(1.0, speed));
+    speed = MathUtil.clamp(speed, -1, 1);
     motor.set(speed);
   }
-  
-  /**
-   * Creates an example command.
-   * @return A command that runs once
-   */
- 
-
-  /**
-   * Queries a boolean state of the subsystem.
-   * @return The current state
-   */
-  
 
   
   private void configureMotor() {

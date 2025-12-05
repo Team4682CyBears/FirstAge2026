@@ -12,12 +12,13 @@ import java.util.function.DoubleSupplier;
 import frc.robot.subsystems.MotorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
+
 /**
  * Command that moves a motor based on joystick input from a DoubleSupplier.
  * The command continuously reads joystick input and applies it to the motor.
  * The command never finishes on its own and will run until interrupted.
  */
-public class MoveMotorCommand extends Command {
+public class MoveMotorDefaultCommand extends Command {
   private final MotorSubsystem motorSubsystem;
   private final DoubleSupplier joystickInputSupplier;
 
@@ -27,18 +28,10 @@ public class MoveMotorCommand extends Command {
    * @param motorSubsystem the MotorSubsystem to control
    * @param joystickInputSupplier a DoubleSupplier that provides joystick input (-1.0 to 1.0)
    */
-  public MoveMotorCommand(MotorSubsystem motorSubsystem, DoubleSupplier joystickInputSupplier) {
+  public MoveMotorDefaultCommand(MotorSubsystem motorSubsystem, DoubleSupplier joystickInputSupplier) {
     this.motorSubsystem = motorSubsystem;
     this.joystickInputSupplier = joystickInputSupplier;
     addRequirements(motorSubsystem);
-  }
-
-  /**
-   * Initializes the command. Called when the command is initially scheduled.
-   */
-  @Override
-  public void initialize() {
-    // No initialization needed
   }
 
   /**
