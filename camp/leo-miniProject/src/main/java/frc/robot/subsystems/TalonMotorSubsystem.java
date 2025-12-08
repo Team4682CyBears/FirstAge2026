@@ -22,13 +22,19 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
 
+// this is a talon motor class which extends subsystem base, it controls the talon motor. 
 public class TalonMotorSubsystem extends SubsystemBase {
 
   private TalonFX motor;
   private final DutyCycleOut eeDutyCycle = new DutyCycleOut(0.0);
   private double motorSpeed = 0.0;
 
-  // contstructer method that takes in a int can id and sets motor to a new TalonFX set to the imput of canId
+  /**
+   * Initialize the talon motor subsystem.
+   * 
+   * @param canId CAN ID for the motor
+   * 
+   */
   public TalonMotorSubsystem(int canId ) {
     this.motor = new TalonFX(canId);
     configureMotor();
@@ -45,13 +51,21 @@ public class TalonMotorSubsystem extends SubsystemBase {
   }
   
   // sets the motor speed to the double motor speed and the motor speed is set in th periodic which checks eveyr ticks
+  /**
+   * Sets the motor speed
+   * @param motorSpeed double 
+   */
   public void setMotorSpeed(double motorSpeed){
     this.motorSpeed = motorSpeed;
   }
 
 
+  /**
+   * Sets motor speed to 0 and stops motor.
+   */
   public void stopMotor(){
     System.out.println("Stopping Motor");
+    this.setMotorSpeed(0);
     motor.stopMotor();
   }
 

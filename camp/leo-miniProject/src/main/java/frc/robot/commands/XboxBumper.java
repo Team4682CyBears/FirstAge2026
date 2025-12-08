@@ -25,7 +25,6 @@ public class XboxBumper extends Command {
     addRequirements(subsystem);
   }
 
-  // Called when the command is initially scheduled.
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
