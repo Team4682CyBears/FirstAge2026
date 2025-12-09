@@ -23,7 +23,8 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-/**The spinner class helps to create motor subsystems which allow the
+/**
+* The spinner class helps to create motor subsystems which allow the
 * rest of the code to accsess the SparkMax motor controller which
 * controls the neo motor.
 */

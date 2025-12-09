@@ -20,7 +20,6 @@ import frc.robot.Constants;
 * the objects are from the TOF sensor.
 */
 public class TofSensor {
-    private static final double noteDetectionThreshold = Constants.tofRangeInches;
     private TimeOfFlight tofSensor;
     private int canID;
     private String displayName;

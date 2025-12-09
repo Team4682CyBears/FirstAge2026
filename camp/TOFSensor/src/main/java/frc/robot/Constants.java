@@ -24,7 +24,7 @@ public final class Constants {
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
-  public static int TofSensorCanID = 14;
+  public static int tofSensorCanID = 14;
   public static double tofRangeInches = 16.0;
   //Motor Config constant variables
   public static final int kDriverControllerPort = 0;
@@ -33,8 +33,5 @@ public final class Constants {
   public static final double motorSupplyVoltageTimeConstant = 0.02;
   //Motor Talon Port
   public static final int motorCanID = 3;
-  public static final double falconMaxVoltage = 12.0;
-  public static final int falconFreeSpeedRps = 6380/60;
-  public static final double minimumMotorSpeedRpm = 0.25*60;
 
 }

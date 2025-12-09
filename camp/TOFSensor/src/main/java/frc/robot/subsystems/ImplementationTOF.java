@@ -29,7 +29,7 @@ public class ImplementationTOF extends SubsystemBase {
      * The constructor for ImplementationTOF it has no parameters 
     */
     public ImplementationTOF(){
-        tofSensor = new TofSensor(Constants.TofSensorCanID);
+        tofSensor = new TofSensor(Constants.tofSensorCanID);
         spinner = new Spinner();
     }
 
@@ -48,6 +48,12 @@ public class ImplementationTOF extends SubsystemBase {
             this.spinner.publishTelemetery();
         }
         if(this.tofSensor != null && this.spinner != null && tofSensor.isRangeValid()){
+            /**
+             * This math is meant to get the inverse of how far away an object
+             * is from the Tof and then turn it into a value from 0-1 by dividing
+             * it by the max distance because the motor only takes in values 
+             * ranging from -1 to 1
+             */
             speed = (maxDistance - tofSensor.getRangeInches())/maxDistance;
             if(speed < 0){
                 speed = 0;
