@@ -49,10 +49,10 @@ public class ImplementationTOF extends SubsystemBase {
         }
         if(this.tofSensor != null && this.spinner != null && tofSensor.isRangeValid()){
             /**
-             * This math finds uses the max range of the tof sensor and how close an object 
-             * is from the TOF sensor. It then uses those two numbers to find a inverse of
-             * the sensed distance. The number is then divided by the max distance as the 
-             * spark max only takes in numbers from 0.0 - 1.0.
+             * This math is meant to get the inverse of how far away an object
+             * is from the Tof and then turn it into a value from 0-1 by dividing
+             * it by the max distance because the motor only takes in values 
+             * ranging from -1 to 1
              */
             speed = (maxDistance - tofSensor.getRangeInches())/maxDistance;
             if(speed < 0){
