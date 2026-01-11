@@ -9,11 +9,11 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class SparkFlexMotorSubsystem extends SubsystemBase {
+public class SparkFlexMotorSubsystem extends MotorSubsystem {
 
   private final SparkFlex motor;
   private final SparkFlexConfig motorConfig;
@@ -25,6 +25,7 @@ public class SparkFlexMotorSubsystem extends SubsystemBase {
   public SparkFlexMotorSubsystem(int canID, boolean inverted) {
     this.motor = new SparkFlex(canID, MotorType.kBrushless);
     this.motorConfig = new SparkFlexConfig();
+    motorConfig.idleMode(IdleMode.kBrake);
     this.canID = canID;
     this.inverted = inverted;
   }

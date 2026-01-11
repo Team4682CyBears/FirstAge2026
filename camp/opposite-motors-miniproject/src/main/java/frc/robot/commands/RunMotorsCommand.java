@@ -4,17 +4,17 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.SparkFlexMotorSubsystem;
+import frc.robot.subsystems.MotorSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
 public class RunMotorsCommand extends Command {
   @SuppressWarnings("PMD.UnusedPrivateField")
-  private final SparkFlexMotorSubsystem motor1;
-  private final SparkFlexMotorSubsystem motor2;
+  private final MotorSubsystem motor1;
+  private final MotorSubsystem motor2;
 
-  public RunMotorsCommand(SparkFlexMotorSubsystem motor1, SparkFlexMotorSubsystem motor2) {
+  public RunMotorsCommand(MotorSubsystem motor1, MotorSubsystem motor2) {
     this.motor1 = motor1;
     this.motor2 = motor2;
 
