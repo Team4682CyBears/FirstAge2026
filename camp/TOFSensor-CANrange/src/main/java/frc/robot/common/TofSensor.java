@@ -14,6 +14,7 @@ import com.playingwithfusion.TimeOfFlight.RangingMode;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+
 /**
  * The TofSensor class helps to create TOF sensor subsystems which allow the
 * rest of the code to access the TOF. It's used to sense objects and how far away
