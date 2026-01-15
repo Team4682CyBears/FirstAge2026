@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.RunMotorsCommand;
+import frc.robot.commands.RunMotorsVoltsCommand;
 import frc.robot.subsystems.SparkFlexMotorSubsystem;
 import frc.robot.subsystems.KrakenMotorSubsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -24,6 +25,7 @@ public class RobotContainer {
   public RobotContainer() {
     // SparkFlex motors SmartDashboard entries
     SmartDashboard.putNumber("Motor Target RPM 1", 0);
+    SmartDashboard.putNumber("Motor Target Volts 1", 0);
     
     // // Kraken motors SmartDashboard entries
     // SmartDashboard.putNumber("Motor Target RPM (ID: %d)".formatted(m_krakenMotor1.getID()), 0);
@@ -35,6 +37,7 @@ public class RobotContainer {
   private void configureBindings() {
     // Left trigger runs SparkFlex motors
     m_driverController.leftTrigger().whileTrue(new RunMotorsCommand(m_motor1));
+    m_driverController.rightTrigger().whileTrue(new RunMotorsVoltsCommand(m_motor1));
     
     // Right trigger runs Kraken motors
     // m_driverController.rightTrigger().whileTrue(new RunMotorsCommand(m_krakenMotor1, m_krakenMotor2));

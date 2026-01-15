@@ -9,10 +9,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
-public class RunMotorsCommand extends Command {
+public class RunMotorsVoltsCommand extends Command {
   private final SparkFlexMotorSubsystem motor1;
 
-  public RunMotorsCommand(SparkFlexMotorSubsystem motor1) {
+  public RunMotorsVoltsCommand(SparkFlexMotorSubsystem motor1) {
     this.motor1 = motor1;
 
     addRequirements(motor1);
@@ -20,8 +20,7 @@ public class RunMotorsCommand extends Command {
 
   @Override
   public void execute() {
-    motor1.runRPM(SmartDashboard.getNumber("Motor Target RPM 1", 0));
-    //motor1.setTargetRPM(100);
+    motor1.runVoltage(SmartDashboard.getNumber("Motor Target Volts 1", 0));
   }
 
   @Override

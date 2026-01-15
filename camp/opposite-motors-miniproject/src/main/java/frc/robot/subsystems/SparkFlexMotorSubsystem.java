@@ -36,11 +36,11 @@ public class SparkFlexMotorSubsystem extends SubsystemBase{
     LeadConfig.voltageCompensation(12.0);
 
     LeadConfig.closedLoop
-      .p(.00027)
-      .i(0.0)
-      .d(0.001)
+      .p(0.0001)
+      .i(0.000)
+      .d(0.0001)
       .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-      .apply(new FeedForwardConfig().kS(.15).kV(.002)); // TODO: Calculate values for kS and kV
+      .apply(new FeedForwardConfig().kS(.07).kV(.0018)); // TODO: Calculate values for kS and kV
 
       LeadMotor.configure(LeadConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
       
