@@ -4,38 +4,34 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.MotorSubsystem;
+import frc.robot.subsystems.SparkFlexMotorSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
 public class RunMotorsCommand extends Command {
   @SuppressWarnings("PMD.UnusedPrivateField")
-  private final MotorSubsystem motor1;
-  private final MotorSubsystem motor2;
+  private final SparkFlexMotorSubsystem motor1;
 
-  public RunMotorsCommand(MotorSubsystem motor1, MotorSubsystem motor2) {
+  public RunMotorsCommand(SparkFlexMotorSubsystem motor1) {
     this.motor1 = motor1;
-    this.motor2 = motor2;
 
-    addRequirements(motor1, motor2);
+    addRequirements(motor1);
   }
 
   @Override
   public void execute() {
-    motor1.setTargetRPM(SmartDashboard.getNumber("Motor Target RPM (ID: %d)".formatted(motor1.getID()), 0));
-    motor2.setTargetRPM(SmartDashboard.getNumber("Motor Target RPM (ID: %d)".formatted(motor2.getID()), 0));
+    motor1.runRPM(SmartDashboard.getNumber("Motor Target RPM 1", 0));
+    //motor1.setTargetRPM(100);
   }
 
   @Override
   public void end(boolean interrupted) {
     motor1.stop();
-    motor2.stop();
   }
 
   @Override
   public boolean isFinished() {
     return false;
-
   }
 }

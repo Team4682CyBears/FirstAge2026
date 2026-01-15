@@ -6,64 +6,75 @@ package frc.robot.subsystems;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.FeedForwardConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class SparkFlexMotorSubsystem extends MotorSubsystem {
+public class SparkFlexMotorSubsystem extends SubsystemBase{
 
-  private final SparkFlex motor;
-  private final SparkFlexConfig motorConfig;
-  private final int canID;
-  private final boolean inverted;
-  // TODO: Use real free rpm from the motor specs
-  private final double kSparkFlexFreeRPM = 6784.0;
+  private final SparkFlex LeadMotor;
+  private final SparkFlex FollowMotor;
+  private final SparkClosedLoopController PIDController;
 
-  public SparkFlexMotorSubsystem(int canID, boolean inverted) {
-    this.motor = new SparkFlex(canID, MotorType.kBrushless);
-    this.motorConfig = new SparkFlexConfig();
-    motorConfig.idleMode(IdleMode.kBrake);
-    this.canID = canID;
-    this.inverted = inverted;
+  //max rpm 6784.0;
+
+  public SparkFlexMotorSubsystem(int LeadCanID, int FollowCanID) {
+    this.LeadMotor = new SparkFlex(LeadCanID, MotorType.kBrushless);
+    this.FollowMotor = new SparkFlex(FollowCanID, MotorType.kBrushless);
+    PIDController = LeadMotor.getClosedLoopController();
+    SparkFlexConfig LeadConfig = new SparkFlexConfig();
+
+    LeadConfig.idleMode(IdleMode.kCoast);
+    LeadConfig.smartCurrentLimit(40);
+    LeadConfig.voltageCompensation(12.0);
+
+    LeadConfig.closedLoop
+      .p(.00027)
+      .i(0.0)
+      .d(0.001)
+      .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+      .apply(new FeedForwardConfig().kS(.15).kV(.002)); // TODO: Calculate values for kS and kV
+
+      LeadMotor.configure(LeadConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      
+      SparkFlexConfig FollowerConfig = new SparkFlexConfig();
+
+      FollowerConfig.idleMode(IdleMode.kCoast);
+      FollowerConfig.smartCurrentLimit(40);
+      FollowerConfig.follow(LeadMotor, true);
+
+      FollowMotor.configure(FollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
-  public void setTargetRPM(double rpm) {
-    double fraction = 0.0;
-    if (Double.isFinite(rpm)) {
-      fraction = rpm / kSparkFlexFreeRPM;
-      if (fraction > 1.0) {
-        fraction = 1.0;
-      } else if (fraction < -1.0) {
-        fraction = -1.0;
-      }
-    }
-    motorConfig.inverted(inverted);
-    motor.configure(motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    motor.set(fraction);
+  public void runVoltage(double Volts){
+    LeadMotor.setVoltage(Volts);
+  }
 
+  public void runRPM(double targetRPM){
+    PIDController.setSetpoint(targetRPM, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
   }
 
   public double getRPM() {
     try {
-      return motor.getEncoder().getVelocity();
+      return LeadMotor.getEncoder().getVelocity();
     } catch (Exception e) {
       return -1;
     }
   }
 
   public void stop() {
-    motor.stopMotor();
-  }
-
-  public int getID() {
-    return canID;
+    LeadMotor.stopMotor();
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Real Motor RPM (ID: %d)".formatted(canID), getRPM());
+    SmartDashboard.putNumber("Real Motor RPM 1", getRPM());
   }
 }
