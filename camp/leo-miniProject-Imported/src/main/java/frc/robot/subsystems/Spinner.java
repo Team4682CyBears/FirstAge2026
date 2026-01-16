@@ -41,26 +41,28 @@ public class Spinner extends SubsystemBase {
     }
 
     public void spin(double speed) {
-        speed = MathUtil.clamp(speed, -1, 1);
-        motor.set(speed);
+    //    speed = MathUtil.clamp(speed, -1, 1);
+    //    motor.set(speed);
 
-        if(speed == 0){
-            motor.stopMotor();
-        }
+    //     if(speed == 0){
+    //         motor.stopMotor();
+    //     }
+        speed = 0; // for testing
     }
 
     public void motorStop(){
-        motor.stopMotor();
+        //motor.stopMotor();
     } 
 
 
     public double getSpeedRpm(){
-        StatusSignal CTREAbomination = motor.getVelocity(true);
-        return CTREAbomination.getValueAsDouble();
+        //StatusSignal CTREAbomination = motor.getVelocity(true);
+        //return CTREAbomination.getValueAsDouble();
+        return 0;
     }
 
     public void publishTelemetry(){
-        SmartDashboard.putNumber("Spinner_Speed", motor.getVelocity(true).getValueAsDouble());
+        //SmartDashboard.putNumber("Spinner_Speed", motor.getVelocity(true).getValueAsDouble());
     }
 
 }
