@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: FollowTrajectoryCommandBuilder.java
 // Intent: A builder that returns a command to follow a PathPlanner trajectory
 // ************************************************************

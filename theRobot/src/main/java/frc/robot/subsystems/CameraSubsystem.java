@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: CameraSubsystem.java
 // Intent: Forms the prelminary code for the camera subsystem.
 // ************************************************************

@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: InstalledHardware.java
 // Intent: Forms a listing of switches that will help to debug code better as hardware is available (or not available).
 // ************************************************************

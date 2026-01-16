@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: public enum SwerveDriveMode.java
 // Intent: Forms enum to hold swerve drive modes.
 // ************************************************************
