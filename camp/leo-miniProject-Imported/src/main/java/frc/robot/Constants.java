@@ -25,6 +25,7 @@ public final class Constants {
   public static final double falconMaxVoltage = 12.0;
   public static final double motorStatorCurrentMaximumAmps = 100.0;
 
+  public static final int SPINNER_CAN_ID = 6;
   public static final double motorSpeed = 0.2;
 
 

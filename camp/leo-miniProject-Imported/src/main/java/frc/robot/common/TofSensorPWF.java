@@ -19,6 +19,7 @@ import frc.robot.Constants;
 * rest of the code to access the TOF. It's used to sense objects and how far away
 * the objects are from the TOF sensor.
 */
+
 public class TofSensorPWF {
     private TimeOfFlight tofSensor;
     private int canID;
@@ -43,12 +44,14 @@ public class TofSensorPWF {
 
 /**
  * getter function for the display name variable
+ * @return displayName
  */
     public String getDisplayName(){
         return displayName;
     }
 /**
  * Gets the number of inches that a object is away from the TOF sensor
+ * @returns distance in inches
  */
     public double getRangeInches(){
         return Units.metersToInches(tofSensor.getRange()/1000);   
@@ -56,6 +59,7 @@ public class TofSensorPWF {
 
 /**
  * Returns true if an object is in range
+ * @return boolean (true if range is valid)
  * 
  */
     public boolean isRangeValid(){
