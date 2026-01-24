@@ -55,7 +55,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private boolean lessThanAMeter = false;
 
-  private boolean displayOdometryDiagnostics = false;
+  private boolean displayOdometryDiagnostics = true;
 
   StructArrayPublisher<SwerveModuleState> publisher;
 
@@ -544,13 +544,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("vision timestamp", visionBotPose.getTimestamp());
         SmartDashboard.putNumber("current timestamp", Utils.fpgaToCurrentTime(visionBotPose.getTimestamp()));
         SmartDashboard.putNumber("robot timestamp", Timer.getFPGATimestamp());
-
+        SmartDashboard.putBoolean("VisionWithinAMeter", lessThanAMeter);
+      }
         SmartDashboard.putNumber("RobotFieldHeadingDegrees", drivetrain.getState().Pose.getRotation().getDegrees());
         SmartDashboard.putNumber("RobotFieldXCoordinateMeters", drivetrain.getState().Pose.getX());
         SmartDashboard.putNumber("RobotFieldYCoordinateMeters", drivetrain.getState().Pose.getY());
-        SmartDashboard.putBoolean("VisionWithinAMeter", lessThanAMeter);
+
         SmartDashboard.putBoolean("UseVision", useVision);
-      }
     }
   }
 }
