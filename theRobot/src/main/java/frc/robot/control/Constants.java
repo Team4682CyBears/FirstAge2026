@@ -12,6 +12,7 @@ package frc.robot.control;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import static edu.wpi.first.units.Units.Inches;
 
@@ -38,6 +39,11 @@ public final class Constants {
     public static final PathConstraints autoAlignPathConstraints = new PathConstraints(3.0, 2.0, 540, 720);
     // Diagnostic Constants
     public static final boolean putDiagnosticPaths = true;
+
+    // *****************************************************************
+    // Field Constants
+    public static final Translation2d blueHubPosition = new Translation2d(1,1);
+    public static final Translation2d redHubPosition = new Translation2d(1,1);
     
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.

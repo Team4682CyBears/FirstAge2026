@@ -36,6 +36,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.math.numbers.N1;
@@ -120,6 +122,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
+  private TrapezoidProfile.Constraints TrapProfConstraints = new TrapezoidProfile.Constraints(MAX_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED, MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND);
+  private ProfiledPIDController autoAnglePID = new ProfiledPIDController(0.001, 0.0, 0.0, TrapProfConstraints);
+
+  private double autoAngleVelocity = 0.0;
+
   /**
    * Constructor for this DrivetrainSubsystem
    */
@@ -181,12 +188,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
       this.previousChassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(previousChassisSpeeds, getGyroscopeRotation());
     }
     this.swerveDriveMode = SwerveDriveMode.FIELD_CENTRIC_SHOOTING;
-    /**ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(
+    ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(
       updatedChassisSpeeds.vxMetersPerSecond,
       updatedChassisSpeeds.vyMetersPerSecond,
-      getVThetaAuto());
-    **/
-    this.chassisSpeeds = updatedChassisSpeeds;
+      getAutoAngleVelocity());
+    this.chassisSpeeds = newChassisSpeeds;
   }
 
   /**
@@ -260,6 +266,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return drivetrain.getState().Pose.getRotation();
   }
 
+  public double getAutoAngleVelocity(){
+    return this.autoAngleVelocity;
+  }
+
   /**
    * A method to get the current position of the robot
    * 
@@ -267,6 +277,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
    */
   public Pose2d getRobotPosition() {
     return drivetrain.getState().Pose;
+  }
+
+  /**
+   * @param targetX meters
+   * @param targetY meters
+   * @return desired field relative Rotation2d for the robot to face the target
+   */
+  public Rotation2d getYawToFaceTarget(Translation2d targetTranslation) {
+    Pose2d botPos = getRobotPosition();
+    double dx = targetTranslation.getX() - botPos.getX();
+    double dy = targetTranslation.getY() - botPos.getY();
+
+    double angleRad = Math.atan2(dy, dx);
+    return Rotation2d.fromRadians(angleRad);
   }
 
   /**
@@ -365,7 +389,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
           .withVelocityY(chassisSpeeds.vyMetersPerSecond)
           .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
     }
+    double robotYawDegrees = getRobotPosition().getRotation().getDegrees();
+    Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
+    setAutoAngleVelocity(autoAnglePID.calculate(robotYawDegrees, getYawToFaceTarget(hubPosition).getDegrees()));
+
     displayDiagnostics();
+  }
+
+  public void setAutoAngleVelocity(double newVelocity){
+    this.autoAngleVelocity = newVelocity;
   }
 
   /**
