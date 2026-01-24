@@ -98,7 +98,7 @@ public class RunExperimentCommand extends Command {
             System.out.println("THE COMMAND WAS INTERRUPTED!!");
         }
         // prints out final data
-        spiningMotor.motorStop();
+        spiningMotor.spin(0); // stops the motor
         double meanValue = 0;
         int skippedCycles = 0;
         double expectedCycleTime = 1.0/(2*desiredSpeed/60.0); //pole comes by 2 times per RPS

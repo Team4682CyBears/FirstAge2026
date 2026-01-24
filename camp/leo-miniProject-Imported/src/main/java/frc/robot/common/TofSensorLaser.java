@@ -1,6 +1,12 @@
-package frc.robot.common;
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - First Age - 2026
+// File: TofSensorLaser.java
+// ************************************************************
 
-// t
+
+package frc.robot.common;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -47,7 +53,8 @@ public class TofSensorLaser {
 
     /**
      * Gets the distance in meters from the laserCan sensor
-     * @return distance in meters
+     * @return distance (double) in inches
+     * 
      */ 
     // use wpilib units to convert to inches. metersToInches and inchesToMeters
     public double getRangeInches() {

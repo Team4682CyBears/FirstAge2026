@@ -1,3 +1,11 @@
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - First Age - 2026
+// File: TofSensorCTRE.java
+// ************************************************************
+
+
 package frc.robot.common;
 
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -33,6 +41,7 @@ public class TofSesorCTRE {
      * @param rangeSensorCanId int
      * @param MaxRange double
      */
+
     // make constructor take in only CANID. 
     // get max range as a class variable. 
     // for now, assume main canBus. so don't use canbus parameter.
@@ -55,16 +64,21 @@ public class TofSesorCTRE {
         return (distance.in(Inches));
     }
 
-
-    
-    
+    /**
+     * Returns true if an object is in range
+     * @return boolean (true if range is valid (0 to MAX_RANGE_INCHES))
+     * 
+     */
 
     public boolean isRangeValid() {
         double distance = getRangeInches();
         return (distance >= 0 && distance <= Constants.MAX_RANGE_INCHES);
     }
 
-
+    /**
+     * Publishes telemetry data to the SmartDashboard
+     * Publishes distance in inches and range valid boolean
+     */
     public void publishTelemetery(){
         SmartDashboard.putNumber(displayName + " DistanceIn ", getRangeInches());
         SmartDashboard.putBoolean(displayName + " RangeValid ", isRangeValid());

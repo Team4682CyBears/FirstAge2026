@@ -32,8 +32,9 @@ public class Implementation extends SubsystemBase{
      * @param useCTRE boolean to determine whether to create CTRE TOF sensor
      * @param usePWF boolean to determine whether to create PWF TOF sensor
      * @param useLaser boolean to determine whether to create Laser TOF sensor
+     * @param useSpinner boolean to determine whether to create Spinner motor
      */
-    public Implementation(boolean useCTRE, boolean usePWF, boolean useLaser){
+    public Implementation(boolean useCTRE, boolean usePWF, boolean useLaser, boolean useSpinner){
         if (useCTRE){
             tofSensorCTRE = new TofSesorCTRE(10);
         } 
@@ -43,13 +44,25 @@ public class Implementation extends SubsystemBase{
         if (useLaser){
             tofSensorLaser = new TofSensorLaser(15);
         }
-        spinner = new Spinner(Constants.SPINNER_CAN_ID);
+        if (useSpinner){
+            spinner = new Spinner(Constants.SPINNER_CAN_ID);
+        }
     }
 
+    /**
+     * sets the speed value to the speed value that the motor will spin at (RPM)
+     * @param speed double speed to set the motor to
+     */
     public void setMotorSpeed(double speed){
         this.speed = speed;
         //spinner.spin(speed);
     }
+
+    /**
+     * periodic function that runs every 20ms
+     * publishes telemetry for each TOF sensor (if they are created/enabled)
+     * spins the motor at the set speed (if spinner is created)
+     */
     @Override
     public void periodic(){
         if(this.tofSensorCTRE != null){
@@ -63,6 +76,7 @@ public class Implementation extends SubsystemBase{
         }
         if(this.spinner != null){
             setMotorSpeed(10);
+            spinner.spin(speed);
         }
     }
 

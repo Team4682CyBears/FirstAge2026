@@ -1,3 +1,11 @@
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - First Age - 2026
+// File: Spinner.java
+// ************************************************************
+
+
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
@@ -13,10 +21,16 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.Velocity;
 
 public class Spinner extends SubsystemBase {
     private final TalonFX motor;
     
+    /**
+     * Contructor for Spinner class under subsystem
+     * configures spinner motor and its voltage,etc
+     * @param canID int
+     */
     public Spinner(int canID) {
         motor = new TalonFX(canID);
         TalonFXConfiguration config = new TalonFXConfiguration();
@@ -40,6 +54,11 @@ public class Spinner extends SubsystemBase {
         }  
     }
 
+    /**
+     * Sets the motor speed to the given value
+     * Stops motor if speed is 0
+     * @param speed double
+     */
     public void spin(double speed) {
        speed = MathUtil.clamp(speed, -1, 1);
        motor.set(speed);
@@ -50,18 +69,25 @@ public class Spinner extends SubsystemBase {
         speed = 0; // for testing
     }
 
-    public void motorStop(){
-        //motor.stopMotor();
-        // not sure if we need to put stop motor as seperate method or just include in spin if speed 0.
-    } 
 
 
+    /**
+     * Gets the velocity speed of motor measured in RPM
+     * @return velocity speed as double (RPM)
+     */
     public double getSpeedRpm(){
-        //StatusSignal CTREAbomination = motor.getVelocity(true);
-        //return CTREAbomination.getValueAsDouble();
-        return 0;
+        //TODO: fix this. 
+        // StatusSignal<velocit> velocityStatSig = motor.getVelocity().getValueAsDouble();
+        // Velocity velocity = motor.getVelocity().getValue();
+        // StatusSignal CTREAbomination = motor.getVelocity(true);
+        // return CTREAbomination.getValueAsDouble();
+        return motor.getVelocity(true).getValueAsDouble();
     }
 
+    /**
+     * Publishes telemetry data to the SmartDashboard of spinner
+     * Publishes the spinner speed as double (RPM)
+     */
     public void publishTelemetry(){
         SmartDashboard.putNumber("Spinner_Speed", motor.getVelocity(true).getValueAsDouble());
     }
