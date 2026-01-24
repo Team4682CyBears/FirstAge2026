@@ -10,7 +10,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.common.TofSensorLazer;
+import frc.robot.common.TofSensorLaser;
 import frc.robot.common.TofSensorPWF;
 import frc.robot.common.TofSesorCTRE;
 
@@ -23,18 +23,33 @@ import frc.robot.common.TofSesorCTRE;
 public class Implementation extends SubsystemBase{
     private TofSesorCTRE tofSensorCTRE;
     private TofSensorPWF tofSensorPWF;
-    private TofSensorLazer tofSensorLazer;
+    private TofSensorLaser tofSensorLaser;
     private Spinner spinner;
     private double speed = 0;
 
-
-    public Implementation(){
-        tofSensorCTRE = new TofSesorCTRE(10, 20, null, Constants.MAX_RANGE_METERS);
-        tofSensorPWF = new TofSensorPWF(5);
-        tofSensorLazer = new TofSensorLazer(15);
+    /**
+     * Constructor for Implementation class that takes 
+     * @param useCTRE boolean to determine whether to create CTRE TOF sensor
+     * @param usePWF boolean to determine whether to create PWF TOF sensor
+     * @param useLaser boolean to determine whether to create Laser TOF sensor
+     */
+    public Implementation(boolean useCTRE, boolean usePWF, boolean useLaser){
+        if (useCTRE){
+            tofSensorCTRE = new TofSesorCTRE(10);
+        } 
+        if (usePWF){
+            tofSensorPWF = new TofSensorPWF(5);
+        }
+        if (useLaser){
+            tofSensorLaser = new TofSensorLaser(15);
+        }
         spinner = new Spinner(Constants.SPINNER_CAN_ID);
     }
 
+    public void setMotorSpeed(double speed){
+        this.speed = speed;
+        //spinner.spin(speed);
+    }
     @Override
     public void periodic(){
         if(this.tofSensorCTRE != null){
@@ -43,11 +58,11 @@ public class Implementation extends SubsystemBase{
         if(this.tofSensorPWF != null){
             this.tofSensorPWF.publishTelemetery();
         }
-        if(this.tofSensorLazer != null){
-            this.tofSensorLazer.publishTelemetery();
+        if(this.tofSensorLaser != null){
+            this.tofSensorLaser.publishTelemetery();
         }
         if(this.spinner != null){
-            this.tofSensorCTRE.publishTelemetery();
+            setMotorSpeed(10);
         }
     }
 

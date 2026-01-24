@@ -41,17 +41,18 @@ public class Spinner extends SubsystemBase {
     }
 
     public void spin(double speed) {
-    //    speed = MathUtil.clamp(speed, -1, 1);
-    //    motor.set(speed);
+       speed = MathUtil.clamp(speed, -1, 1);
+       motor.set(speed);
 
-    //     if(speed == 0){
-    //         motor.stopMotor();
-    //     }
+        if(speed == 0){
+            motor.stopMotor();
+        }
         speed = 0; // for testing
     }
 
     public void motorStop(){
         //motor.stopMotor();
+        // not sure if we need to put stop motor as seperate method or just include in spin if speed 0.
     } 
 
 
@@ -62,7 +63,7 @@ public class Spinner extends SubsystemBase {
     }
 
     public void publishTelemetry(){
-        //SmartDashboard.putNumber("Spinner_Speed", motor.getVelocity(true).getValueAsDouble());
+        SmartDashboard.putNumber("Spinner_Speed", motor.getVelocity(true).getValueAsDouble());
     }
 
 }

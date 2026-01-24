@@ -18,7 +18,7 @@ package frc.robot;
 public final class Constants {
   public static final int talonCanID = 4;
 
-  public static final double MAX_RANGE_METERS = 2.0;
+  public static final double MAX_RANGE_INCHES = 78.74; // 2 meter conversion
 
   public static final double motorSupplyCurrentMaximumAmps = 50.0;
   public static final double motorSupplyVoltageTimeConstant = 0.2;

@@ -49,12 +49,13 @@ public class TofSensorPWF {
     public String getDisplayName(){
         return displayName;
     }
+
 /**
  * Gets the number of inches that a object is away from the TOF sensor
  * @returns distance in inches
  */
     public double getRangeInches(){
-        return Units.metersToInches(tofSensor.getRange()/1000);   
+        return Units.metersToInches(tofSensor.getRange()*1000);   
     }
 
 /**
@@ -63,7 +64,7 @@ public class TofSensorPWF {
  * 
  */
     public boolean isRangeValid(){
-        return tofSensor.isRangeValid() && tofSensor.getRange() <= Constants.MAX_RANGE_METERS * 1000;
+        return tofSensor.isRangeValid() && tofSensor.getRange() <= Constants.MAX_RANGE_INCHES;
 
     }
 
@@ -74,7 +75,6 @@ public class TofSensorPWF {
         SmartDashboard.putNumber(displayName + " Range Inches" , this.getRangeInches());
         SmartDashboard.putBoolean(displayName + " Range Is Valid", this.isRangeValid());
         SmartDashboard.putString(displayName + " TOF Status", this.tofSensor.getStatus().toString());
-        //System.out.println("TOF telemtry published!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       }
     
 }

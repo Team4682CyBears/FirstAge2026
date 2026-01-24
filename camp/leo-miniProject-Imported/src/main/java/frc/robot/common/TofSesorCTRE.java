@@ -2,11 +2,16 @@ package frc.robot.common;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.CANrange;
+
+import static edu.wpi.first.units.Units.Inches;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.controls.compound.Diff_PositionVoltage_Velocity;
 import com.ctre.phoenix6.hardware.core.CoreCANcoder;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
@@ -18,8 +23,6 @@ import frc.robot.Constants;
 public class TofSesorCTRE {
     
     private CANcoder tofSesor;
-    private CANBus canBus;
-    private int tofSensorCanId;
     private String displayName;
     private CANrange rangeSensor;
     private int rangeSensorCanId;
@@ -27,42 +30,44 @@ public class TofSesorCTRE {
 
     /**
      * Contructor method for TofSensorCTRE
-     * @param tofSensorCan
-     * @param rangeSensorCanId
-     * @param canBus
-     * @param MaxRange
+     * @param rangeSensorCanId int
+     * @param MaxRange double
      */
-    public TofSesorCTRE(int tofSensorCan, int rangeSensorCanId, CANBus canBus, double MaxRange) {
-        tofSesor = new CANcoder(tofSensorCanId, canBus);
-        rangeSensor = new CANrange(rangeSensorCanId, canBus);
-        this.canBus = canBus;
-        this.tofSensorCanId = tofSensorCanId;
+    // make constructor take in only CANID. 
+    // get max range as a class variable. 
+    // for now, assume main canBus. so don't use canbus parameter.
+    public TofSesorCTRE(int rangeSensorCanId) {
+        // get rid pf cancoder here. 
+        rangeSensor = new CANrange(rangeSensorCanId);
         this.rangeSensorCanId = rangeSensorCanId;
-        this.displayName = "TofSesor_" + tofSensorCanId;
+        this.displayName = "TofSesor_" + rangeSensorCanId;
     }
 
+  
     /**
-     * Gets the distance in metesr from the CANrange sensor
-     * @return distance in meters
+     * Gets the distance in inches from the TOF sensor
+     * @return double distance in inches
      */
-    public double getDistanceMeters() {
-        StatusSignal statSig = rangeSensor.getDistance();
-        double distanceMM = statSig.getValueAsDouble();
-        SmartDashboard.putNumber(displayName + "_DistanceMM", distanceMM);
-        return (distanceMM/100.0);
+    public double getRangeInches() {
+        StatusSignal<Distance> statSig = rangeSensor.getDistance();
+        Distance distance = statSig.getValue();
+        SmartDashboard.putNumber(displayName + "_DistanceIn", distance.in(Inches));
+        return (distance.in(Inches));
     }
+
+
     
     
 
     public boolean isRangeValid() {
-        double distance = getDistanceMeters();
-        return (distance >= 0 && distance <= Constants.MAX_RANGE_METERS);
+        double distance = getRangeInches();
+        return (distance >= 0 && distance <= Constants.MAX_RANGE_INCHES);
     }
 
 
     public void publishTelemetery(){
-        SmartDashboard.putNumber(displayName, getDistanceMeters());
-        SmartDashboard.putBoolean(displayName, isRangeValid());
+        SmartDashboard.putNumber(displayName + " DistanceIn ", getRangeInches());
+        SmartDashboard.putBoolean(displayName + " RangeValid ", isRangeValid());
         //SmartDashboard.putString(displayName, " ToF status " + CANBus.CANBusStatus + rangeSensorCanId)
     }
 

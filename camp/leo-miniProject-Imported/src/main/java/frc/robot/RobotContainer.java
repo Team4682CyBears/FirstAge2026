@@ -32,13 +32,15 @@ import frc.robot.subsystems.Spinner;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Spinner spinnerMotor = new Spinner(Constants.SPINNER_CAN_ID);
-  Implementation tof = new Implementation();
+  
+  Implementation tof = new Implementation(true, true, true);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     double motorSpeed = 140; //rpm
     SmartDashboard.putData( "Run Experiment Command",
         new RunExperimentCommand(motorSpeed, spinnerMotor, tof, 20)
+
      );
   }
 
