@@ -26,6 +26,7 @@ import frc.robot.generated.LimelightHelpers;
 import frc.robot.generated.TardiTunerConstants;
 import frc.robot.generated.Telemetry;
 import frc.robot.control.SwerveDriveMode;
+import frc.robot.control.SwerveYawMode;
 import frc.robot.generated.TedTunerConstants;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.common.MotorUtils;
@@ -98,6 +99,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private double speedReductionFactor = 1.0;
 
   private SwerveDriveMode swerveDriveMode = SwerveDriveMode.FIELD_CENTRIC_DRIVING;
+
+  private SwerveYawMode swerveYawMode = SwerveYawMode.JOYSTICK;
 
   private SwerveDrivetrain<TalonFX, TalonFX, CANcoder> drivetrain = InstalledHardware.tardiDrivetrainInstalled
       ? new TardiTunerConstants.TunerSwerveDrivetrain(TardiTunerConstants.DrivetrainConstants, 0,
@@ -302,6 +305,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return swerveDriveMode;
   }
 
+  public SwerveYawMode getSwerveYawMode() {
+    return swerveYawMode;
+  }
+
   /**
    * Perodic for this subsystem - very important for it to run every scheduler
    * cycle - 50Hz
@@ -407,6 +414,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
    */
   public void setRobotPosition(Pose2d updatedPosition) {
     drivetrain.resetPose(updatedPosition);
+  }
+
+  public void setSwerveYawMode(SwerveYawMode mode){
+    swerveYawMode = mode;
   }
 
   /**

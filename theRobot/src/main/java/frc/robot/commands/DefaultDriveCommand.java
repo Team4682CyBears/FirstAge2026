@@ -12,6 +12,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.control.SwerveYawMode;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 import java.util.function.DoubleSupplier;
@@ -43,8 +44,11 @@ public class DefaultDriveCommand extends Command {
                 m_translationXSupplier.getAsDouble(),
                 m_translationYSupplier.getAsDouble(),
                 m_rotationSupplier.getAsDouble());
-
-        m_drivetrainSubsystem.driveFieldCentric(commandedChassisSpeeds);
+        if (m_drivetrainSubsystem.getSwerveYawMode() == SwerveYawMode.JOYSTICK){
+            m_drivetrainSubsystem.driveFieldCentric(commandedChassisSpeeds);
+        } else if (m_drivetrainSubsystem.getSwerveYawMode() == SwerveYawMode.AUTO){
+            m_drivetrainSubsystem.driveFieldCentricShooting(commandedChassisSpeeds);
+        }
     }
 
     @Override
