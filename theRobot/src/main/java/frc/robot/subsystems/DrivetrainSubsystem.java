@@ -296,6 +296,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * occurs during testing.
      */
     if (DriverStation.isDisabled()) {
+      LimelightHelpers.SetIMUMode("", 1);
+
       if (!m_hasAppliedOperatorPerspective) {
         DriverStation.getAlliance().ifPresent(allianceColor -> {
           drivetrain.setOperatorPerspectiveForward(
@@ -306,8 +308,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
         });
       }
       // When disabled countinually set the botpose to what the vision says
-
       this.seedRobotPositionFromVision();
+    }
+    else{
+      LimelightHelpers.SetIMUMode("", 3);
+      LimelightHelpers.SetIMUAssistAlpha("", 0.01);
     }
 
     if (InstalledHardware.limelightInstalled) {
