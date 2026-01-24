@@ -13,6 +13,10 @@ public final class Constants {
   public static final int krakenMotor1CanID = 3;
   public static final int krakenMotor2CanID = 4;
 
+  // Rev Servo CAN IDs
+  public static final int servoHubCanID = 5;
+
+
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
   }
