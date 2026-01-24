@@ -11,18 +11,19 @@ public class SetServoPositionCommand extends Command{
     public SetServoPositionCommand(ShooterAngleServoSubsystem servoHub, ShooterAngle angle) {
         this.angle = angle;
         this.servoHub = servoHub;
-
+        
         addRequirements(servoHub);
     }
 
     @Override
     public void execute() {
-        
+        servoHub.setPosition(angle);
         //motor1.setTargetRPM(100);
     }
 
     @Override
     public void end(boolean interrupted) {
+        servoHub.stop();
     }
 
     @Override
