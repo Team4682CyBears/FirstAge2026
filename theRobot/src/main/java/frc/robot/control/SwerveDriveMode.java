@@ -13,5 +13,6 @@ package frc.robot.control;
 public enum SwerveDriveMode {
     FIELD_CENTRIC_DRIVING,
     ROBOT_CENTRIC_DRIVING,
+    FIELD_CENTRIC_SHOOTING,
     IMMOVABLE_STANCE
 }
