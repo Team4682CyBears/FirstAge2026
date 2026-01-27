@@ -56,17 +56,17 @@ public class Spinner extends SubsystemBase {
 
     /**
      * Sets the motor speed to the given value
-     * Stops motor if speed is 0
+     * calls stopMotor if speed is set to 0
      * @param speed double
      */
     public void spin(double speed) {
        speed = MathUtil.clamp(speed, -1, 1);
        motor.set(speed);
-
+    
         if(speed == 0){
             motor.stopMotor();
         }
-        speed = 0; // for testing
+         // speed = 0; // for testing
     }
 
 
@@ -76,6 +76,7 @@ public class Spinner extends SubsystemBase {
      * @return velocity speed as double (RPM)
      */
     public double getSpeedRpm(){
+
         //TODO: fix this. 
         // StatusSignal<velocit> velocityStatSig = motor.getVelocity().getValueAsDouble();
         // Velocity velocity = motor.getVelocity().getValue();
@@ -89,7 +90,7 @@ public class Spinner extends SubsystemBase {
      * Publishes the spinner speed as double (RPM)
      */
     public void publishTelemetry(){
-        SmartDashboard.putNumber("Spinner_Speed", motor.getVelocity(true).getValueAsDouble());
+        SmartDashboard.putNumber("Spinner_Speed ", motor.getVelocity(true).getValueAsDouble());
     }
 
 }
