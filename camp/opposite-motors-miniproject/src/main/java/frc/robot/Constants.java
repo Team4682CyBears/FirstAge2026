@@ -6,8 +6,8 @@ package frc.robot;
 
 public final class Constants {
   // SparkFlex motor CAN IDs
-  public static final int motor1CanID = 1;
-  public static final int motor2CanID = 2;
+  public static final int motor1CanID = 5;
+  public static final int motor2CanID = 1;
   
   // Kraken motor CAN IDs
   public static final int krakenMotor1CanID = 3;
