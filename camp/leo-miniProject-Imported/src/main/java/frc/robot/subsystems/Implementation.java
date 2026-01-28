@@ -36,13 +36,13 @@ public class Implementation extends SubsystemBase{
      */
     public Implementation(boolean useCTRE, boolean usePWF, boolean useLaser, boolean useSpinner){
         if (useCTRE){
-            tofSensorCTRE = new TofSesorCTRE(10);
+            tofSensorCTRE = new TofSesorCTRE(Constants.rangeSensorCTRECanID);
         } 
         if (usePWF){
-            tofSensorPWF = new TofSensorPWF(5);
+            tofSensorPWF = new TofSensorPWF(Constants.rangeSensorPWFCanID);
         }
         if (useLaser){
-            tofSensorLaser = new TofSensorLaser(15);
+            tofSensorLaser = new TofSensorLaser(Constants.rangeSensorLaserCanID);
         }
         if (useSpinner){
             spinner = new Spinner(Constants.SPINNER_CAN_ID);

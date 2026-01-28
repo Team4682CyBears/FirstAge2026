@@ -20,12 +20,18 @@ public final class Constants {
 
   public static final double MAX_RANGE_INCHES = 78.74; // 2 meter conversion
 
+  // CAN Ids for sensors and spinner
+  public static final int rangeSensorCTRECanID = 10;
+  public static final int rangeSensorPWFCanID = 5;
+  public static final int rangeSensorLaserCanID = 15;
+  public static final int SPINNER_CAN_ID = 6;
+
+  // AMPS and Voltage constants for motor config 
   public static final double motorSupplyCurrentMaximumAmps = 50.0;
   public static final double motorSupplyVoltageTimeConstant = 0.2;
   public static final double falconMaxVoltage = 12.0;
   public static final double motorStatorCurrentMaximumAmps = 100.0;
 
-  public static final int SPINNER_CAN_ID = 6;
   public static final double motorSpeed = 0.2;
 
 
