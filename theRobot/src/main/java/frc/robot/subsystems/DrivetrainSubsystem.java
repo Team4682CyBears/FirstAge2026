@@ -39,6 +39,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.math.numbers.N1;
@@ -50,6 +51,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.MathUtil;
 
 public class DrivetrainSubsystem extends SubsystemBase {
   private CameraSubsystem cameraSubsystem;
@@ -125,8 +127,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
-  private TrapezoidProfile.Constraints TrapProfConstraints = new TrapezoidProfile.Constraints(MAX_ANGULAR_ACCELERATION_RADIANS_PER_SECOND_SQUARED, MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND);
-  private ProfiledPIDController autoAnglePID = new ProfiledPIDController(0.001, 0.0, 0.0, TrapProfConstraints);
+  private TrapezoidProfile.Constraints TrapProfConstraints = new TrapezoidProfile.Constraints(540, 720);
+  private ProfiledPIDController autoAnglePID = new ProfiledPIDController(1.0, 0.0, 0.0, TrapProfConstraints);
 
   private double autoAngleVelocity = 0.0;
 
@@ -396,9 +398,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
           .withVelocityY(chassisSpeeds.vyMetersPerSecond)
           .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
     }
-    double robotYawDegrees = getRobotPosition().getRotation().getDegrees();
-    Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
-    setAutoAngleVelocity(autoAnglePID.calculate(robotYawDegrees, getYawToFaceTarget(hubPosition).getDegrees()));
+    if (swerveYawMode == SwerveYawMode.AUTO){
+      double robotYawDegrees = getRobotPosition().getRotation().getRadians();
+      Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
+      setAutoAngleVelocity(autoAnglePID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0));
+      System.out.println(robotYawDegrees);
+      System.out.println(getYawToFaceTarget(hubPosition).getRadians());
+      System.out.println(autoAnglePID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0));
+      System.out.println("------------");
+    }
 
     displayDiagnostics();
   }

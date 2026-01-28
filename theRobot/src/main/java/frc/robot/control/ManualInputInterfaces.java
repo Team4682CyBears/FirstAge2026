@@ -10,6 +10,7 @@
 
 package frc.robot.control;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -184,6 +185,15 @@ public class ManualInputInterfaces {
                                     "driverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
 
+            this.driverController.y().onTrue(
+                    new ParallelCommandGroup(
+                        new InstantCommand(() -> this.subsystemCollection.getDriveTrainSubsystem().setSwerveYawMode(SwerveYawMode.AUTO)),
+                        new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode AUTO")));
+
+            this.driverController.y().onFalse(
+                    new ParallelCommandGroup(
+                        new InstantCommand(() -> this.subsystemCollection.getDriveTrainSubsystem().setSwerveYawMode(SwerveYawMode.JOYSTICK)),
+                        new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode JOYSTICK")));
         }
     }
 
