@@ -14,7 +14,7 @@ public final class Constants {
   public static final int krakenMotor2CanID = 4;
 
   // Rev Servo CAN IDs
-  public static final int servoHubCanID = 5;
+  public static final int servoHubCanID = 37;
 
   // Rev Servo Left-Right Positions
   public static double servoLeftPosition = 500;

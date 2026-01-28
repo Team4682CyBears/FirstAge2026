@@ -16,7 +16,8 @@ public class SetServoPositionCommand extends Command{
     }
 
     @Override
-    public void execute() {
+    public void initialize() {
+    //public void execute() {
         
         servoHub.setPosition(angle);
         //motor1.setTargetRPM(100);

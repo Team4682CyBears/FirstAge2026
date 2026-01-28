@@ -43,8 +43,8 @@ public class RobotContainer {
     // Left trigger runs SparkFlex motors
     
 
-    Constants.servoLeftPosition  = SmartDashboard.getNumber("Servo high/right target", Constants.servoLeftPosition);
-    Constants.servoRightPosition  = SmartDashboard.getNumber("Servo low/left target", Constants.servoRightPosition);
+    //Constants.servoLeftPosition  = SmartDashboard.getNumber("Servo high/right target", Constants.servoLeftPosition);
+    //Constants.servoRightPosition  = SmartDashboard.getNumber("Servo low/left target", Constants.servoRightPosition);
 
 
     //m_driverController.leftTrigger().whileTrue(new RunMotorsCommand(m_motor1));
