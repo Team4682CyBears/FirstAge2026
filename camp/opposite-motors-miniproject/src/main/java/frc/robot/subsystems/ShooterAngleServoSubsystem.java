@@ -19,6 +19,7 @@ import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.servohub.ServoChannel;
 import com.revrobotics.servohub.ServoChannel.ChannelId;
 import frc.robot.common.ShooterAngle;
+import frc.robot.Constants;
 
 public class ShooterAngleServoSubsystem extends ServoSubsystem{
 
@@ -57,14 +58,14 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
     public void setPosition(ShooterAngle position){
         switch(position){
             case LEFT:
-                channel0.setPulseWidth(500);
-                channel1.setPulseWidth(500);
+                channel0.setPulseWidth((int) Constants.servoLeftPosition);
+                channel1.setPulseWidth((int) Constants.servoLeftPosition);
             case RIGHT:
-                channel0.setPulseWidth(2500);
-                channel1.setPulseWidth(2500);
+                channel0.setPulseWidth((int) Constants.servoRightPosition);
+                channel1.setPulseWidth((int) Constants.servoRightPosition);
             default:
-                channel0.setPulseWidth(1500);
-                channel1.setPulseWidth(1500);
+                channel0.setPulseWidth((int) Constants.servoDefaultPosition);
+                channel1.setPulseWidth((int) Constants.servoDefaultPosition);
         }
     };
     
@@ -78,5 +79,11 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
     public int getID(){
         return canID;
     };
+
+    @Override
+    public void periodic() {
+        //SmartDashboard.putNumber("Real Motor RPM (ID: %d)".formatted(canID), left);
+    }
+
 
 }

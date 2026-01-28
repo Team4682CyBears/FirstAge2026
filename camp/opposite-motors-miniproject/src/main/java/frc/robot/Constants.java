@@ -16,6 +16,10 @@ public final class Constants {
   // Rev Servo CAN IDs
   public static final int servoHubCanID = 5;
 
+  // Rev Servo Left-Right Positions
+  public static double servoLeftPosition = 500;
+  public static double servoRightPosition = 2500;
+  public static final double servoDefaultPosition = 1500;
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;

@@ -20,8 +20,8 @@ public class RunMotorsCommand extends Command {
 
   @Override
   public void execute() {
-    motor1.runRPM(SmartDashboard.getNumber("Motor Target RPM 1", 0));
-    //motor1.setTargetRPM(100);
+     motor1.runRPM(SmartDashboard.getNumber("Motor Target RPM 1", 0));
+   //motor1.setTargetRPM(100);
   }
 
   @Override

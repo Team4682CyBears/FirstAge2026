@@ -43,12 +43,15 @@ public class RobotContainer {
     // Left trigger runs SparkFlex motors
     
 
+    Constants.servoLeftPosition  = SmartDashboard.getNumber("Servo high/right target", Constants.servoLeftPosition);
+    Constants.servoRightPosition  = SmartDashboard.getNumber("Servo low/left target", Constants.servoRightPosition);
 
 
     m_driverController.leftTrigger().whileTrue(new RunMotorsCommand(m_motor1));
     m_driverController.rightTrigger().whileTrue(new RunMotorsVoltsCommand(m_motor1));
     m_driverController.rightBumper().toggleOnTrue(new SetServoPositionCommand(servoHub, ShooterAngle.RIGHT));
     m_driverController.leftBumper().toggleOnTrue(new SetServoPositionCommand(servoHub, ShooterAngle.LEFT));
+
     // Right trigger runs Kraken motors
     // m_driverController.rightTrigger().whileTrue(new RunMotorsCommand(m_krakenMotor1, m_krakenMotor2));
   }
