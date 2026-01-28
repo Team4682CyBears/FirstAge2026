@@ -26,8 +26,11 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
     private final int canID;
     private final ServoHubConfig config;
     private final ServoHub servoHub;
-    private final ServoChannel channel0;
-    private final ServoChannel channel1;
+    private ServoChannel channel0;
+    private ServoChannel channel1;
+    private int setPosition = 500;
+    private boolean isEnabled = true;
+    
 
     public ShooterAngleServoSubsystem(int canID){
         this.canID = canID; 
@@ -43,37 +46,40 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
         config.channel0.pulseRange(500, 1500, 2500);
         config.channel1.pulseRange(500, 1500, 2500);
 
-        servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 5000);
+        servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 20000);
 
-        channel0.setPowered(true);
-        channel1.setPowered(true);
+        channel0.setPowered(isEnabled);
+        channel1.setPowered(isEnabled);
 
-        channel0.setEnabled(true);
-        channel1.setEnabled(true);
+        channel0.setEnabled(isEnabled);
+        channel1.setEnabled(isEnabled);
 
-        channel0.setPulseWidth(1500);
-        channel1.setPulseWidth(1500);
+        channel0.setPulseWidth((int) Constants.servoDefaultPosition);
+        channel1.setPulseWidth((int) Constants.servoDefaultPosition);
     }
 
     public void setPosition(ShooterAngle position){
+        configureServos();
+
         switch(position){
             case LEFT:
-                channel0.setPulseWidth((int) Constants.servoLeftPosition);
-                channel1.setPulseWidth((int) Constants.servoLeftPosition);
+                setPosition = (int) Constants.servoLeftPosition;
+                break;
             case RIGHT:
-                channel0.setPulseWidth((int) Constants.servoRightPosition);
-                channel1.setPulseWidth((int) Constants.servoRightPosition);
+                setPosition = (int) Constants.servoRightPosition;
+                break;
             default:
-                channel0.setPulseWidth((int) Constants.servoDefaultPosition);
-                channel1.setPulseWidth((int) Constants.servoDefaultPosition);
+                setPosition = (int) Constants.servoDefaultPosition;
+                break;
         }
     };
     
     public void stop(){
-        channel0.setPowered(false);
-        channel1.setPowered(false);
-        channel0.setEnabled(false);
-        channel1.setEnabled(false);
+        //isEnabled = false;
+        channel0.setPowered(isEnabled);
+        channel1.setPowered(isEnabled);
+        channel0.setEnabled(isEnabled);
+        channel1.setEnabled(isEnabled);
     };
     
     public int getID(){
@@ -83,7 +89,9 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
     @Override
     public void periodic() {
         //SmartDashboard.putNumber("Real Motor RPM (ID: %d)".formatted(canID), left);
+        if (isEnabled) {
+            channel0.setPulseWidth(setPosition);
+            channel1.setPulseWidth(setPosition);
+        }
     }
-
-
 }
