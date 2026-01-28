@@ -45,9 +45,7 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
     private void configureServos() {
         config.channel0.pulseRange(500, 1500, 2500);
         config.channel1.pulseRange(500, 1500, 2500);
-
-        servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 20000);
-
+        
         channel0.setPowered(isEnabled);
         channel1.setPowered(isEnabled);
 
@@ -63,9 +61,12 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
 
         switch(position){
             case LEFT:
+                // Actuator Period Defined here: https://www.actuonix.com/assets/images/datasheets/ActuonixL16datasheet.pdf?
+                servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 1000);
                 setPosition = (int) Constants.servoLeftPosition;
                 break;
             case RIGHT:
+                servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 2000);
                 setPosition = (int) Constants.servoRightPosition;
                 break;
             default:
