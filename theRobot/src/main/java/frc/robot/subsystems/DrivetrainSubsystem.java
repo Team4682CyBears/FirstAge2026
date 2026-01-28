@@ -127,11 +127,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
-  private TrapezoidProfile.Constraints TrapProfConstraints = new TrapezoidProfile.Constraints(540, 720);
-  private ProfiledPIDController autoAnglePID = new ProfiledPIDController(1.0, 0.0, 0.0, TrapProfConstraints);
+  private TrapezoidProfile.Constraints TrapProfConstraints = new TrapezoidProfile.Constraints(540, 920);
+  private ProfiledPIDController autoAnglePID = new ProfiledPIDController(2.0, 0.0, 0.001, TrapProfConstraints);
 
   private double autoAngleVelocity = 0.0;
-  private double minAngleVelocity = 0.1;
+  private double minAngleVelocity = 0.25;
   private double angleVelocityDeadband = 0.01;
 
   /**
@@ -374,7 +374,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // otherwise, we could tip the robot moving to this stance when bot is at high
       // velocity
       drivetrain.setControl(brakeDriveController);
-    } else if (swerveDriveMode == SwerveDriveMode.FIELD_CENTRIC_DRIVING) {
+    } else if (swerveDriveMode == SwerveDriveMode.FIELD_CENTRIC_DRIVING || swerveDriveMode == SwerveDriveMode.FIELD_CENTRIC_SHOOTING) {
       // apply the speed reduction factor to the chassis speeds
       ChassisSpeeds reducedChassisSpeeds = new ChassisSpeeds(
           chassisSpeeds.vxMetersPerSecond * this.speedReductionFactor,
