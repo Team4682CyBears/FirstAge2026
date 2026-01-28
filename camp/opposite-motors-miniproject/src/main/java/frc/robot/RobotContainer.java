@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class RobotContainer {
   // SparkFlex motors
-  private final SparkFlexMotorSubsystem m_motor1 = new SparkFlexMotorSubsystem(Constants.motor1CanID, Constants.motor2CanID);
+  //private final SparkFlexMotorSubsystem m_motor1 = new SparkFlexMotorSubsystem(Constants.motor1CanID, Constants.motor2CanID);
   private final ShooterAngleServoSubsystem servoHub = new ShooterAngleServoSubsystem(Constants.servoHubCanID);
   
   // // Kraken motors
@@ -47,8 +47,8 @@ public class RobotContainer {
     Constants.servoRightPosition  = SmartDashboard.getNumber("Servo low/left target", Constants.servoRightPosition);
 
 
-    m_driverController.leftTrigger().whileTrue(new RunMotorsCommand(m_motor1));
-    m_driverController.rightTrigger().whileTrue(new RunMotorsVoltsCommand(m_motor1));
+    //m_driverController.leftTrigger().whileTrue(new RunMotorsCommand(m_motor1));
+    //m_driverController.rightTrigger().whileTrue(new RunMotorsVoltsCommand(m_motor1));
     m_driverController.rightBumper().toggleOnTrue(new SetServoPositionCommand(servoHub, ShooterAngle.RIGHT));
     m_driverController.leftBumper().toggleOnTrue(new SetServoPositionCommand(servoHub, ShooterAngle.LEFT));
 
