@@ -402,10 +402,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
       double robotYawDegrees = getRobotPosition().getRotation().getRadians();
       Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
       setAutoAngleVelocity(autoAnglePID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0));
-      System.out.println(robotYawDegrees);
-      System.out.println(getYawToFaceTarget(hubPosition).getRadians());
-      System.out.println(autoAnglePID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0));
-      System.out.println("------------");
     }
 
     displayDiagnostics();
