@@ -131,6 +131,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private ProfiledPIDController autoAnglePID = new ProfiledPIDController(1.0, 0.0, 0.0, TrapProfConstraints);
 
   private double autoAngleVelocity = 0.0;
+  private double minAngleVelocity = 0.1;
+  private double angleVelocityDeadband = 0.01;
 
   /**
    * Constructor for this DrivetrainSubsystem
@@ -401,7 +403,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     if (swerveYawMode == SwerveYawMode.AUTO){
       double robotYawDegrees = getRobotPosition().getRotation().getRadians();
       Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
-      setAutoAngleVelocity(autoAnglePID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0));
+      double PIDout = autoAnglePID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0);
+      setAutoAngleVelocity((Math.abs(PIDout) > angleVelocityDeadband) ? PIDout + Math.signum(PIDout) * minAngleVelocity : 0.0);
     }
 
     displayDiagnostics();
