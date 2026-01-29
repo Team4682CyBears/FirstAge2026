@@ -32,6 +32,7 @@ public final class Constants {
   public static final double falconMaxVoltage = 12.0;
   public static final double motorStatorCurrentMaximumAmps = 100.0;
 
+  // Spinner motor speed constant
   public static final double motorSpeed = 10.0;
 
 
