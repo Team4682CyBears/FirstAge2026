@@ -14,7 +14,7 @@ public class AutoAimCommand extends Command {
 
     @Override
     public void execute() {
-        this.hoodSubsystem.setPosition((int) SmartDashboard.getNumber("Hood Extension", 1000));
+        this.hoodSubsystem.setAnglePosition((int) SmartDashboard.getNumber("Hood Angle", 1000));
     }
 
     @Override

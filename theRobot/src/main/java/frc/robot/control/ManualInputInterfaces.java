@@ -222,15 +222,27 @@ public class ManualInputInterfaces {
                 SmartDashboard.putNumber("Shooter RPM", currentRPM - 50);
             }));
             this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
-                double hoodExtention = SmartDashboard.getNumber("Hood Extension", 1000);
+                double hoodExtention = SmartDashboard.getNumber("Hood Angle", 1000);
                 if(hoodExtention >= 1050){
-                    SmartDashboard.putNumber("Hood Extension", hoodExtention - 50);
+                    SmartDashboard.putNumber("Hood Angle", hoodExtention - 50);
                 }
             }));
             this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
-                double hoodExtention = SmartDashboard.getNumber("Hood Extension", 1000);
+                double hoodExtention = SmartDashboard.getNumber("Hood Angle", 1000);
                 if(hoodExtention <= 1950){
-                    SmartDashboard.putNumber("Hood Extension", hoodExtention + 50);
+                    SmartDashboard.putNumber("Hood Angle", hoodExtention + 50);
+                }
+            }));
+            this.coDriverController.y().onTrue(new InstantCommand(() -> {
+                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", 1000);
+                if(hoodExtention >= 1050){
+                    SmartDashboard.putNumber("Hood Extendo", hoodExtention - 50);
+                }
+            }));
+            this.coDriverController.b().onTrue(new InstantCommand(() -> {
+                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", 1000);
+                if(hoodExtention <= 1950){
+                    SmartDashboard.putNumber("Hood Extendo", hoodExtention + 50);
                 }
             }));
 
