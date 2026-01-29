@@ -13,6 +13,9 @@ import frc.robot.commands.SetServoPositionCommand;
 import frc.robot.subsystems.SparkFlexMotorSubsystem;
 import frc.robot.subsystems.KrakenMotorSubsystem;
 import frc.robot.subsystems.ShooterAngleServoSubsystem;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -42,17 +45,26 @@ public class RobotContainer {
   private void configureBindings() {
     // Left trigger runs SparkFlex motors
     
-
-    //Constants.servoLeftPosition  = SmartDashboard.getNumber("Servo high/right target", Constants.servoLeftPosition);
-    //Constants.servoRightPosition  = SmartDashboard.getNumber("Servo low/left target", Constants.servoRightPosition);
-
+    SmartDashboard.putNumber("Servo target", Constants.servoCustomPosition);
 
     //m_driverController.leftTrigger().whileTrue(new RunMotorsCommand(m_motor1));
     //m_driverController.rightTrigger().whileTrue(new RunMotorsVoltsCommand(m_motor1));
-    m_driverController.rightBumper().toggleOnTrue(new SetServoPositionCommand(servoHub, ShooterAngle.RIGHT));
-    m_driverController.leftBumper().toggleOnTrue(new SetServoPositionCommand(servoHub, ShooterAngle.LEFT));
+    m_driverController.rightBumper().onTrue(new SetServoPositionCommand(servoHub, ShooterAngle.RIGHT));
+    m_driverController.leftBumper().onTrue(new SetServoPositionCommand(servoHub, ShooterAngle.LEFT));
+    m_driverController.a().onTrue(
+        new ParallelCommandGroup(
+            new InstantCommand(() ->
+                Constants.servoCustomPosition =
+                    SmartDashboard.getNumber("Servo target", 1000)
+            ),
+            new SetServoPositionCommand(servoHub, ShooterAngle.CUSTOM)
+        )
+    );
 
+    //ShooterAngleServoSubsystem.setValue(
+            //(int) SmartDashboard.getNumber("Servo Target", 1000)
+            //)
     // Right trigger runs Kraken motors
     // m_driverController.rightTrigger().whileTrue(new RunMotorsCommand(m_krakenMotor1, m_krakenMotor2));
   }
-}
+} 

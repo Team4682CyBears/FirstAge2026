@@ -14,5 +14,6 @@ package frc.robot.common;
 // positions from lowest to highest on reef
 public enum ShooterAngle {
     LEFT,
-    RIGHT
+    RIGHT,
+    CUSTOM,
 }

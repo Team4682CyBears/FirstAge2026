@@ -14,6 +14,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
 import com.revrobotics.servohub.config.ServoHubConfig;
 import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.servohub.ServoChannel;
@@ -39,12 +40,12 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
         this.channel1 = servoHub.getServoChannel(ChannelId.kChannelId1);
 
         configureServos();
-        //servoHub.configure(config, ServoHub.ResetMode.kResetSafeParameters);
+        servoHub.configure(config, ServoHub.ResetMode.kResetSafeParameters);
     }
 
     private void configureServos() {
-        config.channel0.pulseRange(500, 1500, 2500);
-        config.channel1.pulseRange(500, 1500, 2500);
+        config.channel0.pulseRange(1000, 1500, 2000);
+        config.channel1.pulseRange(1000, 1500, 2000);
         
         channel0.setPowered(isEnabled);
         channel1.setPowered(isEnabled);
@@ -55,7 +56,7 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
         channel0.setPulseWidth((int) Constants.servoDefaultPosition);
         channel1.setPulseWidth((int) Constants.servoDefaultPosition);
 
-        servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 1500);
+        servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 20000);
 
         servoHub.configure(config, ServoHub.ResetMode.kResetSafeParameters);
     }
@@ -73,9 +74,14 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
                 setPosition = (int) Constants.servoLeftPosition;
                 break;
             case RIGHT:
-                //System.out.println("right position");
+                System.out.println("right position");
                 //servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 2000);
                 setPosition = (int) Constants.servoRightPosition;
+                break;
+            case CUSTOM:
+                System.out.println("custom position");
+                //servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 2000);
+                setPosition = (int) Constants.servoCustomPosition;
                 break;
             default:
                 setPosition = (int) Constants.servoDefaultPosition;
@@ -85,6 +91,10 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
         channel0.setPulseWidth(setPosition);
         System.out.println(setPosition);
     };
+
+    public void setValue(int position){
+        setPosition = MathUtil.clamp(position, 1000, 2000);
+    }
     
     public void stop(){
         //isEnabled = false;

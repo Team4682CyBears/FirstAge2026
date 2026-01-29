@@ -17,8 +17,10 @@ public final class Constants {
   public static final int servoHubCanID = 37;
 
   // Rev Servo Left-Right Positions
-  public static double servoLeftPosition = 500;
-  public static double servoRightPosition = 2500;
+  public static double servoLeftPosition = 1000;
+  public static double servoRightPosition = 2000;
+  public static double servoCustomPosition = 1500;
+
   public static final double servoDefaultPosition = 1000;
 
   public static class OperatorConstants {
