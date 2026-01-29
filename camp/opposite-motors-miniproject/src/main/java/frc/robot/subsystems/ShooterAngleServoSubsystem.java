@@ -39,6 +39,7 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
         this.channel1 = servoHub.getServoChannel(ChannelId.kChannelId1);
 
         configureServos();
+        //servoHub.configure(config, ServoHub.ResetMode.kResetSafeParameters);
     }
 
     private void configureServos() {
@@ -54,8 +55,9 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
         channel0.setPulseWidth((int) Constants.servoDefaultPosition);
         channel1.setPulseWidth((int) Constants.servoDefaultPosition);
 
-        servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 5000);
+        servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 1500);
 
+        servoHub.configure(config, ServoHub.ResetMode.kResetSafeParameters);
     }
 
     public void setPosition(ShooterAngle position){
@@ -71,7 +73,7 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
                 setPosition = (int) Constants.servoLeftPosition;
                 break;
             case RIGHT:
-                System.out.println("right position");
+                //System.out.println("right position");
                 //servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 2000);
                 setPosition = (int) Constants.servoRightPosition;
                 break;
@@ -79,6 +81,9 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
                 setPosition = (int) Constants.servoDefaultPosition;
                 break;
         }
+
+        channel0.setPulseWidth(setPosition);
+        System.out.println(setPosition);
     };
     
     public void stop(){
@@ -102,8 +107,9 @@ public class ShooterAngleServoSubsystem extends ServoSubsystem{
             //System.out.println("Run to position in periodic " + setPosition);
             channel0.setPulseWidth(setPosition);
             channel1.setPulseWidth(setPosition);
+            //System.out.println("Set Position CH0 " + channel0.getPulseWidth());
+            //System.out.println("Set Position CH1 " + channel1.getPulseWidth());
         }
-        //System.out.println("Set Position CH0 " + channel0.getPulseWidth());
-        //System.out.println("Set Position CH1 " + channel1.getPulseWidth());
+
     }
 }
