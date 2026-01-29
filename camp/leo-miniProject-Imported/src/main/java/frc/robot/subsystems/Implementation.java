@@ -75,7 +75,7 @@ public class Implementation extends SubsystemBase{
             this.tofSensorLaser.publishTelemetery();
         }
         if(this.spinner != null){
-            setMotorSpeed(10);
+            setMotorSpeed(Constants.motorSpeed);
             spinner.spin(speed);
         }
     }

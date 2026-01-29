@@ -84,7 +84,5 @@ public class TofSesorCTRE {
         SmartDashboard.putBoolean(displayName + " RangeValid ", isRangeValid());
         //SmartDashboard.putString(displayName, " ToF status " + CANBus.CANBusStatus + rangeSensorCanId)
     }
-
-    
     
 }
