@@ -30,7 +30,6 @@ public class ShooterHoodServoSubsystem extends SubsystemBase {
     private ServoChannel channel0;
     private ServoChannel channel1;
     private int setPosition = 1500;
-    private boolean isEnabled = true;
 
     public ShooterHoodServoSubsystem(int canID) {
         this.canID = canID;
@@ -47,11 +46,11 @@ public class ShooterHoodServoSubsystem extends SubsystemBase {
         config.channel0.pulseRange(1000, 1500, 2000);
         config.channel1.pulseRange(1000, 1500, 2000);
 
-        channel0.setPowered(isEnabled);
-        channel1.setPowered(isEnabled);
+        channel0.setPowered(true);
+        channel1.setPowered(true);
 
-        channel0.setEnabled(isEnabled);
-        channel1.setEnabled(isEnabled);
+        channel0.setEnabled(true);
+        channel1.setEnabled(true);
 
         channel0.setPulseWidth(Constants.servoDefaultPosition);
         channel1.setPulseWidth(Constants.servoDefaultPosition);
@@ -63,7 +62,6 @@ public class ShooterHoodServoSubsystem extends SubsystemBase {
 
     // Between 1000 and 2000
     public void setPosition(int position) {
-        // configureServos();
 
         setPosition = MathUtil.clamp(position, 1000, 2000);
 
@@ -75,13 +73,6 @@ public class ShooterHoodServoSubsystem extends SubsystemBase {
     };
 
     public void stop() {
-        // isEnabled = false;
-        if (!isEnabled) {
-            channel0.setPowered(isEnabled);
-            channel1.setPowered(isEnabled);
-            channel0.setEnabled(isEnabled);
-            channel1.setEnabled(isEnabled);
-        }
     };
 
     public int getID() {
@@ -90,14 +81,7 @@ public class ShooterHoodServoSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // SmartDashboard.putNumber("Real Motor RPM (ID: %d)".formatted(canID), left);
-        if (isEnabled) {
-            // System.out.println("Run to position in periodic " + setPosition);
-            channel0.setPulseWidth(setPosition);
-            channel1.setPulseWidth(setPosition);
-            // System.out.println("Set Position CH0 " + channel0.getPulseWidth());
-            // System.out.println("Set Position CH1 " + channel1.getPulseWidth());
-        }
-
+        channel0.setPulseWidth(setPosition);
+        channel1.setPulseWidth(setPosition);
     }
 }
