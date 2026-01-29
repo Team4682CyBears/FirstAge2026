@@ -52,7 +52,7 @@ public class RobotContainer {
     m_driverController.rightBumper().onTrue(new SetServoPositionCommand(servoHub, ShooterAngle.RIGHT));
     m_driverController.leftBumper().onTrue(new SetServoPositionCommand(servoHub, ShooterAngle.LEFT));
     m_driverController.a().onTrue(
-        new ParallelCommandGroup(
+        new SequentialCommandGroup(
             new InstantCommand(() ->
                 Constants.servoCustomPosition =
                     SmartDashboard.getNumber("Servo target", 1000)
