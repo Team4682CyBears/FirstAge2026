@@ -13,7 +13,7 @@ package frc.robot.control;
 import frc.robot.subsystems.DrivetrainPowerSubsystem;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.PowerDistributionPanelWatcherSubsystem;
-import frc.robot.subsystems.ShooterHoodServoSubsystem;
+import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
@@ -29,7 +29,7 @@ public class SubsystemCollection {
     private PowerDistributionPanelWatcherSubsystem powerDistributionPanelWatcherSubsystem = null;
     private LEDSubsystem ledSubsystem = null;
     private ShooterSubsystem shooterSubsystem = null;
-    private ShooterHoodServoSubsystem hoodSubsystem = null;
+    private HoodSubsystem hoodSubsystem = null;
 
     /**
      * Default constructor
@@ -85,11 +85,11 @@ public class SubsystemCollection {
         return shooterSubsystem != null;
     }
 
-    public ShooterHoodServoSubsystem getHoodSubsystem() {
+    public HoodSubsystem getHoodSubsystem() {
         return hoodSubsystem;
     }
 
-    public void setHoodSubsystem(ShooterHoodServoSubsystem value) {
+    public void setHoodSubsystem(HoodSubsystem value) {
         hoodSubsystem = value;
     }
 
