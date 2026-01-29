@@ -222,12 +222,16 @@ public class ManualInputInterfaces {
                 SmartDashboard.putNumber("Shooter RPM", currentRPM - 50);
             }));
             this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
-                double currentRPM = SmartDashboard.getNumber("Hood Extension", 0);
-                SmartDashboard.putNumber("Hood Extension", currentRPM - 50);
+                double hoodExtention = SmartDashboard.getNumber("Hood Extension", 1000);
+                if(hoodExtention >= 1050){
+                    SmartDashboard.putNumber("Hood Extension", hoodExtention - 50);
+                }
             }));
             this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
-                double currentRPM = SmartDashboard.getNumber("Hood Extension", 0);
-                SmartDashboard.putNumber("Hood Extension", currentRPM + 50);
+                double hoodExtention = SmartDashboard.getNumber("Hood Extension", 1000);
+                if(hoodExtention <= 1950){
+                    SmartDashboard.putNumber("Hood Extension", hoodExtention + 50);
+                }
             }));
 
             if (InstalledHardware.shooterInstalled) {
@@ -237,7 +241,7 @@ public class ManualInputInterfaces {
                         }));
             }
             if (InstalledHardware.hoodInstalled) {
-                this.coDriverController.a().onTrue(new AutoAimCommand(this.subsystemCollection.getHoodSubsystem()));
+                this.coDriverController.a().onTrue(new HoodAngleCommand(this.subsystemCollection.getHoodSubsystem()));
             }
         }
     }

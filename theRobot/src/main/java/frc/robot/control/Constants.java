@@ -102,8 +102,8 @@ public final class Constants {
     // TODO define CAN IDs here for all non drive train components
 
     // shooter related can ids
-    public static final int shooterLeadMotorCanId = 20;
-    public static final int shooterFollowMotorCanId = 21;
+    public static final int shooterLeadMotorCanId = 21;
+    public static final int shooterFollowMotorCanId = 20;
 
     public static final int hoodServoMotorCanId = 22;
 
