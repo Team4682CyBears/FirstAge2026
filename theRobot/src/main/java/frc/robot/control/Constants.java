@@ -10,11 +10,9 @@
 
 package frc.robot.control;
 
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import static edu.wpi.first.units.Units.Inches;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
