@@ -13,7 +13,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.common.LEDState;
 import frc.robot.common.TestTrajectories;
 import frc.robot.control.InstalledHardware;
 import frc.robot.control.ManualInputInterfaces;
@@ -43,6 +42,9 @@ public class RobotContainer {
 
     // init the leds
     this.initializeLEDSubsystem();
+
+    // init the shooter subsystems
+    this.initializeShooterSubsystems();
 
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
@@ -166,6 +168,26 @@ public class RobotContainer {
       System.out.println("SUCCESS: initializeLEDS");
     } else {
       System.out.println("FAIL: initializeLEDS");
+    }
+  }
+
+  /**
+   * A method to init the shooter related subsystems
+   */
+  private void initializeShooterSubsystems() {
+    if (InstalledHardware.shooterInstalled) {
+      subsystems.setShooterSubsystem(
+          new ShooterSubsystem(Constants.shooterLeadMotorCanId, Constants.shooterFollowMotorCanId));
+      System.out.println("SUCCESS: initializeShooter");
+    } else {
+      System.out.println("FAIL: initializeShooter");
+    }
+
+    if (InstalledHardware.hoodInstalled) {
+      subsystems.setHoodSubsystem(new ShooterHoodServoSubsystem(Constants.hoodServoMotorCanId));
+      System.out.println("SUCCESS: initializeHood");
+    } else {
+      System.out.println("FAIL: initializeHood");
     }
   }
 

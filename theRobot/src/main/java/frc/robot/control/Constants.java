@@ -42,9 +42,9 @@ public final class Constants {
 
     // *****************************************************************
     // Field Constants
-    public static final Translation2d blueHubPosition = new Translation2d(1,1);
-    public static final Translation2d redHubPosition = new Translation2d(1,1);
-    
+    public static final Translation2d blueHubPosition = new Translation2d(1, 1);
+    public static final Translation2d redHubPosition = new Translation2d(1, 1);
+
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
     public static final double DegreesPerRevolution = 360.0;
@@ -102,5 +102,13 @@ public final class Constants {
     // ********************************************************************
     // CAN IDs
     // TODO define CAN IDs here for all non drive train components
+
+    // shooter related can ids
+    public static final int shooterLeadMotorCanId = 20;
+    public static final int shooterFollowMotorCanId = 21;
+
+    public static final int hoodServoMotorCanId = 22;
+
+    public static final int servoDefaultPosition = 1000;
 
 }
