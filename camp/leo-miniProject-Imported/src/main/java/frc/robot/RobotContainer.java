@@ -33,17 +33,22 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Spinner spinnerMotor = new Spinner(Constants.SPINNER_CAN_ID);
 
-  Implementation tof = new Implementation(true, false, false, false);
+  private final Implementation tof = new Implementation(true, false, false, false);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     double motorSpeed = 140; //rpm
+    // init class here
+    RunExperimentCommand runExperimentCommand = new RunExperimentCommand(motorSpeed, spinnerMotor, tof, 20);
+    // experiement runs contructure when created
+
     SmartDashboard.putData( "Run Experiment Command",
-        new RunExperimentCommand(motorSpeed, spinnerMotor, tof, 20)
-
+        runExperimentCommand
      );
-  }
 
+     spinnerMotor.setDefaultCommand(runExperimentCommand);
+  }
+  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

@@ -23,12 +23,19 @@ public class RunExperimentCommand extends Command {
     double[] dataValues;
     boolean experimentRunning = false;
 
+    /**
+     * Constructor for RunExperimentCommand, 
+     * @param constS  constant speed to run the motor at
+     * @param spin  spinner motor subsystem
+     * @param tof tof sensor subsystem
+     * @param cyc number of cycles to run the experiment for
+     */
     public RunExperimentCommand(Double constS, Spinner spin, Implementation tof, int cyc) {
-        spiningMotor = spin;
-        tofSensor = tof;
-        constSpeed = constS;
-        desiredCycles = cyc;
-        dataValues = new double[cyc];
+        this.spiningMotor = spin;
+        this.tofSensor = tof;
+        this.constSpeed = constS;
+        this.desiredCycles = cyc;
+        this.dataValues = new double[cyc];
         addRequirements(spin, tof);
     }
 
@@ -47,6 +54,7 @@ public class RunExperimentCommand extends Command {
 
     @Override
     public void execute() {
+        // happens after fully initalized runs periodticly until subsytem is closed
         //System.out.println("Experiment Running: " + experimentRunning);
         //System.out.println("Currentspeed " + spiningMotor.getSpeed());
         //System.out.println("Desired speed" + desiredSpeed);
