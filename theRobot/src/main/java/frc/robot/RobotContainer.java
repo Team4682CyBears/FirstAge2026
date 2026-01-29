@@ -43,8 +43,11 @@ public class RobotContainer {
     // init the leds
     this.initializeLEDSubsystem();
 
-    // init the shooter subsystems
-    this.initializeShooterSubsystems();
+    // init the shooter subsystem
+    this.initializeShooterSubsystem();
+
+    // init the hood subsystem
+    this.initializeHoodSubsystem();
 
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
@@ -172,9 +175,9 @@ public class RobotContainer {
   }
 
   /**
-   * A method to init the shooter related subsystems
+   * A method to init the shooter subsystem
    */
-  private void initializeShooterSubsystems() {
+  private void initializeShooterSubsystem() {
     if (InstalledHardware.shooterInstalled) {
       subsystems.setShooterSubsystem(
           new ShooterSubsystem(Constants.shooterLeadMotorCanId, Constants.shooterFollowMotorCanId));
@@ -182,7 +185,12 @@ public class RobotContainer {
     } else {
       System.out.println("FAIL: initializeShooter");
     }
-
+  }
+  
+  /**
+   * A method to init the hood subsystem
+   */
+  private void initializeHoodSubsystem(){
     if (InstalledHardware.hoodInstalled) {
       subsystems.setHoodSubsystem(new ShooterHoodServoSubsystem(Constants.hoodServoMotorCanId));
       System.out.println("SUCCESS: initializeHood");

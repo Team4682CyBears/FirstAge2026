@@ -1,9 +1,9 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: ShooterAngleServoSubsystem.java
-// Intent: Changes of the shooter
+// Intent: Changes of the shooter angle
 // ************************************************************
 
 // ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
@@ -23,8 +23,6 @@ import com.revrobotics.servohub.ServoChannel.ChannelId;
 import frc.robot.control.Constants;
 
 public class ShooterHoodServoSubsystem extends SubsystemBase {
-
-    private final int canID;
     private final ServoHubConfig config;
     private final ServoHub servoHub;
     private ServoChannel channel0;
@@ -32,9 +30,8 @@ public class ShooterHoodServoSubsystem extends SubsystemBase {
     private int setPosition = 1500;
 
     public ShooterHoodServoSubsystem(int canID) {
-        this.canID = canID;
         this.config = new ServoHubConfig();
-        this.servoHub = new ServoHub(this.canID);
+        this.servoHub = new ServoHub(canID);
         this.channel0 = servoHub.getServoChannel(ChannelId.kChannelId0);
         this.channel1 = servoHub.getServoChannel(ChannelId.kChannelId1);
 
@@ -65,18 +62,9 @@ public class ShooterHoodServoSubsystem extends SubsystemBase {
 
         setPosition = MathUtil.clamp(position, 1000, 2000);
 
-        System.out.println("SET POSITION " + position);
-
         setPosition = position;
 
         channel0.setPulseWidth(setPosition);
-    };
-
-    public void stop() {
-    };
-
-    public int getID() {
-        return canID;
     };
 
     @Override
