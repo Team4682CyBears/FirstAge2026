@@ -22,21 +22,27 @@ public class RunExperimentCommand extends Command {
     double dataValue;
     double[] dataValues;
     boolean experimentRunning = false;
+    boolean spinnerEnabled;
 
     /**
      * Constructor for RunExperimentCommand, 
      * @param constS  constant speed to run the motor at
-     * @param spin  spinner motor subsystem
      * @param tof tof sensor subsystem
      * @param cyc number of cycles to run the experiment for
+     * @param spinnerEnabled boolean that states if spinner is enabeld
      */
-    public RunExperimentCommand(Double constS, Spinner spin, Implementation tof, int cyc) {
-        this.spiningMotor = spin;
+    public RunExperimentCommand(Double constS, Implementation tof, int cyc, boolean spinnerEnabled) {
         this.tofSensor = tof;
         this.constSpeed = constS;
         this.desiredCycles = cyc;
         this.dataValues = new double[cyc];
-        addRequirements(spin, tof);
+        this.spinnerEnabled = spinnerEnabled;
+        addRequirements(tof);
+        
+        if (spinnerEnabled){
+            this.spiningMotor = tof.getSpinner();
+            addRequirements(spiningMotor);
+        }
     }
 
     @Override
@@ -45,7 +51,9 @@ public class RunExperimentCommand extends Command {
         cycles = desiredCycles;
         cyclesRun = 0;
         desiredSpeed = constSpeed;
-        spiningMotor.spin(desiredSpeed);
+        if (spinnerEnabled){
+            spiningMotor.spin(desiredSpeed);
+        }
         System.out.println("HEY LOOK AT ME OVER HERE THE DESIRED SPEED IS " + desiredSpeed);
         stopwatch.reset();
         experimentRunning = false;
@@ -106,7 +114,10 @@ public class RunExperimentCommand extends Command {
             System.out.println("THE COMMAND WAS INTERRUPTED!!");
         }
         // prints out final data
-        spiningMotor.spin(0); // stops the motor
+        if (spinnerEnabled){
+            spiningMotor.spin(0); // stops the motor
+
+        }
         double meanValue = 0;
         int skippedCycles = 0;
         double expectedCycleTime = 1.0/(2*desiredSpeed/60.0); //pole comes by 2 times per RPS

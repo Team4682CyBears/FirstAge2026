@@ -28,7 +28,7 @@ import frc.robot.Constants;
  * The TofSesorCTRE class helps to create TOF sensor subsystems using CTRE CANcoder and CANrange
  * which allow the rest of the code to access the TOF. It's used to sense how far away a object is from the TOF sensor in meters.
  */
-public class TofSesorCTRE {
+public class TofSensorCTRE {
     
     private CANcoder tofSesor;
     private String displayName;
@@ -45,7 +45,7 @@ public class TofSesorCTRE {
     // make constructor take in only CANID. 
     // get max range as a class variable. 
     // for now, assume main canBus. so don't use canbus parameter.
-    public TofSesorCTRE(int rangeSensorCanId) {
+    public TofSensorCTRE(int rangeSensorCanId) {
         // get rid pf cancoder here. 
         rangeSensor = new CANrange(rangeSensorCanId);
         this.rangeSensorCanId = rangeSensorCanId;

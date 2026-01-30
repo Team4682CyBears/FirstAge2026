@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.common.TofSensorLaser;
 import frc.robot.common.TofSensorPWF;
-import frc.robot.common.TofSesorCTRE;
+import frc.robot.common.TofSensorCTRE;
 
 /**
  * The Implementation class is used to access the tof and motors and then
@@ -21,7 +21,7 @@ import frc.robot.common.TofSesorCTRE;
  */
 
 public class Implementation extends SubsystemBase{
-    private TofSesorCTRE tofSensorCTRE;
+    private TofSensorCTRE tofSensorCTRE;
     private TofSensorPWF tofSensorPWF;
     private TofSensorLaser tofSensorLaser;
     private Spinner spinner;
@@ -36,7 +36,7 @@ public class Implementation extends SubsystemBase{
      */
     public Implementation(boolean useCTRE, boolean usePWF, boolean useLaser, boolean useSpinner){
         if (useCTRE){
-            tofSensorCTRE = new TofSesorCTRE(Constants.rangeSensorCTRECanID);
+            tofSensorCTRE = new TofSensorCTRE(Constants.rangeSensorCTRECanID);
         } 
         if (usePWF){
             tofSensorPWF = new TofSensorPWF(Constants.rangeSensorPWFCanID);
@@ -49,6 +49,9 @@ public class Implementation extends SubsystemBase{
         }
     }
 
+    public Spinner getSpinner(){
+        return spinner;
+    }
     /**
      * sets the speed value to the speed value that the motor will spin at (RPM)
      * @param speed double speed to set the motor to

@@ -31,22 +31,23 @@ import frc.robot.subsystems.Spinner;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final Spinner spinnerMotor = new Spinner(Constants.SPINNER_CAN_ID);
+  //private final Spinner spinnerMotor = new Spinner(Constants.SPINNER_CAN_ID);
+    boolean spinnerEnabled = false;
+  private final Implementation tof = new Implementation(true, false, false, spinnerEnabled);
 
-  private final Implementation tof = new Implementation(true, false, false, false);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     double motorSpeed = 140; //rpm
     // init class here
-    RunExperimentCommand runExperimentCommand = new RunExperimentCommand(motorSpeed, spinnerMotor, tof, 20);
-    // experiement runs contructure when created
+    RunExperimentCommand runExperimentCommand = new RunExperimentCommand(motorSpeed, tof, 20, spinnerEnabled);
+    // experiement runs constructor when created
 
     SmartDashboard.putData( "Run Experiment Command",
         runExperimentCommand
      );
 
-     spinnerMotor.setDefaultCommand(runExperimentCommand);
+     //.setDefaultCommand(runExperimentCommand);
   }
   
   /**
