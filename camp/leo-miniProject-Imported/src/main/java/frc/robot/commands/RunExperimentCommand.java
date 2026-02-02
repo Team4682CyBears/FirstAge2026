@@ -116,8 +116,8 @@ public class RunExperimentCommand extends Command {
         // prints out final data
         if (spinnerEnabled){
             spiningMotor.spin(0); // stops the motor
-
         }
+        
         double meanValue = 0;
         int skippedCycles = 0;
         double expectedCycleTime = 1.0/(2*desiredSpeed/60.0); //pole comes by 2 times per RPS

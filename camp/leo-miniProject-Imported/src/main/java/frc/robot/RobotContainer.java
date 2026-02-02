@@ -32,7 +32,8 @@ import frc.robot.subsystems.Spinner;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   //private final Spinner spinnerMotor = new Spinner(Constants.SPINNER_CAN_ID);
-    boolean spinnerEnabled = false;
+  boolean spinnerEnabled = false;
+  
   private final Implementation tof = new Implementation(true, false, false, spinnerEnabled);
 
 
