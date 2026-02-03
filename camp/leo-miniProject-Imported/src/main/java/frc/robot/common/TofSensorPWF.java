@@ -55,7 +55,7 @@ public class TofSensorPWF {
  * @returns distance in inches
  */
     public double getRangeInches(){
-        return Units.metersToInches(tofSensor.getRange()*1000);   
+        return Units.metersToInches(tofSensor.getRange()/1000);   
     }
 
 /**
