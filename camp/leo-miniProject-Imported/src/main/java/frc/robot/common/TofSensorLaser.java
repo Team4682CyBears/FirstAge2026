@@ -39,7 +39,7 @@ public class TofSensorLaser {
      * @param canID
      */
     public TofSensorLaser(int canID){
-        this.displayName = "TofSesorlaser_" + canID;
+        this.displayName = "TofSesorLaser_" + canID;
         this.maxRange = Constants.MAX_RANGE_INCHES;
         this.canID = canID;
         laserSensor = new LaserCan(canID);

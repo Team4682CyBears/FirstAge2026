@@ -49,7 +49,7 @@ public class TofSensorCTRE {
         // get rid pf cancoder here. 
         rangeSensor = new CANrange(rangeSensorCanId);
         this.rangeSensorCanId = rangeSensorCanId;
-        this.displayName = "TofSesor_" + rangeSensorCanId;
+        this.displayName = "TofSesorCTRE_" + rangeSensorCanId;
     }
 
   
