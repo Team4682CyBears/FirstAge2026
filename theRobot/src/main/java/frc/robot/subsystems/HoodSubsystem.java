@@ -80,6 +80,25 @@ public class HoodSubsystem extends SubsystemBase {
         extendoPosition = position;
     }
 
+    /**
+     * Returns the current angle position pulse width for the hood servos.
+     * Useful for logging/testing.
+     *
+     * @return pulse width (1000-2000)
+     */
+    public int getAnglePosition() {
+        return anglePosition;
+    }
+
+    /**
+     * Returns the current extendo position pulse width for the hood extendo servo.
+     *
+     * @return pulse width (1000-2000)
+     */
+    public int getExtendoPosition() {
+        return extendoPosition;
+    }
+
     @Override
     public void periodic() {
         channel0.setPulseWidth(anglePosition);

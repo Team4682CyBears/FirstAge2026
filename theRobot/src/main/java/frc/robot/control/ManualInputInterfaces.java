@@ -255,6 +255,18 @@ public class ManualInputInterfaces {
             if (InstalledHardware.hoodInstalled) {
                 this.coDriverController.a().onTrue(new HoodAngleCommand(this.subsystemCollection.getHoodSubsystem()));
             }
+
+            // Co-driver bumpers: log shot result (made / missed)
+            // Assumption: right bumper = made, left bumper = missed. Change as desired.
+            if (this.subsystemCollection.isShotLoggerAvailable()) {
+                this.coDriverController.rightBumper().onTrue(new InstantCommand(() -> {
+                    this.subsystemCollection.getShotLogger().logShot(true);
+                }));
+
+                this.coDriverController.leftBumper().onTrue(new InstantCommand(() -> {
+                    this.subsystemCollection.getShotLogger().logShot(false);
+                }));
+            }
         }
     }
 }
