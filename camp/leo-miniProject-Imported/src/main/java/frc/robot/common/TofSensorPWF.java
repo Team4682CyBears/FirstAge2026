@@ -28,7 +28,7 @@ public class TofSensorPWF {
     public TofSensorPWF(int canID){
         tofSensor = new TimeOfFlight(canID);
         this.canID = canID;
-        this.displayName = "TOF ID" + this.canID;
+        this.displayName = "TOF ID" + this.canID + " PWF";
 
         tofSensor.setRangingMode(RangingMode.Short, 20);
         System.out.println("DONE CONFIG OF TOF SENSOR AT CanID!!!" + canID);
