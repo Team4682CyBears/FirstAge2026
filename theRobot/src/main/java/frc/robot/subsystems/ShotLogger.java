@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.control.SubsystemCollection;
@@ -59,7 +59,7 @@ public class ShotLogger {
             }
 
             if (subsystems.isShooterSubsystemAvailable()) {
-                shooterRPM = subsystems.getShooterSubsystem().getRPM();
+                shooterRPM = SmartDashboard.getNumber("Shooter RPM", 0);
             }
 
             if (subsystems.isHoodSubsystemAvailable()) {
