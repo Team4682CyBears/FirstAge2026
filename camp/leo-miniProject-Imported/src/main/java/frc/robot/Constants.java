@@ -18,7 +18,9 @@ package frc.robot;
 public final class Constants {
   public static final int talonCanID = 4;
 
+  // most of the distance sensors have this max range. 
   public static final double MAX_RANGE_INCHES = 78.74; // 2 meter conversion
+  public static final double maxRangeLaserCanInches = 157.48; // 4 meters in inches
 
   // CAN Ids for sensors and spinner
   public static final int rangeSensorCTRECanID = 32;

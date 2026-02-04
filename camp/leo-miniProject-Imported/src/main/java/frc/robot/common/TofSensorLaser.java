@@ -57,11 +57,15 @@ public class TofSensorLaser {
      * 
      */ 
     // use wpilib units to convert to inches. metersToInches and inchesToMeters
-    public double getRangeInches() {
-        Measurement distance = laserSensor.getMeasurement();
-        double dInches = distance.distance_mm * 0.0393701; // convert mm to inches
-        // distance.in(Inches)
-        return (dInches);
+    public Double getRangeInches() {
+        Measurement measurement = laserSensor.getMeasurement();
+        if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
+            // TODO change this to use wpilib units conversation
+            Double dInches = measurement.distance_mm * 0.0393701; // convert mm to inches
+            return (dInches);
+        }
+        // if invalid, return the max range as a default
+        return Constants.maxRangeLaserCanInches; 
     }
 
     /**
