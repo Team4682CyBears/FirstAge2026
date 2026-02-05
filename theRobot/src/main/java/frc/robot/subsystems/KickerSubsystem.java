@@ -1,0 +1,96 @@
+package frc.robot.subsystems;
+
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.StrictFollower;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.control.Constants;
+
+public class KickerSubsystem extends SubsystemBase {
+
+    private TalonFX kickerLeadTalonFX = new TalonFX(Constants.kickerLeadTalonCanId);
+    private TalonFX kickerFollowTalonFX = new TalonFX(Constants.kickerFollowTalonCanId);
+
+    private final VelocityDutyCycle dutyCycle = new VelocityDutyCycle(0);
+
+    private double targetRPM = 0.0;
+
+    // TODO: Find good values
+    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.0).withKV(0.0).withKP(0.0).withKA(0.0);
+
+    public KickerSubsystem() {
+        kickerFollowTalonFX.setControl(new StrictFollower(kickerLeadTalonFX.getDeviceID()));
+        configureMotor();
+    }
+
+    public void runRPM(double rpm) {
+        this.targetRPM = rpm;
+    }
+
+    public double getRPM() {
+        return kickerLeadTalonFX.getVelocity().getValueAsDouble();
+    }
+
+    public void stop() {
+        kickerLeadTalonFX.stopMotor();
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Kicker Real RPM", getRPM());
+
+        dutyCycle.withVelocity(targetRPM);
+        kickerLeadTalonFX.setControl(dutyCycle);
+    }
+
+    /*
+     * configures motor
+     */
+    private void configureMotor() {
+        // from ElevatorSubsystem.java Reefscape2025
+        // Config motor
+        TalonFXConfiguration talonMotorConfig = new TalonFXConfiguration();
+        talonMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        talonMotorConfig.Slot0 = slot0Configs;
+        talonMotorConfig.ClosedLoopRamps.withVoltageClosedLoopRampPeriod(0.02);
+        // do not config feedbacksource, since the default is the internal one.
+        talonMotorConfig.Voltage.PeakForwardVoltage = Constants.falconMaxVoltage;
+        ;
+        talonMotorConfig.Voltage.PeakReverseVoltage = -Constants.falconMaxVoltage;
+        talonMotorConfig.Voltage.SupplyVoltageTimeConstant = Constants.motorSupplyVoltageTimeConstant;
+
+        // maximum current settings
+        talonMotorConfig.CurrentLimits.StatorCurrentLimit = Constants.motorStatorCurrentMaximumAmps;
+        talonMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        talonMotorConfig.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
+        talonMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        // motor direction
+        talonMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+        StatusCode response = kickerLeadTalonFX.getConfigurator().apply(talonMotorConfig);
+        if (!response.isOK()) {
+            System.out.println(
+                    "TalonFX ID " + kickerLeadTalonFX.getDeviceID() + " failed config with error "
+                            + response.toString());
+        }
+
+        // change invert for angleRightMotor
+        talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        // apply configs
+        response = kickerFollowTalonFX.getConfigurator().apply(talonMotorConfig);
+        if (!response.isOK()) {
+            DataLogManager.log(
+                    "TalonFX ID " + kickerFollowTalonFX.getDeviceID() + " failed config with error "
+                            + response.toString());
+        }
+
+    }
+}

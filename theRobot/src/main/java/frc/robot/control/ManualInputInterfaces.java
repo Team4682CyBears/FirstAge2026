@@ -267,6 +267,12 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getShotLogger().logShot(false);
                 }));
             }
+            if (InstalledHardware.kickerInstalled) {
+                this.coDriverController.rightTrigger()
+                        .whileTrue(new KickerCommand(this.subsystemCollection.getKickerSubsystem(), () -> {
+                            return SmartDashboard.getNumber("Kicker RPM", 0);
+                        }));
+            }
         }
     }
 }

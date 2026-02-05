@@ -105,6 +105,10 @@ public final class Constants {
     public static final int shooterLeadMotorCanId = 21;
     public static final int shooterFollowMotorCanId = 20;
 
+    // kicker can ids
+    public static final int kickerLeadTalonCanId = 18;
+    public static final int kickerFollowTalonCanId = 19;
+
     public static final int hoodServoMotorCanId = 22;
 
     public static final int servoDefaultPosition = 1000;
