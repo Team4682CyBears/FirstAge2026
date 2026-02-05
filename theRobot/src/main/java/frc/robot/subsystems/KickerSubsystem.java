@@ -4,7 +4,7 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.StrictFollower;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -19,12 +19,11 @@ public class KickerSubsystem extends SubsystemBase {
     private TalonFX kickerLeadTalonFX = new TalonFX(Constants.kickerLeadTalonCanId);
     private TalonFX kickerFollowTalonFX = new TalonFX(Constants.kickerFollowTalonCanId);
 
-    private final VelocityDutyCycle dutyCycle = new VelocityDutyCycle(0);
+    private final VelocityVoltage dutyCycle = new VelocityVoltage(0.0);
 
     private double targetRPM = 0.0;
 
-    // TODO: Find good values
-    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.0).withKV(0.0).withKP(0.0).withKA(0.0);
+    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.09009009009).withKV(0.4504504505).withKP(0.4);
 
     public KickerSubsystem() {
         kickerFollowTalonFX.setControl(new StrictFollower(kickerLeadTalonFX.getDeviceID()));
@@ -63,7 +62,7 @@ public class KickerSubsystem extends SubsystemBase {
         talonMotorConfig.ClosedLoopRamps.withVoltageClosedLoopRampPeriod(0.02);
         // do not config feedbacksource, since the default is the internal one.
         talonMotorConfig.Voltage.PeakForwardVoltage = Constants.falconMaxVoltage;
-        ;
+
         talonMotorConfig.Voltage.PeakReverseVoltage = -Constants.falconMaxVoltage;
         talonMotorConfig.Voltage.SupplyVoltageTimeConstant = Constants.motorSupplyVoltageTimeConstant;
 
