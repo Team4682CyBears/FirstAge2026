@@ -239,6 +239,12 @@ public class ManualInputInterfaces {
             if (InstalledHardware.hoodInstalled) {
                 this.coDriverController.a().onTrue(new AutoAimCommand(this.subsystemCollection.getHoodSubsystem()));
             }
+            if (InstalledHardware.kickerInstalled) {
+                this.coDriverController.rightTrigger()
+                        .whileTrue(new KickerCommand(this.subsystemCollection.getKickerSubsystem(), () -> {
+                            return SmartDashboard.getNumber("Kicker RPM", 0);
+                        }));
+            }
         }
     }
 }
