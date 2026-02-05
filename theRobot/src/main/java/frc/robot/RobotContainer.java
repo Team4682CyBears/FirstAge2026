@@ -50,11 +50,14 @@ public class RobotContainer {
     // init the hood subsystem
     this.initializeHoodSubsystem();
 
+    // init the kicker subsystem
+    this.initializeKickerSubsystem();
+
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
 
-  // init the shot logger (after drivetrain, shooter and hood are initialized)
-  this.initializeShotLogger();
+    // init the shot logger (after drivetrain, shooter and hood are initialized)
+    this.initializeShotLogger();
 
     // init the input system
     this.initializeManualInputInterfaces();
@@ -161,8 +164,10 @@ public class RobotContainer {
     if (InstalledHardware.limelightInstalled) {
       subsystems.setCameraSubsystem(new CameraSubsystem());
       if (subsystems.isLEDSubsystemAvailable()) {
-        subsystems.getLedSubsystem().registerStateAction(LEDState.Green, () -> subsystems.getCameraSubsystem().getTagId() != -1);
-        subsystems.getLedSubsystem().registerStateAction(LEDState.Red, () -> subsystems.getCameraSubsystem().getTagId() == -1);
+        subsystems.getLedSubsystem().registerStateAction(LEDState.Green,
+            () -> subsystems.getCameraSubsystem().getTagId() != -1);
+        subsystems.getLedSubsystem().registerStateAction(LEDState.Red,
+            () -> subsystems.getCameraSubsystem().getTagId() == -1);
       }
       DataLogManager.log("SUCCESS: initializeCamera");
     } else {
@@ -194,16 +199,28 @@ public class RobotContainer {
       System.out.println("FAIL: initializeShooter");
     }
   }
-  
+
   /**
    * A method to init the hood subsystem
    */
-  private void initializeHoodSubsystem(){
+  private void initializeHoodSubsystem() {
     if (InstalledHardware.hoodInstalled) {
       subsystems.setHoodSubsystem(new HoodSubsystem(Constants.hoodServoMotorCanId));
       System.out.println("SUCCESS: initializeHood");
     } else {
       System.out.println("FAIL: initializeHood");
+    }
+  }
+
+  /**
+   * A method to init the hood subsystem
+   */
+  private void initializeKickerSubsystem() {
+    if (InstalledHardware.kickerInstalled) {
+      subsystems.setKickerSubsystem(new KickerSubsystem());
+      System.out.println("SUCCESS: initializeKicker");
+    } else {
+      System.out.println("FAIL: initializeKicker");
     }
   }
 
@@ -228,7 +245,8 @@ public class RobotContainer {
    * Initialize the shot logger helper that writes shot events to disk.
    */
   private void initializeShotLogger() {
-    // Require at minimum drivetrain and shooter/hood to be available to make logs useful
+    // Require at minimum drivetrain and shooter/hood to be available to make logs
+    // useful
     if (subsystems.isDriveTrainSubsystemAvailable() && subsystems.isShooterSubsystemAvailable()
         && subsystems.isHoodSubsystemAvailable()) {
       subsystems.setShotLogger(new frc.robot.subsystems.ShotLogger(subsystems));
