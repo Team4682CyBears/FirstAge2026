@@ -222,12 +222,28 @@ public class ManualInputInterfaces {
                 SmartDashboard.putNumber("Shooter RPM", currentRPM - 50);
             }));
             this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
-                double currentRPM = SmartDashboard.getNumber("Hood Extension", 0);
-                SmartDashboard.putNumber("Hood Extension", currentRPM - 50);
+                double hoodExtention = SmartDashboard.getNumber("Hood Angle", 1000);
+                if(hoodExtention >= 1050){
+                    SmartDashboard.putNumber("Hood Angle", hoodExtention - 50);
+                }
             }));
             this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
-                double currentRPM = SmartDashboard.getNumber("Hood Extension", 0);
-                SmartDashboard.putNumber("Hood Extension", currentRPM + 50);
+                double hoodExtention = SmartDashboard.getNumber("Hood Angle", 1000);
+                if(hoodExtention <= 1950){
+                    SmartDashboard.putNumber("Hood Angle", hoodExtention + 50);
+                }
+            }));
+            this.coDriverController.y().onTrue(new InstantCommand(() -> {
+                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", 1000);
+                if(hoodExtention >= 1050){
+                    SmartDashboard.putNumber("Hood Extendo", hoodExtention - 50);
+                }
+            }));
+            this.coDriverController.b().onTrue(new InstantCommand(() -> {
+                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", 1000);
+                if(hoodExtention <= 1950){
+                    SmartDashboard.putNumber("Hood Extendo", hoodExtention + 50);
+                }
             }));
 
             if (InstalledHardware.shooterInstalled) {
@@ -237,7 +253,19 @@ public class ManualInputInterfaces {
                         }));
             }
             if (InstalledHardware.hoodInstalled) {
-                this.coDriverController.a().onTrue(new AutoAimCommand(this.subsystemCollection.getHoodSubsystem()));
+                this.coDriverController.a().onTrue(new HoodAngleCommand(this.subsystemCollection.getHoodSubsystem()));
+            }
+
+            // Co-driver bumpers: log shot result (made / missed)
+            // Assumption: right bumper = made, left bumper = missed. Change as desired.
+            if (this.subsystemCollection.isShotLoggerAvailable()) {
+                this.coDriverController.rightBumper().onTrue(new InstantCommand(() -> {
+                    this.subsystemCollection.getShotLogger().logShot(true);
+                }));
+
+                this.coDriverController.leftBumper().onTrue(new InstantCommand(() -> {
+                    this.subsystemCollection.getShotLogger().logShot(false);
+                }));
             }
             if (InstalledHardware.kickerInstalled) {
                 this.coDriverController.rightTrigger()

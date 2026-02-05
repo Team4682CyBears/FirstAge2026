@@ -4,16 +4,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.HoodSubsystem;
 
-public class AutoAimCommand extends Command {
+public class HoodAngleCommand extends Command {
     private final HoodSubsystem hoodSubsystem;
 
-    public AutoAimCommand(HoodSubsystem hoodSubsystem) {
+    public HoodAngleCommand(HoodSubsystem hoodSubsystem) {
         this.hoodSubsystem = hoodSubsystem;
         addRequirements(hoodSubsystem);
     }
 
     @Override
-    public void execute() {
+    public void initialize() {
         this.hoodSubsystem.setAnglePosition((int) SmartDashboard.getNumber("Hood Angle", 1000));
         this.hoodSubsystem.setExtendoPosition((int) SmartDashboard.getNumber("Hood Extendo", 1000));
     }
@@ -24,6 +24,6 @@ public class AutoAimCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return false;
+        return true;
     }
 }

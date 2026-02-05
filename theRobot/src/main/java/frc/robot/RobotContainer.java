@@ -52,6 +52,9 @@ public class RobotContainer {
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
 
+  // init the shot logger (after drivetrain, shooter and hood are initialized)
+  this.initializeShotLogger();
+
     // init the input system
     this.initializeManualInputInterfaces();
 
@@ -192,7 +195,7 @@ public class RobotContainer {
    */
   private void initializeHoodSubsystem(){
     if (InstalledHardware.hoodInstalled) {
-      subsystems.setHoodSubsystem(new ShooterHoodServoSubsystem(Constants.hoodServoMotorCanId));
+      subsystems.setHoodSubsystem(new HoodSubsystem(Constants.hoodServoMotorCanId));
       System.out.println("SUCCESS: initializeHood");
     } else {
       System.out.println("FAIL: initializeHood");
@@ -213,6 +216,20 @@ public class RobotContainer {
       DataLogManager.log("SUCCESS: initializeManualInputInterfaces");
     } else {
       DataLogManager.log("FAIL: initializeManualInputInterfaces");
+    }
+  }
+
+  /**
+   * Initialize the shot logger helper that writes shot events to disk.
+   */
+  private void initializeShotLogger() {
+    // Require at minimum drivetrain and shooter/hood to be available to make logs useful
+    if (subsystems.isDriveTrainSubsystemAvailable() && subsystems.isShooterSubsystemAvailable()
+        && subsystems.isHoodSubsystemAvailable()) {
+      subsystems.setShotLogger(new frc.robot.subsystems.ShotLogger(subsystems));
+      DataLogManager.log("SUCCESS: initializeShotLogger");
+    } else {
+      DataLogManager.log("FAIL: initializeShotLogger - missing subsystems");
     }
   }
 

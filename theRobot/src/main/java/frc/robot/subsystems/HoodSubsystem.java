@@ -22,18 +22,24 @@ import com.revrobotics.servohub.ServoChannel;
 import com.revrobotics.servohub.ServoChannel.ChannelId;
 import frc.robot.control.Constants;
 
-public class ShooterHoodServoSubsystem extends SubsystemBase {
+public class HoodSubsystem extends SubsystemBase {
     private final ServoHubConfig config;
     private final ServoHub servoHub;
     private ServoChannel channel0;
     private ServoChannel channel1;
-    private int setPosition = 1500;
+    private ServoChannel channel2;
+    private int anglePosition;
+    private int extendoPosition;
 
-    public ShooterHoodServoSubsystem(int canID) {
+    public HoodSubsystem(int canID) {
         this.config = new ServoHubConfig();
         this.servoHub = new ServoHub(canID);
         this.channel0 = servoHub.getServoChannel(ChannelId.kChannelId0);
         this.channel1 = servoHub.getServoChannel(ChannelId.kChannelId1);
+        this.channel2 = servoHub.getServoChannel(ChannelId.kChannelId2);
+
+        anglePosition = 1000;
+        extendoPosition = 1000;
 
         configureServos();
         servoHub.configure(config, ResetMode.kResetSafeParameters);
@@ -42,15 +48,19 @@ public class ShooterHoodServoSubsystem extends SubsystemBase {
     private void configureServos() {
         config.channel0.pulseRange(1000, 1500, 2000);
         config.channel1.pulseRange(1000, 1500, 2000);
+        config.channel2.pulseRange(1000,1500, 2000);
 
         channel0.setPowered(true);
         channel1.setPowered(true);
-
+        channel2.setPowered(true);
+        
         channel0.setEnabled(true);
         channel1.setEnabled(true);
+        channel2.setEnabled(true);
 
         channel0.setPulseWidth(Constants.servoDefaultPosition);
         channel1.setPulseWidth(Constants.servoDefaultPosition);
+        channel2.setPulseWidth(Constants.servoDefaultPosition);
 
         servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 20000);
 
@@ -58,18 +68,41 @@ public class ShooterHoodServoSubsystem extends SubsystemBase {
     }
 
     // Between 1000 and 2000
-    public void setPosition(int position) {
+    public void setAnglePosition(int position) {
+        anglePosition = MathUtil.clamp(position, 1000, 2000);
 
-        setPosition = MathUtil.clamp(position, 1000, 2000);
-
-        setPosition = position;
-
-        channel0.setPulseWidth(setPosition);
+        anglePosition = position;
     };
+
+    public void setExtendoPosition(int position) {
+        extendoPosition = MathUtil.clamp(position, 1000, 2000);
+
+        extendoPosition = position;
+    }
+
+    /**
+     * Returns the current angle position pulse width for the hood servos.
+     * Useful for logging/testing.
+     *
+     * @return pulse width (1000-2000)
+     */
+    public int getAnglePosition() {
+        return anglePosition;
+    }
+
+    /**
+     * Returns the current extendo position pulse width for the hood extendo servo.
+     *
+     * @return pulse width (1000-2000)
+     */
+    public int getExtendoPosition() {
+        return extendoPosition;
+    }
 
     @Override
     public void periodic() {
-        channel0.setPulseWidth(setPosition);
-        channel1.setPulseWidth(setPosition);
+        channel0.setPulseWidth(anglePosition);
+        channel1.setPulseWidth(anglePosition);
+        channel2.setPulseWidth(extendoPosition);
     }
 }

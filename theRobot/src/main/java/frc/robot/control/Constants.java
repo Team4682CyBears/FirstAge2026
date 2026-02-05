@@ -40,8 +40,8 @@ public final class Constants {
 
     // *****************************************************************
     // Field Constants
-    public static final Translation2d blueHubPosition = new Translation2d(1, 1);
-    public static final Translation2d redHubPosition = new Translation2d(1, 1);
+    public static final Translation2d blueHubPosition = new Translation2d(1+17.5482504/2, 1+8.0519016/2);
+    public static final Translation2d redHubPosition = new Translation2d(1+17.5482504/2, 1+8.0519016/2);
 
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
@@ -102,8 +102,8 @@ public final class Constants {
     // TODO define CAN IDs here for all non drive train components
 
     // shooter related can ids
-    public static final int shooterLeadMotorCanId = 20;
-    public static final int shooterFollowMotorCanId = 21;
+    public static final int shooterLeadMotorCanId = 21;
+    public static final int shooterFollowMotorCanId = 20;
 
     // kicker can ids
     public static final int kickerLeadTalonCanId = 18;
