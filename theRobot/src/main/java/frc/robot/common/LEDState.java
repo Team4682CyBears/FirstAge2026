@@ -15,8 +15,11 @@ package frc.robot.common;
  */
 public enum LEDState {
     Off,
+    RedBlink,
+    GreenBlink,
     OrangeBlink,
     OrangeSolid,
+    Red,
     Yellow,
     Green,
     Blue
