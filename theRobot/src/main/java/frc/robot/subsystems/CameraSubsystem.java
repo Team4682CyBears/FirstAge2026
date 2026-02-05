@@ -22,6 +22,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.common.VisionMeasurement;
 import frc.robot.control.Constants;
+import frc.robot.generated.LimelightHelpers;
 import frc.robot.common.DistanceMeasurement;
 
 /**
@@ -62,35 +63,53 @@ public class CameraSubsystem extends SubsystemBase {
    * @return a vision measurement of the bot pose in field space
    */
   public VisionMeasurement getVisionBotPose() {
-    double tagId = this.table.getEntry("tid").getDouble(noTagInSightId);
-    NetworkTableEntry botposeEntry = this.table.getEntry(botPoseSource);
+    // Use LimelightHelpers to get a PoseEstimate (includes timestamp + latency handling)
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
-
-    if (botposeEntry.exists() && tagId != noTagInSightId) {
-      double[] botpose = botposeEntry.getDoubleArray(new double[this.BotposeDoubleArraySize]);
-      Double timestamp = (botposeEntry.getLastChange() / this.microsecondsInSeconds)
-          - (botpose[this.latencyIndex] / this.milisecondsInSeconds);
-      Translation2d botTranslation = new Translation2d(botpose[this.fieldSpaceXIndex], botpose[this.fieldSpaceYIndex]);
-      Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]);
-      Pose2d realRobotPosition = new Pose2d(botTranslation, botYaw);
-      visionMeasurement = new VisionMeasurement(realRobotPosition, Utils.fpgaToCurrentTime(timestamp));
+    try {
+      LimelightHelpers.PoseEstimate pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("");
+      if (pe != null && pe.pose != null) {
+        // LimelightHelpers timestampSeconds is server-time (seconds since epoch), convert to FPGA time reference
+        double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
+        visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
+      }
+    } catch (Exception e) {
+      // fall back to previous behavior if helper fails
+      double tagId = this.table.getEntry("tid").getDouble(noTagInSightId);
+      NetworkTableEntry botposeEntry = this.table.getEntry(botPoseSource);
+      if (botposeEntry.exists() && tagId != noTagInSightId) {
+        double[] botpose = botposeEntry.getDoubleArray(new double[this.BotposeDoubleArraySize]);
+        Double timestamp = (botposeEntry.getLastChange() / this.microsecondsInSeconds)
+            - (botpose[this.latencyIndex] / this.milisecondsInSeconds);
+        Translation2d botTranslation = new Translation2d(botpose[this.fieldSpaceXIndex], botpose[this.fieldSpaceYIndex]);
+        Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]);
+        Pose2d realRobotPosition = new Pose2d(botTranslation, botYaw);
+        visionMeasurement = new VisionMeasurement(realRobotPosition, Utils.fpgaToCurrentTime(timestamp));
+      }
     }
     return visionMeasurement;
   }
 
   public VisionMeasurement getVisionBotPoseOrb() {
-    double tagId = this.table.getEntry("tid").getDouble(noTagInSightId);
-    NetworkTableEntry botposeEntry = this.table.getEntry(botPoseOrbSource);
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
-
-    if (botposeEntry.exists() && tagId != noTagInSightId) {
-      double[] botpose = botposeEntry.getDoubleArray(new double[this.BotposeDoubleArraySize]);
-      Double timestamp = (botposeEntry.getLastChange() / this.microsecondsInSeconds)
-          - (botpose[this.latencyIndex] / this.milisecondsInSeconds);
-      Translation2d botTranslation = new Translation2d(botpose[this.fieldSpaceXIndex], botpose[this.fieldSpaceYIndex]);
-      Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]);
-      Pose2d realRobotPosition = new Pose2d(botTranslation, botYaw);
-      visionMeasurement = new VisionMeasurement(realRobotPosition, Utils.fpgaToCurrentTime(timestamp));
+    try {
+      LimelightHelpers.PoseEstimate pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("");
+      if (pe != null && pe.pose != null) {
+        double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
+        visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
+      }
+    } catch (Exception e) {
+      // fallback to manual read
+      double tagId = this.table.getEntry("tid").getDouble(noTagInSightId);
+      NetworkTableEntry botposeEntry = this.table.getEntry(botPoseOrbSource);
+      if (botposeEntry.exists() && tagId != noTagInSightId) {
+        double[] botpose = botposeEntry.getDoubleArray(new double[this.BotposeDoubleArraySize]);
+        Double timestamp = (botposeEntry.getLastChange() / this.microsecondsInSeconds)
+            - (botpose[this.latencyIndex] / this.milisecondsInSeconds);
+        Translation2d botTranslation = new Translation2d(botpose[this.fieldSpaceXIndex], botpose[this.fieldSpaceYIndex]);
+        Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]);
+        Pose2d realRobotPosition = new Pose2d(botTranslation, botYaw);
+        visionMeasurement = new VisionMeasurement(realRobotPosition, Utils.fpgaToCurrentTime(timestamp));
+      }
     }
     return visionMeasurement;
   }
@@ -163,16 +182,14 @@ public class CameraSubsystem extends SubsystemBase {
    */
   public Pose2d getVisionBotPoseInTargetSpace() {
     double tagId = table.getEntry("tid").getDouble(noTagInSightId);
-    double[] botpose = this.table.getEntry("botpose_targetspace").getDoubleArray(new double[this.TagDoubleArraySize]);
-    Translation2d botTranslation = new Translation2d(botpose[this.tagSpaceXIndex], botpose[this.tagSpaceYIndex]);
-    Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]);
-    Pose2d realRobotPosition = new Pose2d(botTranslation, botYaw);
-
     if (tagId == noTagInSightId) {
       return null;
-    } else {
-      return realRobotPosition;
     }
+    double[] botpose = LimelightHelpers.getBotPose_TargetSpace("");
+    if (botpose == null || botpose.length == 0) {
+      return null;
+    }
+    return LimelightHelpers.toPose2D(botpose);
   }
 
   /**
