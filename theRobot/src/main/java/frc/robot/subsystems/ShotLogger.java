@@ -9,13 +9,15 @@ import java.io.PrintWriter;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.control.SubsystemCollection;
 
 /**
  * Small utility that logs shots (made/missed) to a CSV file on the robot.
- * Columns: timestamp,robot_x_m,robot_y_m,robot_yaw_deg,shooter_rpm,hood_pulse,extendo_pulse,made
+ * Columns:
+ * timestamp,robot_x_m,robot_y_m,robot_yaw_deg,shooter_rpm,hood_pulse,extendo_pulse,made
  */
 public class ShotLogger {
     private final SubsystemCollection subsystems;
