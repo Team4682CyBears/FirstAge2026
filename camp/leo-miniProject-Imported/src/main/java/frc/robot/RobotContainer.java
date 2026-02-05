@@ -35,7 +35,7 @@ public class RobotContainer {
   // private final Spinner spinnerMotor = new Spinner(Constants.SPINNER_CAN_ID);
 
   boolean spinnerEnabled = false;
-  private final Implementation tof = new Implementation(false, false, true, spinnerEnabled);
+  private final Implementation tof = new Implementation(true, true, true, spinnerEnabled);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -46,8 +46,7 @@ public class RobotContainer {
     RunExperimentCommand runExperimentCommand = new RunExperimentCommand(motorSpeed, tof, 20, spinnerEnabled);
     // experiement runs constructor when created
 
-    SmartDashboard.putData("Run Experiment Command",
-        runExperimentCommand);
+    SmartDashboard.putData("Run Experiment Command", runExperimentCommand);
 
     // TODO debug code for the laserCAN. REMOVE once the LaserCAN is configured.
     CanBridge.runTCP();

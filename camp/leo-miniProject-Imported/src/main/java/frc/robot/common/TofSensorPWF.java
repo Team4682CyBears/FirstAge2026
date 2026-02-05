@@ -59,12 +59,13 @@ public class TofSensorPWF {
     }
 
 /**
+ * *
  * Returns true if an object is in range
  * @return boolean (true if range is valid)
  * 
  */
     public boolean isRangeValid(){
-        return tofSensor.isRangeValid() && tofSensor.getRange() <= Constants.MAX_RANGE_INCHES;
+        return tofSensor.isRangeValid() && this.getRangeInches() <= Constants.MAX_RANGE_INCHES;
 
     }
 
