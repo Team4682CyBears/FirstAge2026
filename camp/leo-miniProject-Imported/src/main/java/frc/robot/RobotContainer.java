@@ -34,7 +34,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   // private final Spinner spinnerMotor = new Spinner(Constants.SPINNER_CAN_ID);
 
-  boolean spinnerEnabled = false;
+  boolean spinnerEnabled = true;
   private final Implementation tof = new Implementation(true, true, true, spinnerEnabled);
 
   /**
