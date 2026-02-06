@@ -23,6 +23,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.common.VisionMeasurement;
 import frc.robot.control.Constants;
 import frc.robot.generated.LimelightHelpers;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.common.DistanceMeasurement;
 
 /**
@@ -31,12 +33,27 @@ import frc.robot.common.DistanceMeasurement;
 public class CameraSubsystem extends SubsystemBase {
   private final double milisecondsInSeconds = 1000.0;
   private final double microsecondsInSeconds = 1000000.0;
-  private final int TagDoubleArraySize = 7;
   private final int BotposeDoubleArraySize = 8;
   private final int latencyIndex = 6;
-  private final int tagCountIndex = 7;
-  private final int tagSpaceXIndex = 0;
-  private final int tagSpaceYIndex = 2;
+
+  /**
+   * Set the internal botPoseSource (NT entry name) based on DriverStation alliance.
+   * This mirrors the commented-out logic previously in RobotContainer.
+   */
+  public void setBotPoseSource() {
+    DriverStation.getAlliance().ifPresent(alliance -> {
+      if (alliance == Alliance.Red) {
+        botPoseSource = "botpose_wpired";
+        botPoseOrbSource = "botpose_orb_wpired";
+      } else if (alliance == Alliance.Blue) {
+        botPoseSource = "botpose_wpiblue";
+        botPoseOrbSource = "botpose_orb_wpiblue";
+      } else {
+        botPoseSource = "botpose";
+        botPoseOrbSource = "botpose_orb";
+      }
+    });
+  }
   private final int fieldSpaceXIndex = 0;
   private final int fieldSpaceYIndex = 1;
   private final int botRotationIndex = 5;
@@ -66,7 +83,13 @@ public class CameraSubsystem extends SubsystemBase {
     // Use LimelightHelpers to get a PoseEstimate (includes timestamp + latency handling)
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
     try {
-      LimelightHelpers.PoseEstimate pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("");
+      LimelightHelpers.PoseEstimate pe;
+      // Select helper based on alliance so we read the correct wpi entry
+      if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+        pe = LimelightHelpers.getBotPoseEstimate_wpiRed("");
+      } else {
+        pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("");
+      }
       if (pe != null && pe.pose != null) {
         // LimelightHelpers timestampSeconds is server-time (seconds since epoch), convert to FPGA time reference
         double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
@@ -92,7 +115,12 @@ public class CameraSubsystem extends SubsystemBase {
   public VisionMeasurement getVisionBotPoseOrb() {
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
     try {
-      LimelightHelpers.PoseEstimate pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("");
+      LimelightHelpers.PoseEstimate pe;
+      if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+        pe = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("");
+      } else {
+        pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("");
+      }
       if (pe != null && pe.pose != null) {
         double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
         visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
@@ -212,5 +240,7 @@ public class CameraSubsystem extends SubsystemBase {
    */
   @Override
   public void periodic() {
+    // Keep the botPose source in sync with alliance during runtime.
+    setBotPoseSource();
   }
 }

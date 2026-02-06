@@ -349,7 +349,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       LimelightHelpers.SetIMUAssistAlpha("", 0.01);
     }
 
-    if (InstalledHardware.limelightInstalled) {
+    if (InstalledHardware.limelightInstalled && cameraSubsystem != null) {
       VisionMeasurement visionMeasurement = cameraSubsystem.getVisionBotPose();
 
       if (visionMeasurement.getRobotPosition() != null) {
@@ -358,14 +358,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
           recentVisionYaws.remove(0);
         }
       }
+      // Only add the measurement once when enabled. (Avoid double-calling addVisionMeasurement.)
       if (DriverStation.isEnabled()) {
         this.addVisionMeasurement(visionMeasurement);
       }
-    }
-
-    // update robot position with vision
-    if (InstalledHardware.limelightInstalled && DriverStation.isEnabled()) {
-      this.addVisionMeasurement(cameraSubsystem.getVisionBotPose());
     }
 
     if (swerveDriveMode == SwerveDriveMode.IMMOVABLE_STANCE && chassisSpeedsAreZero()) {
@@ -470,8 +466,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * otherwise not moving)
    */
   public void seedRobotPositionFromVision() {
-    if (recentVisionYaws.size() != 0) {
-      // TODO check the latency between SetRobotOrientation and being able to
+    if (recentVisionYaws.size() != 0 && cameraSubsystem != null) {
       // getVisionBotPoseOrb based on that updated orientation being set
       LimelightHelpers.SetRobotOrientation("", getMedianOfList(recentVisionYaws), 0, 0, 0, 0, 0);
       Pose2d visonBotPoseOrb = cameraSubsystem.getVisionBotPoseOrb().getRobotPosition();
