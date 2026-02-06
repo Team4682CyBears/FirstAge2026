@@ -88,7 +88,7 @@ public final class Constants {
     public static final double limelightToWPIBlueYOffset = 4.0;
 
     // Threshold for limelight/AprilTag pose ambiguity above which detections are
-    // considered ambiguous. Tweak after field testing.
+    // considered ambiguous.
     public static final double TAG_AMBIGUITY_THRESHOLD = 0.5;
 
     // ********************************************************************
