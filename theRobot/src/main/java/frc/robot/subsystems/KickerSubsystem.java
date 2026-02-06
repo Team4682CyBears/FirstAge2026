@@ -31,14 +31,15 @@ public class KickerSubsystem extends SubsystemBase {
     }
 
     public void runRPM(double rpm) {
-        this.targetRPM = rpm;
+        this.targetRPM = rpm / 60.0;
     }
 
     public double getRPM() {
-        return kickerLeadTalonFX.getVelocity().getValueAsDouble();
+        return kickerLeadTalonFX.getVelocity().getValueAsDouble() * 60;
     }
 
     public void stop() {
+        targetRPM = 0.0;
         kickerLeadTalonFX.stopMotor();
     }
 

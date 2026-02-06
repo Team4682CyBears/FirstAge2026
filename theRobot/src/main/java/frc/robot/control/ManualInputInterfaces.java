@@ -267,6 +267,7 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getShotLogger().logShot(false);
                 }));
             }
+            SmartDashboard.putNumber("Kicker RPM", 100);
             if (InstalledHardware.kickerInstalled) {
                 this.coDriverController.rightTrigger()
                         .whileTrue(new KickerCommand(this.subsystemCollection.getKickerSubsystem(), () -> {
