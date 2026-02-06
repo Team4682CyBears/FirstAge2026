@@ -63,12 +63,12 @@ public class RunExperimentCommand extends Command {
     @Override
     public void execute() {
         // happens after fully initalized runs periodticly until subsytem is closed
-        //System.out.println("Experiment Running: " + experimentRunning);
-        //System.out.println("Currentspeed " + spiningMotor.getSpeed());
-        //System.out.println("Desired speed" + desiredSpeed);
+        System.out.println("Experiment Running: " + experimentRunning);
+        System.out.println("Currentspeed " + spiningMotor.getSpeedRpm());
+        System.out.println("Desired speed" + desiredSpeed);
         if (experimentRunning == false && spiningMotor.getSpeedRpm() >= desiredSpeed) {
             experimentRunning = true;
-            System.out.println("MOTOR AT SPEED. RUNNING EXPERIMENT for " + cycles + " cycles.");
+            System.out.println("MOTOR AT SPEED. RUNNING EXPERIMENT for " + cycles + " cycles. + " + spiningMotor.getSpeedRpm() + "RPM");
         }
         if (experimentRunning == true && cycles > 0) {
             stopwatch.start();
