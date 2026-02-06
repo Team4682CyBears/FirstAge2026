@@ -103,6 +103,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private SwerveYawMode swerveYawMode = SwerveYawMode.JOYSTICK;
 
+  private Translation2d shootingAimTarget = null;
+
   private SwerveDrivetrain<TalonFX, TalonFX, CANcoder> drivetrain = InstalledHardware.tardiDrivetrainInstalled
       ? new TardiTunerConstants.TunerSwerveDrivetrain(TardiTunerConstants.DrivetrainConstants, 0,
           odometryStdDev, visionStdDev,
@@ -397,12 +399,34 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
     if (swerveYawMode == SwerveYawMode.AUTO){
       double robotYawDegrees = getRobotPosition().getRotation().getRadians();
-      Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
-      double PIDout = autoAnglePID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0);
+      Translation2d hubPosition = (shootingAimTarget != null)
+          ? shootingAimTarget
+          : (DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
+      double PIDout = autoAnglePID.calculate(MathUtil.angleModulus(robotYawDegrees - getYawToFaceTarget(hubPosition).getRadians()), 0.0);
       setAutoAngleVelocity((Math.abs(PIDout) > angleVelocityDeadband) ? PIDout + Math.signum(PIDout) * minAngleVelocity : 0.0);
     }
 
     displayDiagnostics();
+  }
+
+  /**
+   * Set an aiming target (field-relative) for use while in AUTO yaw mode. Use
+   * null to clear.
+   *
+   * @param target field-relative translation for the aim target (meters). If
+   *               null the drivetrain will revert to the default hub position
+   *               behavior.
+   */
+  public void setShootingAimTarget(Translation2d target) {
+    this.shootingAimTarget = target;
+  }
+
+  /**
+   * Clear any manual shooting aim target so the drivetrain uses the default
+   * hub position.
+   */
+  public void clearShootingAimTarget() {
+    this.shootingAimTarget = null;
   }
 
   public void setAutoAngleVelocity(double newVelocity){

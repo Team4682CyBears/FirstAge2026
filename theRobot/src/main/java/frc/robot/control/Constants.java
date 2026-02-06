@@ -117,4 +117,15 @@ public final class Constants {
 
     public static final int servoDefaultPosition = 1000;
 
+    // ********************************************************************
+    // Shooting / aiming constants (tunable)
+    public static final double PROJECTILE_SPEED_METERS_PER_SECOND = 12.0; //tune this
+
+    // Hood servo pulse widths
+    public static final int HOOD_MIN_PULSE = 1000;
+    public static final int HOOD_MAX_PULSE = 2000;
+    // Distances corresponding to min and max hood positions
+    public static final double HOOD_MIN_DISTANCE_METERS = 1.0;
+    public static final double HOOD_MAX_DISTANCE_METERS = 8.0;
+
 }
