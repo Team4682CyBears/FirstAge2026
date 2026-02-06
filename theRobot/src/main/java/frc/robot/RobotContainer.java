@@ -164,8 +164,17 @@ public class RobotContainer {
     if (InstalledHardware.limelightInstalled) {
       subsystems.setCameraSubsystem(new CameraSubsystem());
       if (subsystems.isLEDSubsystemAvailable()) {
-        subsystems.getLedSubsystem().registerStateAction(LEDState.Green,
-            () -> subsystems.getCameraSubsystem().getTagId() != -1);
+        // Green: tag seen and ambiguity is low
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Green,
+      () -> subsystems.getCameraSubsystem().getTagId() != -1
+        && subsystems.getCameraSubsystem().getMaxRawFiducialAmbiguity() <= Constants.TAG_AMBIGUITY_THRESHOLD);
+
+        // Yellow: tag seen but ambiguity is above threshold
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Yellow,
+      () -> subsystems.getCameraSubsystem().getTagId() != -1
+        && subsystems.getCameraSubsystem().getMaxRawFiducialAmbiguity() > Constants.TAG_AMBIGUITY_THRESHOLD);
+
+        // Red: no tag in sight
         subsystems.getLedSubsystem().registerStateAction(LEDState.Red,
             () -> subsystems.getCameraSubsystem().getTagId() == -1);
       }

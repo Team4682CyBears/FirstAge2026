@@ -87,6 +87,10 @@ public final class Constants {
     public static final double limelightToWPIBlueXOffest = 8.75;
     public static final double limelightToWPIBlueYOffset = 4.0;
 
+    // Threshold for limelight/AprilTag pose ambiguity above which detections are
+    // considered ambiguous. Tweak after field testing.
+    public static final double TAG_AMBIGUITY_THRESHOLD = 0.5;
+
     // ********************************************************************
     // Controller Constants
     public static final double rumbleTimeSeconds = 0.15;

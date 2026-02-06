@@ -182,6 +182,32 @@ public class CameraSubsystem extends SubsystemBase {
   }
 
   /**
+   * Returns the maximum ambiguity value from the latest raw fiducials read from
+   * the Limelight. If no fiducials are present this returns 0.0.
+   *
+   * @return maximum ambiguity (double)
+   */
+  public double getMaxRawFiducialAmbiguity() {
+    try {
+      LimelightHelpers.RawFiducial[] raw = LimelightHelpers.getRawFiducials("");
+      if (raw == null || raw.length == 0) {
+        return 0.0;
+      }
+      double max = 0.0;
+      for (LimelightHelpers.RawFiducial r : raw) {
+        if (r != null) {
+          if (r.ambiguity > max) {
+            max = r.ambiguity;
+          }
+        }
+      }
+      return max;
+    } catch (Exception e) {
+      return 0.0;
+    }
+  }
+
+  /**
    * a method that returns the robots distance from one of the given tags
    * 
    * @param blueTId
