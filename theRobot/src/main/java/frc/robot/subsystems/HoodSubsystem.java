@@ -2,7 +2,7 @@
 // Bishop Blanchet Robotics
 // Home of the Cybears
 // FRC - Rebuilt - 2026
-// File: ShooterAngleServoSubsystem.java
+// File: HoodSubsystem.java
 // Intent: Changes of the shooter angle
 // ************************************************************
 
@@ -22,6 +22,9 @@ import com.revrobotics.servohub.ServoChannel;
 import com.revrobotics.servohub.ServoChannel.ChannelId;
 import frc.robot.control.Constants;
 
+/**
+ * Subsystem for controlling the shooter hood angle and extendo using REV ServoHub.
+ */
 public class HoodSubsystem extends SubsystemBase {
     private final ServoHubConfig config;
     private final ServoHub servoHub;
@@ -31,6 +34,11 @@ public class HoodSubsystem extends SubsystemBase {
     private int anglePosition;
     private int extendoPosition;
 
+    /**
+     * Constructs a new HoodSubsystem.
+     *
+     * @param canID the CAN ID of the ServoHub
+     */
     public HoodSubsystem(int canID) {
         this.config = new ServoHubConfig();
         this.servoHub = new ServoHub(canID);
@@ -45,15 +53,18 @@ public class HoodSubsystem extends SubsystemBase {
         servoHub.configure(config, ResetMode.kResetSafeParameters);
     }
 
+    /**
+     * Configures all servo channels with pulse ranges and default positions.
+     */
     private void configureServos() {
         config.channel0.pulseRange(1000, 1500, 2000);
         config.channel1.pulseRange(1000, 1500, 2000);
-        config.channel2.pulseRange(1000,1500, 2000);
+        config.channel2.pulseRange(1000, 1500, 2000);
 
         channel0.setPowered(true);
         channel1.setPowered(true);
         channel2.setPowered(true);
-        
+
         channel0.setEnabled(true);
         channel1.setEnabled(true);
         channel2.setEnabled(true);
@@ -67,13 +78,22 @@ public class HoodSubsystem extends SubsystemBase {
         servoHub.configure(config, ResetMode.kResetSafeParameters);
     }
 
-    // Between 1000 and 2000
+    /**
+     * Sets the angle position for the hood servos.
+     *
+     * @param position pulse width between 1000 and 2000
+     */
     public void setAnglePosition(int position) {
         anglePosition = MathUtil.clamp(position, 1000, 2000);
 
         anglePosition = position;
     };
 
+    /**
+     * Sets the extendo position for the hood extendo servo.
+     *
+     * @param position pulse width between 1000 and 2000
+     */
     public void setExtendoPosition(int position) {
         extendoPosition = MathUtil.clamp(position, 1000, 2000);
 
