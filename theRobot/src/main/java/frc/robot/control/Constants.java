@@ -40,8 +40,9 @@ public final class Constants {
 
     // *****************************************************************
     // Field Constants
-    public static final Translation2d blueHubPosition = new Translation2d(1+17.5482504/2, 1+8.0519016/2);
-    public static final Translation2d redHubPosition = new Translation2d(1+17.5482504/2, 1+8.0519016/2);
+    public static final Translation2d blueHubPosition = new Translation2d(4.625594, 8.069326 / 2); // removed adding one
+                                                                                                   // to this
+    public static final Translation2d redHubPosition = new Translation2d(16.540988 - 4.625594, 8.069326 / 2);
 
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.

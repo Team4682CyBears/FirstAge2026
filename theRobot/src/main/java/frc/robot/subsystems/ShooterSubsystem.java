@@ -1,3 +1,12 @@
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Rebuilt - 2026
+// File: ShooterSubsystem.java
+// Intent: Use spark flex motors to shoot the ball
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
 package frc.robot.subsystems;
 
 import com.revrobotics.PersistMode;
@@ -14,6 +23,9 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/*
+ * Shoots the ball using two mechanically connected spark flex motors
+ */
 public class ShooterSubsystem extends SubsystemBase {
     private final SparkFlex LeadMotor;
     private final SparkFlex FollowMotor;
@@ -22,7 +34,9 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private final DoubleLogEntry speedLogEntry;
 
-    // max rpm 6784.0
+    /*
+     * Initialize and configure the shooter motors and PIDs
+     */
     public ShooterSubsystem(int LeadCanID, int FollowCanID) {
         this.LeadMotor = new SparkFlex(LeadCanID, MotorType.kBrushless);
         this.FollowMotor = new SparkFlex(FollowCanID, MotorType.kBrushless);
@@ -52,14 +66,23 @@ public class ShooterSubsystem extends SubsystemBase {
         FollowMotor.configure(FollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
+    /*
+     * Run the shooter at the target voltage
+     */
     public void runVoltage(double Volts) {
         LeadMotor.setVoltage(Volts);
     }
 
+    /*
+     * Run the motor at the target velocity in rpm
+     */
     public void runRPM(double targetRPM) {
         PIDController.setSetpoint(targetRPM, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
     }
 
+    /*
+     * Get the rpm from the lead motor
+     */
     public double getRPM() {
         try {
             return LeadMotor.getEncoder().getVelocity();
@@ -68,10 +91,16 @@ public class ShooterSubsystem extends SubsystemBase {
         }
     }
 
+    /*
+     * stop the motors
+     */
     public void stop() {
         LeadMotor.stopMotor();
     }
 
+    /*
+     * log the rpm every 20ms
+     */
     @Override
     public void periodic() {
         speedLogEntry.append(getRPM());

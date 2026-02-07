@@ -1,3 +1,13 @@
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Rebuilt - 2026
+// File: KickerSubsystem.java
+// Intent: Run two krakens to kick the ball into the shooter
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
+
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusCode;
@@ -13,6 +23,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
 
+/* 
+ * Runs the kicker which kicks the ball into the shooter consistiently
+ */
 public class KickerSubsystem extends SubsystemBase {
 
     private TalonFX kickerLeadTalonFX = new TalonFX(Constants.kickerLeadTalonCanId);
@@ -21,34 +34,49 @@ public class KickerSubsystem extends SubsystemBase {
     private final VelocityVoltage leaderController = new VelocityVoltage(0.0);
     private final VelocityVoltage followerController = new VelocityVoltage(0.0);
 
-    private double targetRPM = 0.0;
+    private double targetRPS = 0.0;
 
     private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.09009009009).withKV(0.4504504505).withKP(0.4);
 
+    /*
+     * Initialize the kicker and configure the motor
+     */
     public KickerSubsystem() {
         configureMotor();
     }
 
+    /*
+     * Sets the target rps
+     */
     public void runRPM(double rpm) {
-        this.targetRPM = rpm / 60.0;
+        this.targetRPS = rpm / 60.0;
     }
 
+    /*
+     * Get the rpm from the lead motor
+     */
     public double getRPM() {
         return kickerLeadTalonFX.getVelocity().getValueAsDouble() * 60;
     }
 
+    /*
+     * Stop both motors and set the targetRPS to 0
+     */
     public void stop() {
-        targetRPM = 0.0;
+        targetRPS = 0.0;
         kickerLeadTalonFX.stopMotor();
         kickerFollowTalonFX.stopMotor();
     }
 
+    /*
+     * Run the motors every 20ms and log the real rpm
+     */
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Kicker Real RPM", getRPM());
 
-        leaderController.withVelocity(targetRPM);
-        followerController.withVelocity(targetRPM);
+        leaderController.withVelocity(targetRPS);
+        followerController.withVelocity(targetRPS);
         kickerLeadTalonFX.setControl(leaderController);
         kickerFollowTalonFX.setControl(followerController);
     }
