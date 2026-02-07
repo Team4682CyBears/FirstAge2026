@@ -56,7 +56,5 @@ public class ShotLogger {
         logHood.append(hoodPulse);
         logExtendo.append(extendoPulse);
         logMade.append(made);
-        
-        DataLogManager.log("Shot logged.");
     }
 }
