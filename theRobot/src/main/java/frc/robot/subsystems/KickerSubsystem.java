@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -19,14 +18,14 @@ public class KickerSubsystem extends SubsystemBase {
     private TalonFX kickerLeadTalonFX = new TalonFX(Constants.kickerLeadTalonCanId);
     private TalonFX kickerFollowTalonFX = new TalonFX(Constants.kickerFollowTalonCanId);
 
-    private final VelocityVoltage dutyCycle = new VelocityVoltage(0.0);
+    private final VelocityVoltage leaderController = new VelocityVoltage(0.0);
+    private final VelocityVoltage followerController = new VelocityVoltage(0.0);
 
     private double targetRPM = 0.0;
 
     private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.09009009009).withKV(0.4504504505).withKP(0.4);
 
     public KickerSubsystem() {
-        kickerFollowTalonFX.setControl(new StrictFollower(kickerLeadTalonFX.getDeviceID()));
         configureMotor();
     }
 
@@ -41,14 +40,17 @@ public class KickerSubsystem extends SubsystemBase {
     public void stop() {
         targetRPM = 0.0;
         kickerLeadTalonFX.stopMotor();
+        kickerFollowTalonFX.stopMotor();
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Kicker Real RPM", getRPM());
 
-        dutyCycle.withVelocity(targetRPM);
-        kickerLeadTalonFX.setControl(dutyCycle);
+        leaderController.withVelocity(targetRPM);
+        followerController.withVelocity(targetRPM);
+        kickerLeadTalonFX.setControl(leaderController);
+        kickerFollowTalonFX.setControl(followerController);
     }
 
     /*
