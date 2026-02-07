@@ -442,6 +442,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
     drivetrain.resetPose(updatedPosition);
   }
 
+  /**
+   * Sets the swerve yaw mode for the drivetrain subsystem.
+   *
+   * @param mode The desired SwerveYawMode to set.
+   */
   public void setSwerveYawMode(SwerveYawMode mode){
     swerveYawMode = mode;
   }

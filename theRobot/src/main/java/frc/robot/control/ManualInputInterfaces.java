@@ -245,6 +245,7 @@ public class ManualInputInterfaces {
                     SmartDashboard.putNumber("Hood Extendo", hoodExtention + 50);
                 }
             }));
+            SmartDashboard.putNumber("Shooter RPM", 0);
 
             if (InstalledHardware.shooterInstalled) {
                 this.coDriverController.leftTrigger()
@@ -267,6 +268,7 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getShotLogger().logShot(false);
                 }));
             }
+            SmartDashboard.putNumber("Kicker RPM", 0);
             if (InstalledHardware.kickerInstalled) {
                 this.coDriverController.rightTrigger()
                         .whileTrue(new KickerCommand(this.subsystemCollection.getKickerSubsystem(), () -> {

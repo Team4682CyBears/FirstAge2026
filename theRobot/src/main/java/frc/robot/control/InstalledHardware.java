@@ -37,7 +37,7 @@ public class InstalledHardware {
 
     // Shooter related hardware
     public static final boolean shooterInstalled = true;
-    public static final boolean hoodInstalled = true;
+    public static final boolean hoodInstalled = false;
 
     // Kicker
     public static final boolean kickerInstalled = true;
@@ -48,5 +48,5 @@ public class InstalledHardware {
     // the other TOF sensors that are installed will not work.
 
     // LED Hardware
-    public static final boolean LEDSInstalled = true;
+    public static final boolean LEDSInstalled = false;
 }

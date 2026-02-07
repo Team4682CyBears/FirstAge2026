@@ -16,7 +16,7 @@ public class KickerCommand extends Command {
     }
 
     @Override
-    public void execute() {
+    public void initialize() {
         this.kickerSubsystem.runRPM(kickSpeedSupplier.getAsDouble());
     }
 
@@ -27,6 +27,7 @@ public class KickerCommand extends Command {
 
     @Override
     public boolean isFinished() {
+        // this command runs on a while true trigger. So, it should not stop until interrupted.
         return false;
     }
 }
