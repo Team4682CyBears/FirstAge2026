@@ -36,7 +36,7 @@ public class KickerSubsystem extends SubsystemBase {
 
     private double targetRPS = 0.0;
 
-    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.09009009009).withKV(0.4504504505).withKP(0.4);
+    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.09009009009).withKV(0.4504504505).withKP(0.4).withKD(0.0);
 
     /*
      * Initialize the kicker and configure the motor
@@ -50,6 +50,10 @@ public class KickerSubsystem extends SubsystemBase {
      */
     public void runRPM(double rpm) {
         this.targetRPS = rpm / 60.0;
+        leaderController.withVelocity(targetRPS);
+        followerController.withVelocity(targetRPS);
+        kickerLeadTalonFX.setControl(leaderController);
+        kickerFollowTalonFX.setControl(followerController);
     }
 
     /*
@@ -74,11 +78,6 @@ public class KickerSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Kicker Real RPM", getRPM());
-
-        leaderController.withVelocity(targetRPS);
-        followerController.withVelocity(targetRPS);
-        kickerLeadTalonFX.setControl(leaderController);
-        kickerFollowTalonFX.setControl(followerController);
     }
 
     /*
