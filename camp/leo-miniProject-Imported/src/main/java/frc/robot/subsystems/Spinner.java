@@ -60,8 +60,9 @@ public class Spinner extends SubsystemBase {
      * @param speed double
      */
     public void spin(double speed) {
-       speed = MathUtil.clamp(speed, -1, 1);
+       speed = MathUtil.clamp(speed, -0.5, 0.5);
        motor.set(speed);
+      
     
         if(speed == 0){
             motor.stopMotor();

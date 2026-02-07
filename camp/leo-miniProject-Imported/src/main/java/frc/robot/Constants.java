@@ -35,7 +35,7 @@ public final class Constants {
   public static final double motorStatorCurrentMaximumAmps = 100.0;
 
   // Spinner motor speed constant measured in rpm
-  public static final double motorSpeed = 5.0;
+  public static final double motorSpeed = 1.0;
 
 
   public static final int kDriverControllerPort = 0;
