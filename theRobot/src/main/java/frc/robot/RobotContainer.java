@@ -13,6 +13,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.common.LEDState;
 import frc.robot.common.TestTrajectories;
 import frc.robot.control.InstalledHardware;
 import frc.robot.control.ManualInputInterfaces;
@@ -37,11 +38,11 @@ public class RobotContainer {
     // init the pdp watcher
     this.initializePowerDistributionPanelWatcherSubsystem();
 
+    // init the leds (before camera)
+    this.initializeLEDSubsystem();
+
     // init the camera (before drivetrain)
     this.initializeCameraSubsystem();
-
-    // init the leds
-    this.initializeLEDSubsystem();
 
     // init the shooter subsystem
     this.initializeShooterSubsystem();
@@ -162,6 +163,12 @@ public class RobotContainer {
   private void initializeCameraSubsystem() {
     if (InstalledHardware.limelightInstalled) {
       subsystems.setCameraSubsystem(new CameraSubsystem());
+      if (subsystems.isLEDSubsystemAvailable()) {
+        subsystems.getLedSubsystem().registerStateAction(LEDState.Green,
+            () -> subsystems.getCameraSubsystem().getTagId() != -1);
+        subsystems.getLedSubsystem().registerStateAction(LEDState.Red,
+            () -> subsystems.getCameraSubsystem().getTagId() == -1);
+      }
       DataLogManager.log("SUCCESS: initializeCamera");
     } else {
       DataLogManager.log("FAIL: initializeCamera");
