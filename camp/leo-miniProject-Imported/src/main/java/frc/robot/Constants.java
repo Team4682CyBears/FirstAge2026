@@ -19,8 +19,10 @@ public final class Constants {
   public static final int talonCanID = 4;
 
   // most of the distance sensors have this max range. 
-  public static final double MAX_RANGE_INCHES = 78.74; // 2 meter conversion
-  public static final double maxRangeLaserCanInches = 157.48; // 4 meters in inches
+  public static final double MAX_RANGE_INCHES = 18.5; // 2 meter conversion
+  public static final double maxRangeLaserCanInches = 18.5; // 4 meters in inches
+
+  //TODO IF WE ARE USING OTHER SENSORS ACOUNT FOR OFFSET IN IS VALID CHECK
 
   // CAN Ids for sensors and spinner
   public static final int rangeSensorCTRECanID = 32;
@@ -35,7 +37,7 @@ public final class Constants {
   public static final double motorStatorCurrentMaximumAmps = 100.0;
 
   // Spinner motor speed constant measured in rpm
-  public static final double motorSpeed = 3000.0;
+  public static final double motorSpeed = 60;
 
 
   public static final int kDriverControllerPort = 0;
