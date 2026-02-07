@@ -41,7 +41,7 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    double motorSpeed = 10; // rpm
+    double motorSpeed = Constants.motorSpeed; // rpm
     // init class here
     RunExperimentCommand runExperimentCommand = new RunExperimentCommand(motorSpeed, tof, 20, spinnerEnabled);
     // experiement runs constructor when created

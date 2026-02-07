@@ -65,7 +65,7 @@ public class Implementation extends SubsystemBase{
      * periodic function that runs every 20ms
      * publishes telemetry for each TOF sensor (if they are created/enabled)
      * spins the motor at the set speed (if spinner is created)
-     */
+     */ 
     @Override
     public void periodic(){
         if(this.tofSensorCTRE != null){
