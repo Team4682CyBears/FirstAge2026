@@ -245,6 +245,7 @@ public class ManualInputInterfaces {
                     SmartDashboard.putNumber("Hood Extendo", hoodExtention + 50);
                 }
             }));
+            SmartDashboard.putNumber("Shooter RPM", 0);
 
             if (InstalledHardware.shooterInstalled) {
                 this.coDriverController.leftTrigger()

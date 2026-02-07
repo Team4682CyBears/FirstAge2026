@@ -21,6 +21,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /*
@@ -103,6 +104,8 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        speedLogEntry.append(getRPM());
+        double rpm = getRPM();
+        SmartDashboard.putNumber("Shooter RPM", rpm);
+        speedLogEntry.append(rpm);
     }
 }
