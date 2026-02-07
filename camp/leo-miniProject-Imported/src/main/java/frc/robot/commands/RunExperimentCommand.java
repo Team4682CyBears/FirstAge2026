@@ -25,10 +25,11 @@ public class RunExperimentCommand extends Command {
     boolean spinnerEnabled;
 
     /**
-     * Constructor for RunExperimentCommand, 
-     * @param constS  constant speed to run the motor at
-     * @param tof tof sensor subsystem
-     * @param cyc number of cycles to run the experiment for
+     * Constructor for RunExperimentCommand,
+     * 
+     * @param constS         constant speed to run the motor at
+     * @param tof            tof sensor subsystem
+     * @param cyc            number of cycles to run the experiment for
      * @param spinnerEnabled boolean that states if spinner is enabeld
      */
     public RunExperimentCommand(Double constS, Implementation tof, int cyc, boolean spinnerEnabled) {
@@ -38,8 +39,8 @@ public class RunExperimentCommand extends Command {
         this.dataValues = new double[cyc];
         this.spinnerEnabled = spinnerEnabled;
         addRequirements(tof);
-        
-        if (spinnerEnabled){
+
+        if (spinnerEnabled) {
             this.spiningMotor = tof.getSpinner();
             addRequirements(spiningMotor);
         }
@@ -51,8 +52,8 @@ public class RunExperimentCommand extends Command {
         cycles = desiredCycles;
         cyclesRun = 0;
         desiredSpeed = constSpeed;
-        if (spinnerEnabled){
-            spiningMotor.spin(desiredSpeed);
+        if (spinnerEnabled) {
+            spiningMotor.setRPM(desiredSpeed);
         }
         System.out.println("HEY LOOK AT ME OVER HERE THE DESIRED SPEED IS " + desiredSpeed);
         stopwatch.reset();
@@ -64,15 +65,16 @@ public class RunExperimentCommand extends Command {
     public void execute() {
         // happens after fully initalized runs periodticly until subsytem is closed
         System.out.println("Experiment Running: " + experimentRunning);
-        System.out.println("Currentspeed " + spiningMotor.getSpeedRpm());
+        System.out.println("Currentspeed " + spiningMotor.getRPM());
         System.out.println("Desired speed" + desiredSpeed);
-        if (experimentRunning == false && spiningMotor.getSpeedRpm() >= desiredSpeed) {
+        if (experimentRunning == false && spiningMotor.getRPM() >= desiredSpeed) {
             experimentRunning = true;
-            System.out.println("MOTOR AT SPEED. RUNNING EXPERIMENT for " + cycles + " cycles. + " + spiningMotor.getSpeedRpm() + "RPM");
+            System.out.println(
+                    "MOTOR AT SPEED. RUNNING EXPERIMENT for " + cycles + " cycles. + " + spiningMotor.getRPM() + "RPM");
         }
         if (experimentRunning == true && cycles > 0) {
             stopwatch.start();
-            if (tofActivated && !previousTofActivation || tofActivated2 && !previousTofActivation2 ) {
+            if (tofActivated && !previousTofActivation || tofActivated2 && !previousTofActivation2) {
                 dataValues[cyclesRun] = stopwatch.get();
                 cycles -= 1;
                 cyclesRun += 1;
@@ -110,20 +112,20 @@ public class RunExperimentCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        if (interrupted){
+        if (interrupted) {
             System.out.println("THE COMMAND WAS INTERRUPTED!!");
         }
         // prints out final data
-        if (spinnerEnabled){
-            spiningMotor.spin(0); // stops the motor
+        if (spinnerEnabled) {
+            spiningMotor.stop(); // stops the motor
         }
-        
+
         double meanValue = 0;
         int skippedCycles = 0;
-        double expectedCycleTime = 1.0/(2*desiredSpeed/60.0); //pole comes by 2 times per RPS
-        double cycleTimeTol = 1.25; 
+        double expectedCycleTime = 1.0 / (2 * desiredSpeed / 60.0); // pole comes by 2 times per RPS
+        double cycleTimeTol = 1.25;
         double allowedCycleTime = cycleTimeTol * expectedCycleTime;
-        double[] varianceData = new double[cyclesRun-1];
+        double[] varianceData = new double[cyclesRun - 1];
         System.out.println("Here is the Final Data:");
         for (int i = 1; i < cyclesRun; i++) {
             System.out.println(dataValues[i]);
@@ -131,15 +133,15 @@ public class RunExperimentCommand extends Command {
             // System.out.println(x);
             meanValue += x;
             varianceData[i - 1] = x;
-            if (x > allowedCycleTime){
+            if (x > allowedCycleTime) {
                 skippedCycles++;
             }
         }
         System.out.println();
-        for (int i = 0; i < cyclesRun-2; i++) {
+        for (int i = 0; i < cyclesRun - 2; i++) {
             System.out.println(varianceData[i]);
         }
-        meanValue = meanValue/(cyclesRun-1);
+        meanValue = meanValue / (cyclesRun - 1);
         System.out.println("The speed of the experiment was: " + constSpeed);
         System.out.println("Num Cycles run " + cyclesRun);
         System.out.println("The mean time between cycles was: " + meanValue);

@@ -79,7 +79,7 @@ public class Implementation extends SubsystemBase{
         }
         if(this.spinner != null){
             setMotorSpeed(Constants.motorSpeed);
-            spinner.spin(speed);
+            spinner.setRPM(speed);
         }
     }
 

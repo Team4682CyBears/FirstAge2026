@@ -5,7 +5,6 @@
 // File: Spinner.java
 // ************************************************************
 
-
 package frc.robot.subsystems;
 
 import frc.robot.Constants;
@@ -14,7 +13,10 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -25,16 +27,24 @@ import edu.wpi.first.units.measure.Velocity;
 
 public class Spinner extends SubsystemBase {
     private final TalonFX motor;
-    
+
+    private final VelocityVoltage controller = new VelocityVoltage(0.0);
+    private double targetRPS = 0.0;
+
+    //private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.4).withKD(0.0);
+
+    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.2);
     /**
      * Contructor for Spinner class under subsystem
      * configures spinner motor and its voltage,etc
+     * 
      * @param canID int
      */
     public Spinner(int canID) {
         motor = new TalonFX(canID);
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        config.Slot0 = slot0Configs;
 
         config.Voltage.PeakForwardVoltage = Constants.falconMaxVoltage;
         config.Voltage.PeakReverseVoltage = -Constants.falconMaxVoltage;
@@ -50,47 +60,34 @@ public class Spinner extends SubsystemBase {
         StatusCode response = motor.getConfigurator().apply(config);
         if (!response.isOK()) {
             System.out.println(
-                "TalonFX ID " + motor.getDeviceID() + " failed config with error " + response.toString());
-        }  
-    }
-
-    /**
-     * Sets the motor speed to the given value
-     * calls stopMotor if speed is set to 0
-     * @param speed double
-     */
-    public void spin(double speed) {
-       speed = MathUtil.clamp(speed, -0.5, 0.5);
-       motor.set(speed);
-      
-    
-        if(speed == 0){
-            motor.stopMotor();
+                    "TalonFX ID " + motor.getDeviceID() + " failed config with error " + response.toString());
         }
-         // speed = 0; // for testing
     }
 
+    public void setRPM(double rpm) {
+        this.targetRPS = rpm / 60.0;
+    }
 
+    public double getRPM() {
+        return this.motor.getVelocity().getValueAsDouble() * 60.0;
+    }
 
-    /**
-     * Gets the velocity speed of motor measured in RPM
-     * @return velocity speed as double (RPM)
-     */
-    public double getSpeedRpm(){
+    public void stop() {
+        targetRPS = 0.0;
+        this.motor.stopMotor();
+    }
 
-        //TODO: fix this. 
-        // StatusSignal<velocit> velocityStatSig = motor.getVelocity().getValueAsDouble();
-        // Velocity velocity = motor.getVelocity().getValue();
-        // StatusSignal CTREAbomination = motor.getVelocity(true);
-        // return CTREAbomination.getValueAsDouble();
-        return motor.getVelocity(true).getValueAsDouble();
+    @Override
+    public void periodic() {
+        controller.withVelocity(this.targetRPS);
+        motor.setControl(controller);
     }
 
     /**
      * Publishes telemetry data to the SmartDashboard of spinner
      * Publishes the spinner speed as double (RPM)
      */
-    public void publishTelemetry(){
+    public void publishTelemetry() {
         SmartDashboard.putNumber("Spinner_Speed ", motor.getVelocity(true).getValueAsDouble());
     }
 
