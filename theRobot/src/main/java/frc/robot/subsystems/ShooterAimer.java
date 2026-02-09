@@ -29,8 +29,8 @@ public class ShooterAimer {
     double flightTime = projectileSpeed > 0.001 ? (distance / projectileSpeed) : 0.0;
 
     Translation2d predicted = new Translation2d(
-        targetFieldTranslation.getX() + fieldVel.getX() * flightTime,
-        targetFieldTranslation.getY() + fieldVel.getY() * flightTime);
+        targetFieldTranslation.getX() - (fieldVel.getX() * flightTime),
+        targetFieldTranslation.getY() - (fieldVel.getY() * flightTime));
 
     return predicted;
   }
