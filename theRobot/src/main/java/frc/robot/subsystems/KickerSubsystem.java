@@ -28,6 +28,7 @@ import frc.robot.control.Constants;
  */
 public class KickerSubsystem extends SubsystemBase {
 
+    // TODO: Remove the follower in the final mechanism
     private TalonFX kickerLeadTalonFX = new TalonFX(Constants.kickerLeadTalonCanId);
     private TalonFX kickerFollowTalonFX = new TalonFX(Constants.kickerFollowTalonCanId);
 
