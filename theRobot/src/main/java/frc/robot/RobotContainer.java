@@ -213,7 +213,7 @@ public class RobotContainer {
   }
 
   /**
-   * A method to init the hood subsystem
+   * A method to init the kicker subsystem
    */
   private void initializeKickerSubsystem() {
     if (InstalledHardware.kickerInstalled) {
