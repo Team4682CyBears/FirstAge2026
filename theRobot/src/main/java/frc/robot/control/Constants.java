@@ -88,6 +88,8 @@ public final class Constants {
     public static final double limelightToWPIBlueXOffest = 8.75;
     public static final double limelightToWPIBlueYOffset = 4.0;
 
+    public static final double IMUassistAlpha = .01; // value between 0 and 1, higher values will cause the IMU to have more influence on the final angle output
+
     // ********************************************************************
     // Controller Constants
     public static final double rumbleTimeSeconds = 0.15;
