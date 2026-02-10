@@ -321,6 +321,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return swerveDriveMode;
   }
 
+  /**
+   * A method to obtain the swerve yaw mode
+   * @return
+   */
   public SwerveYawMode getSwerveYawMode() {
     return swerveYawMode;
   }
