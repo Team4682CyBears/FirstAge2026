@@ -15,6 +15,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
+
+import com.revrobotics.servohub.config.ServoChannelConfig;
 import com.revrobotics.servohub.config.ServoHubConfig;
 import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.ResetMode;
@@ -50,32 +52,35 @@ public class HoodSubsystem extends SubsystemBase {
         extendoPosition = Constants.HOOD_MIN_EXT;
 
         configureServos();
-        servoHub.configure(config, ResetMode.kResetSafeParameters);
     }
 
     /**
      * Configures all servo channels with pulse ranges and default positions.
      */
     private void configureServos() {
-        config.channel0.pulseRange(Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
-        config.channel1.pulseRange(Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
-        config.channel2.pulseRange(Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
-
-        rightAngleServoChannel.setPowered(true);
-        leftAngleServoChannel.setPowered(true);
-        extendoServoChannel.setPowered(true);
-
-        rightAngleServoChannel.setEnabled(true);
-        leftAngleServoChannel.setEnabled(true);
-        extendoServoChannel.setEnabled(true);
-
-        rightAngleServoChannel.setPulseWidth(Constants.servoDefaultPosition);
-        leftAngleServoChannel.setPulseWidth(Constants.servoDefaultPosition);
-        extendoServoChannel.setPulseWidth(Constants.servoDefaultPosition);
+        configureServoChannel(rightAngleServoChannel, config.channel0, Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
+        configureServoChannel(leftAngleServoChannel, config.channel1, Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
+        configureServoChannel(extendoServoChannel, config.channel2, Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
 
         servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 20000);
 
         servoHub.configure(config, ResetMode.kResetSafeParameters);
+    }
+
+    /**
+     * Configures a single servo channel with the given pulse range.
+     *
+     * @param channel the servo channel to configure
+     * @param servoConfig the servo channel configuration
+     * @param minPulse the minimum pulse width
+     * @param midPulse the middle pulse width
+     * @param maxPulse the maximum pulse width
+     */
+    public void configureServoChannel(ServoChannel channel, ServoChannelConfig servoConfig, int minPulse, int midPulse, int maxPulse) {
+        servoConfig.pulseRange(minPulse, midPulse, maxPulse);
+        channel.setPowered(true);
+        channel.setEnabled(true);
+        channel.setPulseWidth(Constants.servoDefaultPosition);
     }
 
     /**
