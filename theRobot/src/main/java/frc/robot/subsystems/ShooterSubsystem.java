@@ -23,6 +23,7 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.control.HardwareConstants;
 
 /*
  * Shoots the ball using two mechanically connected spark flex motors
@@ -46,8 +47,8 @@ public class ShooterSubsystem extends SubsystemBase {
         SparkFlexConfig LeadConfig = new SparkFlexConfig();
 
         LeadConfig.idleMode(IdleMode.kCoast);
-        LeadConfig.smartCurrentLimit(40);
-        LeadConfig.voltageCompensation(12.0);
+        LeadConfig.smartCurrentLimit(HardwareConstants.shooterSmartCurrentLimitAmps);
+        LeadConfig.voltageCompensation(HardwareConstants.nominalVoltageCompensationVolts);
 
         LeadConfig.closedLoop
                 .p(.00027)
