@@ -281,6 +281,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return drivetrain.getState().Pose.getRotation();
   }
 
+  /**
+   * Method to get the current auto yaw velocity in radians per second.
+   * @return the current auto yaw velocity in radians per second.
+   */
   public double getAutoYawVelocityRadiansPerSecond(){
     return this.autoYawVelocityRadiansPerSecond;
   }
