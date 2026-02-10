@@ -46,8 +46,8 @@ public class HoodSubsystem extends SubsystemBase {
         this.channel1 = servoHub.getServoChannel(ChannelId.kChannelId1);
         this.channel2 = servoHub.getServoChannel(ChannelId.kChannelId2);
 
-        anglePosition = 1000;
-        extendoPosition = 1000;
+        anglePosition = Constants.HOOD_MIN_EXT;
+        extendoPosition = Constants.HOOD_MIN_EXT;
 
         configureServos();
         servoHub.configure(config, ResetMode.kResetSafeParameters);

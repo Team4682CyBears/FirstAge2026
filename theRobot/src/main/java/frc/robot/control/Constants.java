@@ -120,6 +120,6 @@ public final class Constants {
     public static final double SHOOTER_MIN_RPM = 0.0;
     public static final double SHOOTER_MAX_RPM = 5000.0;
 
-    public static final double HOOD_MIN_EXT = 1000.0;
-    public static final double HOOD_MAX_EXT = 2000.0;
+    public static final int HOOD_MIN_EXT = 1000;
+    public static final int HOOD_MAX_EXT = 2000;
 }
