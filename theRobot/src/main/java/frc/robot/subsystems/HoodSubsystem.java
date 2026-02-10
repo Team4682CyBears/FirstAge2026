@@ -90,8 +90,6 @@ public class HoodSubsystem extends SubsystemBase {
      */
     public void setAnglePosition(int position) {
         anglePosition = MathUtil.clamp(position, Constants.HOOD_MIN_EXT, Constants.HOOD_MAX_EXT);
-
-        anglePosition = position;
     };
 
     /**
