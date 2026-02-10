@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.*;
 
@@ -215,35 +216,39 @@ public class ManualInputInterfaces {
 
             this.coDriverController.povUp().onTrue(new InstantCommand(() -> {
                 double currentRPM = SmartDashboard.getNumber("Shooter RPM", 0);
-                SmartDashboard.putNumber("Shooter RPM", currentRPM + 50);
+                double newRPM = MathUtil.clamp(currentRPM + 50, Constants.SHOOTER_MIN_RPM,
+                        Constants.SHOOTER_MAX_RPM);
+                SmartDashboard.putNumber("Shooter RPM", newRPM);
             }));
             this.coDriverController.povDown().onTrue(new InstantCommand(() -> {
                 double currentRPM = SmartDashboard.getNumber("Shooter RPM", 0);
-                SmartDashboard.putNumber("Shooter RPM", currentRPM - 50);
+                double newRPM = MathUtil.clamp(currentRPM - 50, Constants.SHOOTER_MIN_RPM,
+                        Constants.SHOOTER_MAX_RPM);
+                SmartDashboard.putNumber("Shooter RPM", newRPM);
             }));
             this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
                 double hoodExtention = SmartDashboard.getNumber("Hood Angle", 1000);
-                if(hoodExtention >= 1050){
-                    SmartDashboard.putNumber("Hood Angle", hoodExtention - 50);
-                }
+                double newAngle = MathUtil.clamp(hoodExtention - 50, Constants.HOOD_MIN_EXT,
+                        Constants.HOOD_MAX_EXT);
+                SmartDashboard.putNumber("Hood Angle", newAngle);
             }));
             this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
                 double hoodExtention = SmartDashboard.getNumber("Hood Angle", 1000);
-                if(hoodExtention <= 1950){
-                    SmartDashboard.putNumber("Hood Angle", hoodExtention + 50);
-                }
+                double newAngle = MathUtil.clamp(hoodExtention + 50, Constants.HOOD_MIN_EXT,
+                        Constants.HOOD_MAX_EXT);
+                SmartDashboard.putNumber("Hood Angle", newAngle);
             }));
             this.coDriverController.y().onTrue(new InstantCommand(() -> {
                 double hoodExtention = SmartDashboard.getNumber("Hood Extendo", 1000);
-                if(hoodExtention >= 1050){
-                    SmartDashboard.putNumber("Hood Extendo", hoodExtention - 50);
-                }
+                double newExt = MathUtil.clamp(hoodExtention - 50, Constants.HOOD_MIN_EXT,
+                        Constants.HOOD_MAX_EXT);
+                SmartDashboard.putNumber("Hood Extendo", newExt);
             }));
             this.coDriverController.b().onTrue(new InstantCommand(() -> {
                 double hoodExtention = SmartDashboard.getNumber("Hood Extendo", 1000);
-                if(hoodExtention <= 1950){
-                    SmartDashboard.putNumber("Hood Extendo", hoodExtention + 50);
-                }
+                double newExt = MathUtil.clamp(hoodExtention + 50, Constants.HOOD_MIN_EXT,
+                        Constants.HOOD_MAX_EXT);
+                SmartDashboard.putNumber("Hood Extendo", newExt);
             }));
             SmartDashboard.putNumber("Shooter RPM", 0);
 
@@ -254,7 +259,10 @@ public class ManualInputInterfaces {
                         }));
             }
             if (InstalledHardware.hoodInstalled) {
-                this.coDriverController.a().onTrue(new HoodAngleCommand(this.subsystemCollection.getHoodSubsystem()));
+                this.coDriverController.a().onTrue(new HoodAngleCommand(
+                        this.subsystemCollection.getHoodSubsystem(),
+                        () -> (int) SmartDashboard.getNumber("Hood Angle", 1000),
+                        () -> (int) SmartDashboard.getNumber("Hood Extendo", 1000)));
             }
 
             // Co-driver bumpers: log shot result (made / missed)

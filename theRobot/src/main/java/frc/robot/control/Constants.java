@@ -112,8 +112,14 @@ public final class Constants {
 
     public static final double followKickerMotorGearRatio = 3;
 
-    public static final int hoodServoMotorCanId = 22;
+    public static final int servoHubCanID = 22;
 
-    public static final int servoDefaultPosition = 1000;
+    public static final int servoDefaultPosition = 1000; //fully retracted position
 
+    // Shooter RPM bounds
+    public static final double SHOOTER_MIN_RPM = 0.0;
+    public static final double SHOOTER_MAX_RPM = 5000.0;
+
+    public static final double HOOD_MIN_EXT = 1000.0;
+    public static final double HOOD_MAX_EXT = 2000.0;
 }

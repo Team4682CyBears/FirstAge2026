@@ -126,12 +126,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
-  private TrapezoidProfile.Constraints TrapProfConstraints = new TrapezoidProfile.Constraints(540, 920);
-  private ProfiledPIDController autoAnglePID = new ProfiledPIDController(2.0, 0.0, 0.001, TrapProfConstraints);
+  // Trapezoid profile constrains motion by limiting max velocity and
+  // max acceleration so the setpoint follows a smooth accel->cruise->decel
+  // (trapezoidal) velocity profile used by the ProfiledPIDController.
+  private TrapezoidProfile.Constraints autoYawProfileConstraints = new TrapezoidProfile.Constraints(540, 920);
+  //TODO found via testing on Tardi drivetrain, needs to be changed for BareBones
+  private ProfiledPIDController autoYawPID = new ProfiledPIDController(2.0, 0.0, 0.001, autoYawProfileConstraints);
 
-  private double autoAngleVelocity = 0.0;
-  private double minAngleVelocity = 0.25;
-  private double angleVelocityDeadband = 0.01;
+  private double autoYawVelocityRadiansPerSecond = 0.0;
+  private double minYawVelocityRadiansPerSecond = 0.25;
+  private double yawVelocityDeadband = 0.01;
 
   /**
    * Constructor for this DrivetrainSubsystem
@@ -197,7 +201,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(
       updatedChassisSpeeds.vxMetersPerSecond,
       updatedChassisSpeeds.vyMetersPerSecond,
-      getAutoAngleVelocity());
+      getAutoYawVelocityRadiansPerSecond());
     this.chassisSpeeds = newChassisSpeeds;
   }
 
@@ -272,8 +276,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return drivetrain.getState().Pose.getRotation();
   }
 
-  public double getAutoAngleVelocity(){
-    return this.autoAngleVelocity;
+  public double getAutoYawVelocityRadiansPerSecond(){
+    return this.autoYawVelocityRadiansPerSecond;
   }
 
   /**
@@ -330,7 +334,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * occurs during testing.
      */
     if (DriverStation.isDisabled()) {
-      LimelightHelpers.SetIMUMode("", 1);
+      LimelightHelpers.SetIMUMode("", 1); //set limelight IMU to seeding mode
 
       if (!m_hasAppliedOperatorPerspective) {
         DriverStation.getAlliance().ifPresent(allianceColor -> {
@@ -345,7 +349,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       this.seedRobotPositionFromVision();
     }
     else{
-      LimelightHelpers.SetIMUMode("", 3);
+      LimelightHelpers.SetIMUMode("", 3); //set limelight IMU to assist mode, where it uses the limelight botpose to assist the IMU's yaw angle estimation
       LimelightHelpers.SetIMUAssistAlpha("", 0.01);
     }
 
@@ -402,15 +406,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
     if (swerveYawMode == SwerveYawMode.AUTO){
       double robotYawDegrees = getRobotPosition().getRotation().getRadians();
       Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
-      double PIDout = autoAnglePID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0);
-      setAutoAngleVelocity((Math.abs(PIDout) > angleVelocityDeadband) ? PIDout + Math.signum(PIDout) * minAngleVelocity : 0.0);
+      double PIDout = autoYawPID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0);
+      setAutoYawVelocityRadiansPerSecond((Math.abs(PIDout) > yawVelocityDeadband) ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond : 0.0);
     }
 
     displayDiagnostics();
   }
 
-  public void setAutoAngleVelocity(double newVelocity){
-    this.autoAngleVelocity = newVelocity;
+  public void setAutoYawVelocityRadiansPerSecond(double newVelocity){
+    this.autoYawVelocityRadiansPerSecond = newVelocity;
   }
 
   /**
