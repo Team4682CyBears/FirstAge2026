@@ -15,10 +15,18 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 
+/**
+ * Command to set the shooter speed.
+ */
 public class ShootCommand extends Command {
     private final ShooterSubsystem shooterSubsystem;
     private final DoubleSupplier shootSpeedSupplier;
 
+    /**
+     * Constructs a new ShootCommand.
+     * @param shooterSubsystem
+     * @param shootSpeedSupplier
+     */
     public ShootCommand(ShooterSubsystem shooterSubsystem, DoubleSupplier shootSpeedSupplier) {
         this.shooterSubsystem = shooterSubsystem;
         this.shootSpeedSupplier = shootSpeedSupplier;
