@@ -23,6 +23,7 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.servohub.ServoChannel;
 import com.revrobotics.servohub.ServoChannel.ChannelId;
 import frc.robot.control.Constants;
+import frc.robot.control.HardwareConstants;
 
 /**
  * Subsystem for controlling the shooter hood angle and extendo using REV ServoHub.
@@ -48,8 +49,8 @@ public class HoodSubsystem extends SubsystemBase {
         this.leftAngleServoChannel = servoHub.getServoChannel(ChannelId.kChannelId1);
         this.extendoServoChannel = servoHub.getServoChannel(ChannelId.kChannelId2);
 
-        anglePosition = Constants.HOOD_MIN_EXT;
-        extendoPosition = Constants.HOOD_MIN_EXT;
+        anglePosition = HardwareConstants.HOOD_MIN_EXT;
+        extendoPosition = HardwareConstants.HOOD_MIN_EXT;
 
         configureServos();
     }
@@ -58,9 +59,9 @@ public class HoodSubsystem extends SubsystemBase {
      * Configures all servo channels with pulse ranges and default positions.
      */
     private void configureServos() {
-        configureServoChannel(rightAngleServoChannel, config.channel0, Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
-        configureServoChannel(leftAngleServoChannel, config.channel1, Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
-        configureServoChannel(extendoServoChannel, config.channel2, Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
+        configureServoChannel(rightAngleServoChannel, config.channel0, HardwareConstants.HOOD_MIN_EXT, (HardwareConstants.HOOD_MIN_EXT+HardwareConstants.HOOD_MAX_EXT)/2, HardwareConstants.HOOD_MAX_EXT);
+        configureServoChannel(leftAngleServoChannel, config.channel1, HardwareConstants.HOOD_MIN_EXT, (HardwareConstants.HOOD_MIN_EXT+HardwareConstants.HOOD_MAX_EXT)/2, HardwareConstants.HOOD_MAX_EXT);
+        configureServoChannel(extendoServoChannel, config.channel2, HardwareConstants.HOOD_MIN_EXT, (HardwareConstants.HOOD_MIN_EXT+HardwareConstants.HOOD_MAX_EXT)/2, HardwareConstants.HOOD_MAX_EXT);
 
         servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 20000);
 
@@ -89,7 +90,7 @@ public class HoodSubsystem extends SubsystemBase {
      * @param position pulse width between 1000 and 2000
      */
     public void setAnglePosition(int position) {
-        anglePosition = MathUtil.clamp(position, Constants.HOOD_MIN_EXT, Constants.HOOD_MAX_EXT);
+        anglePosition = MathUtil.clamp(position, HardwareConstants.HOOD_MIN_EXT, HardwareConstants.HOOD_MAX_EXT);
     };
 
     /**
@@ -98,7 +99,7 @@ public class HoodSubsystem extends SubsystemBase {
      * @param position pulse width between 1000 and 2000
      */
     public void setExtendoPosition(int position) {
-        extendoPosition = MathUtil.clamp(position, Constants.HOOD_MIN_EXT, Constants.HOOD_MAX_EXT);
+        extendoPosition = MathUtil.clamp(position, HardwareConstants.HOOD_MIN_EXT, HardwareConstants.HOOD_MAX_EXT);
 
         extendoPosition = position;
     }

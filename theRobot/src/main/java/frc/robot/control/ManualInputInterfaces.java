@@ -228,26 +228,26 @@ public class ManualInputInterfaces {
             }));
             this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
                 double hoodExtention = SmartDashboard.getNumber("Hood Angle", 1000);
-                double newAngle = MathUtil.clamp(hoodExtention - 50, Constants.HOOD_MIN_EXT,
-                        Constants.HOOD_MAX_EXT);
+                double newAngle = MathUtil.clamp(hoodExtention - 50, HardwareConstants.HOOD_MIN_EXT,
+                        HardwareConstants.HOOD_MAX_EXT);
                 SmartDashboard.putNumber("Hood Angle", newAngle);
             }));
             this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
                 double hoodExtention = SmartDashboard.getNumber("Hood Angle", 1000);
-                double newAngle = MathUtil.clamp(hoodExtention + 50, Constants.HOOD_MIN_EXT,
-                        Constants.HOOD_MAX_EXT);
+                double newAngle = MathUtil.clamp(hoodExtention + 50, HardwareConstants.HOOD_MIN_EXT,
+                        HardwareConstants.HOOD_MAX_EXT);
                 SmartDashboard.putNumber("Hood Angle", newAngle);
             }));
             this.coDriverController.y().onTrue(new InstantCommand(() -> {
                 double hoodExtention = SmartDashboard.getNumber("Hood Extendo", 1000);
-                double newExt = MathUtil.clamp(hoodExtention - 50, Constants.HOOD_MIN_EXT,
-                        Constants.HOOD_MAX_EXT);
+                double newExt = MathUtil.clamp(hoodExtention - 50, HardwareConstants.HOOD_MIN_EXT,
+                        HardwareConstants.HOOD_MAX_EXT);
                 SmartDashboard.putNumber("Hood Extendo", newExt);
             }));
             this.coDriverController.b().onTrue(new InstantCommand(() -> {
                 double hoodExtention = SmartDashboard.getNumber("Hood Extendo", 1000);
-                double newExt = MathUtil.clamp(hoodExtention + 50, Constants.HOOD_MIN_EXT,
-                        Constants.HOOD_MAX_EXT);
+                double newExt = MathUtil.clamp(hoodExtention + 50, HardwareConstants.HOOD_MIN_EXT,
+                        HardwareConstants.HOOD_MAX_EXT);
                 SmartDashboard.putNumber("Hood Extendo", newExt);
             }));
             SmartDashboard.putNumber("Shooter RPM", 0);
