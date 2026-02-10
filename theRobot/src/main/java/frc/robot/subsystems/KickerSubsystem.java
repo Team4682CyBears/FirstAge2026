@@ -51,11 +51,15 @@ public class KickerSubsystem extends SubsystemBase {
      * Sets the target rpm
      */
     public void runRPM(double rpm) {
-        this.targetRPS = rpm / 60.0;
+        this.targetRPS = rpmToRPS(rpm);
         leaderController.withVelocity(targetRPS);
         followerController.withVelocity(targetRPS * Constants.followKickerMotorGearRatio);
         kickerLeadTalonFX.setControl(leaderController);
         kickerFollowTalonFX.setControl(followerController);
+    }
+
+    private double rpmToRPS(double rpm) {
+        return rpm / 60.0;
     }
 
     /*
