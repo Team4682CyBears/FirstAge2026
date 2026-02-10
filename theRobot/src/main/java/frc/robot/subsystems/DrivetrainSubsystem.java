@@ -363,7 +363,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
     else{
       LimelightHelpers.SetIMUMode("", 3); //set limelight IMU to assist mode, where it uses the limelight botpose to assist the IMU's yaw angle estimation
-      LimelightHelpers.SetIMUAssistAlpha("", 0.01);
+      LimelightHelpers.SetIMUAssistAlpha("", Constants.IMUassistAlpha);
     }
 
     if (InstalledHardware.limelightInstalled) {

@@ -50,6 +50,7 @@ public class ShooterSubsystem extends SubsystemBase {
         LeadConfig.smartCurrentLimit(HardwareConstants.shooterSmartCurrentLimitAmps);
         LeadConfig.voltageCompensation(HardwareConstants.nominalVoltageCompensationVolts);
 
+        //Derived values from testing on tardi
         LeadConfig.closedLoop
                 .p(.00027)
                 .i(0.0)
