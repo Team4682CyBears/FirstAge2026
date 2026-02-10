@@ -193,6 +193,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
     this.chassisSpeeds = updatedChassisSpeeds;
   }
 
+  /**
+   * Method avaliable so that callers can update the chassis speeds to induce
+   * changes in robot movement while maintaining a constant auto yaw velocity
+   * @param updatedChassisSpeeds
+   */
   public void driveFieldCentricShooting(ChassisSpeeds updatedChassisSpeeds){
     if (swerveDriveMode == SwerveDriveMode.ROBOT_CENTRIC_DRIVING) {
       this.previousChassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(previousChassisSpeeds, getGyroscopeRotation());
