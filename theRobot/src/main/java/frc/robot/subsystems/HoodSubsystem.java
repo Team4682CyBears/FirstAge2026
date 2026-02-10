@@ -57,9 +57,9 @@ public class HoodSubsystem extends SubsystemBase {
      * Configures all servo channels with pulse ranges and default positions.
      */
     private void configureServos() {
-        config.channel0.pulseRange(1000, 1500, 2000);
-        config.channel1.pulseRange(1000, 1500, 2000);
-        config.channel2.pulseRange(1000, 1500, 2000);
+        config.channel0.pulseRange(Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
+        config.channel1.pulseRange(Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
+        config.channel2.pulseRange(Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
 
         channel0.setPowered(true);
         channel1.setPowered(true);
@@ -84,7 +84,7 @@ public class HoodSubsystem extends SubsystemBase {
      * @param position pulse width between 1000 and 2000
      */
     public void setAnglePosition(int position) {
-        anglePosition = MathUtil.clamp(position, 1000, 2000);
+        anglePosition = MathUtil.clamp(position, Constants.HOOD_MIN_EXT, Constants.HOOD_MAX_EXT);
 
         anglePosition = position;
     };
@@ -95,7 +95,7 @@ public class HoodSubsystem extends SubsystemBase {
      * @param position pulse width between 1000 and 2000
      */
     public void setExtendoPosition(int position) {
-        extendoPosition = MathUtil.clamp(position, 1000, 2000);
+        extendoPosition = MathUtil.clamp(position, Constants.HOOD_MIN_EXT, Constants.HOOD_MAX_EXT);
 
         extendoPosition = position;
     }
