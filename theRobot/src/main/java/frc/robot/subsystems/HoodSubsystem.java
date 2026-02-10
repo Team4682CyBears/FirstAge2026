@@ -28,9 +28,9 @@ import frc.robot.control.Constants;
 public class HoodSubsystem extends SubsystemBase {
     private final ServoHubConfig config;
     private final ServoHub servoHub;
-    private ServoChannel channel0;
-    private ServoChannel channel1;
-    private ServoChannel channel2;
+    private ServoChannel rightAngleServoChannel;
+    private ServoChannel leftAngleServoChannel;
+    private ServoChannel extendoServoChannel;
     private int anglePosition;
     private int extendoPosition;
 
@@ -42,9 +42,9 @@ public class HoodSubsystem extends SubsystemBase {
     public HoodSubsystem(int canID) {
         this.config = new ServoHubConfig();
         this.servoHub = new ServoHub(canID);
-        this.channel0 = servoHub.getServoChannel(ChannelId.kChannelId0);
-        this.channel1 = servoHub.getServoChannel(ChannelId.kChannelId1);
-        this.channel2 = servoHub.getServoChannel(ChannelId.kChannelId2);
+        this.rightAngleServoChannel = servoHub.getServoChannel(ChannelId.kChannelId0);
+        this.leftAngleServoChannel = servoHub.getServoChannel(ChannelId.kChannelId1);
+        this.extendoServoChannel = servoHub.getServoChannel(ChannelId.kChannelId2);
 
         anglePosition = Constants.HOOD_MIN_EXT;
         extendoPosition = Constants.HOOD_MIN_EXT;
@@ -61,17 +61,17 @@ public class HoodSubsystem extends SubsystemBase {
         config.channel1.pulseRange(Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
         config.channel2.pulseRange(Constants.HOOD_MIN_EXT, (Constants.HOOD_MIN_EXT+Constants.HOOD_MAX_EXT)/2, Constants.HOOD_MAX_EXT);
 
-        channel0.setPowered(true);
-        channel1.setPowered(true);
-        channel2.setPowered(true);
+        rightAngleServoChannel.setPowered(true);
+        leftAngleServoChannel.setPowered(true);
+        extendoServoChannel.setPowered(true);
 
-        channel0.setEnabled(true);
-        channel1.setEnabled(true);
-        channel2.setEnabled(true);
+        rightAngleServoChannel.setEnabled(true);
+        leftAngleServoChannel.setEnabled(true);
+        extendoServoChannel.setEnabled(true);
 
-        channel0.setPulseWidth(Constants.servoDefaultPosition);
-        channel1.setPulseWidth(Constants.servoDefaultPosition);
-        channel2.setPulseWidth(Constants.servoDefaultPosition);
+        rightAngleServoChannel.setPulseWidth(Constants.servoDefaultPosition);
+        leftAngleServoChannel.setPulseWidth(Constants.servoDefaultPosition);
+        extendoServoChannel.setPulseWidth(Constants.servoDefaultPosition);
 
         servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 20000);
 
@@ -121,8 +121,8 @@ public class HoodSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        channel0.setPulseWidth(anglePosition);
-        channel1.setPulseWidth(anglePosition);
-        channel2.setPulseWidth(extendoPosition);
+        rightAngleServoChannel.setPulseWidth(anglePosition);
+        leftAngleServoChannel.setPulseWidth(anglePosition);
+        extendoServoChannel.setPulseWidth(extendoPosition);
     }
 }
