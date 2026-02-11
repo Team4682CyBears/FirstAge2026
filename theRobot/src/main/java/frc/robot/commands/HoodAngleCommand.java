@@ -15,11 +15,21 @@ import java.util.function.IntSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.HoodSubsystem;
 
+/**
+ * Command to set the hood angle and extendo position.
+ */
 public class HoodAngleCommand extends Command {
     private final HoodSubsystem hoodSubsystem;
     private final IntSupplier angleSupplier;
     private final IntSupplier extendoSupplier;
 
+    /**
+     * Constructs a new HoodAngleCommand.
+     *
+     * @param hoodSubsystem the hood subsystem to control
+     * @param angleSupplier a supplier that provides the target angle position
+     * @param extendoSupplier a supplier that provides the target extendo position
+     */
     public HoodAngleCommand(HoodSubsystem hoodSubsystem, IntSupplier angleSupplier, IntSupplier extendoSupplier) {
         this.hoodSubsystem = hoodSubsystem;
         this.angleSupplier = angleSupplier;
