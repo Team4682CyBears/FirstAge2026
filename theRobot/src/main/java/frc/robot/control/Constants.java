@@ -90,7 +90,7 @@ public final class Constants {
 
     // Threshold for limelight/AprilTag pose ambiguity above which detections are
     // considered ambiguous.
-    public static final double TAG_AMBIGUITY_THRESHOLD = 0.5;
+    public static final double TAG_AMBIGUITY_THRESHOLD = 0.6;
 
     // ********************************************************************
     // Controller Constants
