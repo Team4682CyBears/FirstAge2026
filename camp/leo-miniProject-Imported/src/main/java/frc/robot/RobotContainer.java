@@ -19,6 +19,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.commands.RunExperimentCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Spinner;
+
+import java.util.function.ToIntFunction;
+
 import au.grapplerobotics.CanBridge;
 
 /**
@@ -35,12 +38,19 @@ public class RobotContainer {
   // private final Spinner spinnerMotor = new Spinner(Constants.SPINNER_CAN_ID);
 
   boolean spinnerEnabled = true;
-  private final Implementation tof = new Implementation(true, true, true, spinnerEnabled);
+  boolean useCTRE = true;
+  boolean usePWF = true;
+  boolean useLaser = true;
 
+
+
+  private final Implementation tof = new Implementation(useCTRE, usePWF, useLaser, spinnerEnabled);
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
+
   public RobotContainer() {
+
     double motorSpeed = Constants.motorSpeed; // rpm
     // init class here
     RunExperimentCommand runExperimentCommand = new RunExperimentCommand(motorSpeed, tof, 20, spinnerEnabled);

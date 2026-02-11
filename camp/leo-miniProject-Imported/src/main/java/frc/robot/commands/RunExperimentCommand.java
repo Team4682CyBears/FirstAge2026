@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Implementation;
 import frc.robot.subsystems.Spinner;
-
+import frc.robot.common.TofSensorLaser;
 public class RunExperimentCommand extends Command {
     Spinner spiningMotor;
     Implementation tofSensor;
@@ -24,6 +24,8 @@ public class RunExperimentCommand extends Command {
     boolean experimentRunning = false;
     boolean spinnerEnabled;
 
+    //TODO ADD COMMENTS TO CODE AND ADD TO MY GOOGLE DOCS (SENSOR DOCS)
+
     /**
      * Constructor for RunExperimentCommand,
      * 
@@ -31,6 +33,7 @@ public class RunExperimentCommand extends Command {
      * @param tof            tof sensor subsystem
      * @param cyc            number of cycles to run the experiment for
      * @param spinnerEnabled boolean that states if spinner is enabeld
+     * @param allSensorsUsed boolean that is needed to check whether or not to run the experiment
      */
     public RunExperimentCommand(Double constS, Implementation tof, int cyc, boolean spinnerEnabled) {
         this.tofSensor = tof;
@@ -39,13 +42,16 @@ public class RunExperimentCommand extends Command {
         this.dataValues = new double[cyc];
         this.spinnerEnabled = spinnerEnabled;
         addRequirements(tof);
-
+        // if spinner enabled add req to spinner
         if (spinnerEnabled) {
             this.spiningMotor = tof.getSpinner();
             addRequirements(spiningMotor);
         }
     }
 
+    /**
+     * sets the cycles ran to 0 and if the spinner is enabled, sets the rpm to the desired speed
+     */
     @Override
     public void initialize() {
         isDone = false;
@@ -60,28 +66,33 @@ public class RunExperimentCommand extends Command {
         experimentRunning = false;
         System.out.println("Run experiment command initilized");
     }
-
+    /**
+     * Prints out the deailts of the experiment (isRunning, currentSpeed, and desiredSpeed)
+     * checks if experiment is running and if the motor is the desired speed and enables the experiment
+     * Checks if its running and cycles <0 and starts the stopwatch
+     */
     @Override
     public void execute() {
+        // TODO ADD IS TOFFALID CHECK AND RMMOVE ALL SENSORED USED
         // happens after fully initalized runs periodticly until subsytem is closed
         System.out.println("Experiment Running: " + experimentRunning);
         System.out.println("Currentspeed " + spiningMotor.getRPM());
         System.out.println("Desired speed" + desiredSpeed);
-        if (experimentRunning == false && spiningMotor.getRPM() >= desiredSpeed) {
+        if (experimentRunning == false && spiningMotor.getRPM() >= desiredSpeed) { // checks if its not running and the rpm is at the desired speed needed
             experimentRunning = true;
             System.out.println(
                     "MOTOR AT SPEED. RUNNING EXPERIMENT for " + cycles + " cycles. + " + spiningMotor.getRPM() + "RPM");
         }
         if (experimentRunning == true && cycles > 0) {
             stopwatch.start();
-            if (tofActivated && !previousTofActivation || tofActivated2 && !previousTofActivation2) {
-                dataValues[cyclesRun] = stopwatch.get();
+            tofActivated = tofSensor.tofSensorLaser.tofActivated();
+            if (tofSensor.tofSensorLaser.tofActivated() && !previousTofActivation) {
+                dataValues[cyclesRun] = stopwatch.get(); // gets current stopwatch time
                 cycles -= 1;
                 cyclesRun += 1;
                 System.out.println("Num cycles: " + ((Integer) cycles).toString());
             }
             previousTofActivation = tofActivated;
-            previousTofActivation2 = tofActivated2;
         }
     }
 

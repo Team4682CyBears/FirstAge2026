@@ -71,8 +71,9 @@ public class TofSensorLaser {
     /**
      * Gets the distnace in meters and checks if its valid 
      * @return true if distance is valid and within the max range (MAX_RANGE_METERS)
+     * Also checks if its ac
      */
-    public boolean isRangeValid() {
+    public boolean tofActivated() {
         Measurement measurement = laserSensor.getMeasurement();
         
         //use the code:
@@ -88,7 +89,7 @@ public class TofSensorLaser {
      */
     public void publishTelemetery(){
         SmartDashboard.putNumber(displayName + " DistanceIn ", getRangeInches());
-        SmartDashboard.putBoolean(displayName + "RangeValid ", isRangeValid());
+        SmartDashboard.putBoolean(displayName + "tofActivated ", tofActivated());
         //martDashboard.putString(displayName, " ToF status " + CANBus.CANBusStatus + rangeSensorCanId)
     }
 }

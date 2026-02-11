@@ -23,7 +23,7 @@ import frc.robot.common.TofSensorCTRE;
 public class Implementation extends SubsystemBase{
     private TofSensorCTRE tofSensorCTRE;
     private TofSensorPWF tofSensorPWF;
-    private TofSensorLaser tofSensorLaser;
+    public TofSensorLaser tofSensorLaser;
     private Spinner spinner;
     private double speed = 0;
 
