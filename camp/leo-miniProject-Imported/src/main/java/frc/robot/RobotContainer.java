@@ -16,40 +16,45 @@ package frc.robot;
 import frc.robot.subsystems.Implementation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.commands.RunExperimentCommand;
+import frc.robot.commands.DetectSpinningFlagCommand;
+import frc.robot.commands.OldExperimentCommand;
+import frc.robot.commands.SpinMotorCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.Spinner;
+import frc.robot.subsystems.MotorSubsystem;
+import frc.robot.subsystems.SensorsSubsystem;
 import au.grapplerobotics.CanBridge;
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
+ * This class is where the bulk of the robot should be declared. 
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  // private final Spinner spinnerMotor = new Spinner(Constants.SPINNER_CAN_ID);
 
   boolean spinnerEnabled = true;
-  private final Implementation tof = new Implementation(true, true, true, spinnerEnabled);
+  boolean CTREEnabled = true;
+  boolean PWFEnabled = true;
+  boolean LaserEnabled = true;
+  double motorSpeed = Constants.motorSpeed;
+
+  //private final Implementation tof = new Implementation(CTREEnabled, PWFEnabled, LaserEnabled, spinnerEnabled);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
-    double motorSpeed = Constants.motorSpeed; // rpm
-    // init class here
-    RunExperimentCommand runExperimentCommand = new RunExperimentCommand(motorSpeed, tof, 20, spinnerEnabled);
-    // experiement runs constructor when created
 
-    SmartDashboard.putData("Run Experiment Command", runExperimentCommand);
+    // Define Motor Speed in RPM
+    // double motorSpeed = SmartDashboard.getNumber(null, 0);
 
-    // TODO debug code for the laserCAN. REMOVE once the LaserCAN is configured.
-    CanBridge.runTCP();
+    SensorsSubsystem sensorSubsystem = new SensorsSubsystem(CTREEnabled, PWFEnabled, LaserEnabled);
+    MotorSubsystem motorSubsystem = new MotorSubsystem(Constants.motorCanID); // initiazlie motor
+    new SpinMotorCommand(motorSubsystem); // start motor
+    new DetectSpinningFlagCommand(sensorSubsystem, motorSubsystem);
+
+    
+    //new OldExperimentCommand(this.motorSpeed, sensorSubsystem, 20, spinnerEnabled);
+    //SmartDashboard.putData("Run Experiment Command", detectSpinningFlagCommand);
+    // TO:DO debug code for the laserCAN. REMOVE once the LaserCAN is configured.
+    //CanBridge.runTCP();
     // .setDefaultCommand(runExperimentCommand);
   }
 

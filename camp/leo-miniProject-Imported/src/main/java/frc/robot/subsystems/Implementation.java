@@ -24,7 +24,7 @@ public class Implementation extends SubsystemBase{
     private TofSensorCTRE tofSensorCTRE;
     private TofSensorPWF tofSensorPWF;
     private TofSensorLaser tofSensorLaser;
-    private Spinner spinner;
+    private MotorSubsystem spinner;
     private double speed = 0;
 
     /**
@@ -45,11 +45,11 @@ public class Implementation extends SubsystemBase{
             tofSensorLaser = new TofSensorLaser(Constants.rangeSensorLaserCanID);
         }
         if (useSpinner){
-            spinner = new Spinner(Constants.SPINNER_CAN_ID);
+            spinner = new MotorSubsystem(Constants.SPINNER_CAN_ID);
         }
     }
 
-    public Spinner getSpinner(){
+    public MotorSubsystem getSpinner(){
         return spinner;
     }
     /**

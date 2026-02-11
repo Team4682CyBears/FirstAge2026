@@ -29,6 +29,7 @@ public final class Constants {
   public static final int rangeSensorPWFCanID = 33;
   public static final int rangeSensorLaserCanID = 34;
   public static final int SPINNER_CAN_ID = 8;
+  public static final int motorCanID = 8;
 
   // AMPS and Voltage constants for motor config 
   public static final double motorSupplyCurrentMaximumAmps = 50.0;

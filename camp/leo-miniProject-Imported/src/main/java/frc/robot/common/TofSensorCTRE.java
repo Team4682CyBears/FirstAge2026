@@ -53,7 +53,7 @@ public class TofSensorCTRE {
     }
 
   
-    /**
+/**
      * Gets the distance in inches from the TOF sensor
      * @return double distance in inches
      */

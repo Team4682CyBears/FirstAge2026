@@ -2,7 +2,7 @@
 // Bishop Blanchet Robotics
 // Home of the Cybears
 // FRC - First Age - 2026
-// File: Spinner.java
+// File: MotorSubsystem.java
 // ************************************************************
 
 package frc.robot.subsystems;
@@ -25,22 +25,24 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.Velocity;
 
-public class Spinner extends SubsystemBase {
+public class MotorSubsystem extends SubsystemBase {
     private final TalonFX motor;
 
+    // Set motor speed
     private final VelocityVoltage controller = new VelocityVoltage(0.0);
     private double targetRPS = 0.0;
 
-    //private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.4).withKD(0.0);
-
+    // PID constants
+    //private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.4); // 2025 Experiment
     private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.2);
+
     /**
-     * Contructor for Spinner class under subsystem
-     * configures spinner motor and its voltage,etc
+     * Contructor for MotorSubsystem class 
+     * Configures motor and sets speed
      * 
      * @param canID int
      */
-    public Spinner(int canID) {
+    public MotorSubsystem(int canID) {
         motor = new TalonFX(canID);
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -77,10 +79,13 @@ public class Spinner extends SubsystemBase {
         this.motor.stopMotor();
     }
 
-    @Override
-    public void periodic() {
+    public void setSpeed() {
         controller.withVelocity(this.targetRPS);
         motor.setControl(controller);
+    }
+
+    @Override
+    public void periodic() {
     }
 
     /**

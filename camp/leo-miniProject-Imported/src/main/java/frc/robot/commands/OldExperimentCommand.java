@@ -3,10 +3,10 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Implementation;
-import frc.robot.subsystems.Spinner;
+import frc.robot.subsystems.MotorSubsystem;
 
-public class RunExperimentCommand extends Command {
-    Spinner spiningMotor;
+public class OldExperimentCommand extends Command {
+    MotorSubsystem spiningMotor;
     Implementation tofSensor;
     double constSpeed;
     double desiredSpeed = 0;
@@ -32,7 +32,7 @@ public class RunExperimentCommand extends Command {
      * @param cyc            number of cycles to run the experiment for
      * @param spinnerEnabled boolean that states if spinner is enabeld
      */
-    public RunExperimentCommand(Double constS, Implementation tof, int cyc, boolean spinnerEnabled) {
+    public OldExperimentCommand(Double constS, Implementation tof, int cyc, boolean spinnerEnabled) {
         this.tofSensor = tof;
         this.constSpeed = constS;
         this.desiredCycles = cyc;
