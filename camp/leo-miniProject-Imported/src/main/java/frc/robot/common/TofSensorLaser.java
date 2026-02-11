@@ -49,6 +49,7 @@ public class TofSensorLaser {
         } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
         } 
+        System.out.println("TOF CONFIGURED");
     }
 
     /**

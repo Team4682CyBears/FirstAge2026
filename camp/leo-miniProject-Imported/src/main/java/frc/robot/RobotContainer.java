@@ -38,8 +38,8 @@ public class RobotContainer {
   // private final Spinner spinnerMotor = new Spinner(Constants.SPINNER_CAN_ID);
 
   boolean spinnerEnabled = true;
-  boolean useCTRE = true;
-  boolean usePWF = true;
+  boolean useCTRE = false;
+  boolean usePWF = false;
   boolean useLaser = true;
 
 

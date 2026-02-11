@@ -47,6 +47,7 @@ public class RunExperimentCommand extends Command {
             this.spiningMotor = tof.getSpinner();
             addRequirements(spiningMotor);
         }
+        System.out.print("run experiment command");
     }
 
     /**
@@ -59,6 +60,7 @@ public class RunExperimentCommand extends Command {
         cyclesRun = 0;
         desiredSpeed = constSpeed;
         if (spinnerEnabled) {
+            System.out.println("Motor set");
             spiningMotor.setRPM(desiredSpeed);
         }
         System.out.println("HEY LOOK AT ME OVER HERE THE DESIRED SPEED IS " + desiredSpeed);
@@ -133,7 +135,7 @@ public class RunExperimentCommand extends Command {
 
         double meanValue = 0;
         int skippedCycles = 0;
-        double expectedCycleTime = 1.0 / (2 * desiredSpeed / 60.0); // pole comes by 2 times per RPS
+        double expectedCycleTime = 1.0 / (desiredSpeed / 60.0); // pole comes by 2 times per RPS
         double cycleTimeTol = 1.25;
         double allowedCycleTime = cycleTimeTol * expectedCycleTime;
         double[] varianceData = new double[cyclesRun - 1];
@@ -148,7 +150,7 @@ public class RunExperimentCommand extends Command {
                 skippedCycles++;
             }
         }
-        System.out.println();
+        System.out.println("Variance data for cycles: ");
         for (int i = 0; i < cyclesRun - 2; i++) {
             System.out.println(varianceData[i]);
         }

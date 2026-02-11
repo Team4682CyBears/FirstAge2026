@@ -19,8 +19,8 @@ public final class Constants {
   public static final int talonCanID = 4;
 
   // most of the distance sensors have this max range. 
-  public static final double MAX_RANGE_INCHES = 18.5; // 2 meter conversion
-  public static final double maxRangeLaserCanInches = 18.5; // 4 meters in inches
+  public static final double MAX_RANGE_INCHES = 20.65; // 2 meter conversion
+  public static final double maxRangeLaserCanInches = 20.65; // 4 meters in inches low of non cardboard and high of carboard
 
   //TODO IF WE ARE USING OTHER SENSORS ACOUNT FOR OFFSET IN IS VALID CHECK
 
