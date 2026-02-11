@@ -85,8 +85,8 @@ public class RunExperimentCommand extends Command {
         }
         if (experimentRunning == true && cycles > 0) {
             stopwatch.start();
-            tofActivated = tofSensor.tofSensorLaser.tofActivated();
-            if (tofSensor.tofSensorLaser.tofActivated() && !previousTofActivation) {
+            tofActivated = tofSensor.getTofLazer().tofActivated();
+            if (tofSensor.getTofLazer().tofActivated() && !previousTofActivation) {
                 dataValues[cyclesRun] = stopwatch.get(); // gets current stopwatch time
                 cycles -= 1;
                 cyclesRun += 1;

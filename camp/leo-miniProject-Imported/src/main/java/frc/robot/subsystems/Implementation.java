@@ -23,7 +23,7 @@ import frc.robot.common.TofSensorCTRE;
 public class Implementation extends SubsystemBase{
     private TofSensorCTRE tofSensorCTRE;
     private TofSensorPWF tofSensorPWF;
-    public TofSensorLaser tofSensorLaser;
+    private TofSensorLaser tofSensorLaser;
     private Spinner spinner;
     private double speed = 0;
 
@@ -47,6 +47,10 @@ public class Implementation extends SubsystemBase{
         if (useSpinner){
             spinner = new Spinner(Constants.SPINNER_CAN_ID);
         }
+    }
+
+    public TofSensorLaser getTofLazer(){
+        return tofSensorLaser;
     }
 
     public Spinner getSpinner(){
