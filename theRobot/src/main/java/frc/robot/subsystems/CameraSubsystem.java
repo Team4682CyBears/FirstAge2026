@@ -86,9 +86,9 @@ public class CameraSubsystem extends SubsystemBase {
       LimelightHelpers.PoseEstimate pe;
       // Select helper based on alliance so we read the correct wpi entry
       if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-        pe = LimelightHelpers.getBotPoseEstimate_wpiRed("");
+        pe = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
       } else {
-        pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("");
+        pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
       }
       if (pe != null && pe.pose != null) {
         // LimelightHelpers timestampSeconds is server-time (seconds since epoch), convert to FPGA time reference
@@ -117,9 +117,9 @@ public class CameraSubsystem extends SubsystemBase {
     try {
       LimelightHelpers.PoseEstimate pe;
       if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-        pe = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("");
+        pe = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight");
       } else {
-        pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("");
+        pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
       }
       if (pe != null && pe.pose != null) {
         double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
@@ -189,7 +189,7 @@ public class CameraSubsystem extends SubsystemBase {
    */
   public double getMaxRawFiducialAmbiguity() {
     try {
-      LimelightHelpers.RawFiducial[] raw = LimelightHelpers.getRawFiducials("");
+      LimelightHelpers.RawFiducial[] raw = LimelightHelpers.getRawFiducials("limelight");
       if (raw == null || raw.length == 0) {
         return 0.0;
       }
@@ -239,7 +239,7 @@ public class CameraSubsystem extends SubsystemBase {
     if (tagId == noTagInSightId) {
       return null;
     }
-    double[] botpose = LimelightHelpers.getBotPose_TargetSpace("");
+    double[] botpose = LimelightHelpers.getBotPose_TargetSpace("limelight");
     if (botpose == null || botpose.length == 0) {
       return null;
     }
@@ -266,7 +266,6 @@ public class CameraSubsystem extends SubsystemBase {
    */
   @Override
   public void periodic() {
-    // Keep the botPose source in sync with alliance during runtime.
     setBotPoseSource();
   }
 }
