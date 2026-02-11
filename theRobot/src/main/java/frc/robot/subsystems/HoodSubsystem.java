@@ -15,12 +15,15 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.MathUtil;
+
+import com.revrobotics.servohub.config.ServoChannelConfig;
 import com.revrobotics.servohub.config.ServoHubConfig;
 import com.revrobotics.servohub.ServoHub;
 import com.revrobotics.ResetMode;
 import com.revrobotics.servohub.ServoChannel;
 import com.revrobotics.servohub.ServoChannel.ChannelId;
 import frc.robot.control.Constants;
+import frc.robot.control.HardwareConstants;
 
 /**
  * Subsystem for controlling the shooter hood angle and extendo using REV ServoHub.
@@ -28,9 +31,9 @@ import frc.robot.control.Constants;
 public class HoodSubsystem extends SubsystemBase {
     private final ServoHubConfig config;
     private final ServoHub servoHub;
-    private ServoChannel channel0;
-    private ServoChannel channel1;
-    private ServoChannel channel2;
+    private ServoChannel rightAngleServoChannel;
+    private ServoChannel leftAngleServoChannel;
+    private ServoChannel extendoServoChannel;
     private int anglePosition;
     private int extendoPosition;
 
@@ -42,40 +45,43 @@ public class HoodSubsystem extends SubsystemBase {
     public HoodSubsystem(int canID) {
         this.config = new ServoHubConfig();
         this.servoHub = new ServoHub(canID);
-        this.channel0 = servoHub.getServoChannel(ChannelId.kChannelId0);
-        this.channel1 = servoHub.getServoChannel(ChannelId.kChannelId1);
-        this.channel2 = servoHub.getServoChannel(ChannelId.kChannelId2);
+        this.rightAngleServoChannel = servoHub.getServoChannel(ChannelId.kChannelId0);
+        this.leftAngleServoChannel = servoHub.getServoChannel(ChannelId.kChannelId1);
+        this.extendoServoChannel = servoHub.getServoChannel(ChannelId.kChannelId2);
 
-        anglePosition = 1000;
-        extendoPosition = 1000;
+        anglePosition = HardwareConstants.HOOD_MIN_EXT;
+        extendoPosition = HardwareConstants.HOOD_MIN_EXT;
 
         configureServos();
-        servoHub.configure(config, ResetMode.kResetSafeParameters);
     }
 
     /**
      * Configures all servo channels with pulse ranges and default positions.
      */
     private void configureServos() {
-        config.channel0.pulseRange(1000, 1500, 2000);
-        config.channel1.pulseRange(1000, 1500, 2000);
-        config.channel2.pulseRange(1000, 1500, 2000);
-
-        channel0.setPowered(true);
-        channel1.setPowered(true);
-        channel2.setPowered(true);
-
-        channel0.setEnabled(true);
-        channel1.setEnabled(true);
-        channel2.setEnabled(true);
-
-        channel0.setPulseWidth(Constants.servoDefaultPosition);
-        channel1.setPulseWidth(Constants.servoDefaultPosition);
-        channel2.setPulseWidth(Constants.servoDefaultPosition);
+        configureServoChannel(rightAngleServoChannel, config.channel0, HardwareConstants.HOOD_MIN_EXT, (HardwareConstants.HOOD_MIN_EXT+HardwareConstants.HOOD_MAX_EXT)/2, HardwareConstants.HOOD_MAX_EXT);
+        configureServoChannel(leftAngleServoChannel, config.channel1, HardwareConstants.HOOD_MIN_EXT, (HardwareConstants.HOOD_MIN_EXT+HardwareConstants.HOOD_MAX_EXT)/2, HardwareConstants.HOOD_MAX_EXT);
+        configureServoChannel(extendoServoChannel, config.channel2, HardwareConstants.HOOD_MIN_EXT, (HardwareConstants.HOOD_MIN_EXT+HardwareConstants.HOOD_MAX_EXT)/2, HardwareConstants.HOOD_MAX_EXT);
 
         servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 20000);
 
         servoHub.configure(config, ResetMode.kResetSafeParameters);
+    }
+
+    /**
+     * Configures a single servo channel with the given pulse range.
+     *
+     * @param channel the servo channel to configure
+     * @param servoConfig the servo channel configuration
+     * @param minPulse the minimum pulse width
+     * @param midPulse the middle pulse width
+     * @param maxPulse the maximum pulse width
+     */
+    public void configureServoChannel(ServoChannel channel, ServoChannelConfig servoConfig, int minPulse, int midPulse, int maxPulse) {
+        servoConfig.pulseRange(minPulse, midPulse, maxPulse);
+        channel.setPowered(true);
+        channel.setEnabled(true);
+        channel.setPulseWidth(Constants.servoDefaultPosition);
     }
 
     /**
@@ -84,9 +90,7 @@ public class HoodSubsystem extends SubsystemBase {
      * @param position pulse width between 1000 and 2000
      */
     public void setAnglePosition(int position) {
-        anglePosition = MathUtil.clamp(position, 1000, 2000);
-
-        anglePosition = position;
+        anglePosition = MathUtil.clamp(position, HardwareConstants.HOOD_MIN_EXT, HardwareConstants.HOOD_MAX_EXT);
     };
 
     /**
@@ -95,7 +99,7 @@ public class HoodSubsystem extends SubsystemBase {
      * @param position pulse width between 1000 and 2000
      */
     public void setExtendoPosition(int position) {
-        extendoPosition = MathUtil.clamp(position, 1000, 2000);
+        extendoPosition = MathUtil.clamp(position, HardwareConstants.HOOD_MIN_EXT, HardwareConstants.HOOD_MAX_EXT);
 
         extendoPosition = position;
     }
@@ -121,8 +125,8 @@ public class HoodSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        channel0.setPulseWidth(anglePosition);
-        channel1.setPulseWidth(anglePosition);
-        channel2.setPulseWidth(extendoPosition);
+        rightAngleServoChannel.setPulseWidth(anglePosition);
+        leftAngleServoChannel.setPulseWidth(anglePosition);
+        extendoServoChannel.setPulseWidth(extendoPosition);
     }
 }

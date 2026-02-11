@@ -49,6 +49,7 @@ public class DefaultDriveCommand extends Command {
         } else if (m_drivetrainSubsystem.getSwerveYawMode() == SwerveYawMode.AUTO){
             m_drivetrainSubsystem.driveFieldCentricShooting(commandedChassisSpeeds);
         }
+        //else do nothing
     }
 
     @Override

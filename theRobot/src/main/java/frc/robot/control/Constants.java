@@ -88,6 +88,8 @@ public final class Constants {
     public static final double limelightToWPIBlueXOffest = 8.75;
     public static final double limelightToWPIBlueYOffset = 4.0;
 
+    public static final double IMUassistAlpha = .01; // value between 0 and 1, higher values will cause the IMU to have more influence on the final angle output
+
     // ********************************************************************
     // Controller Constants
     public static final double rumbleTimeSeconds = 0.15;
@@ -112,8 +114,11 @@ public final class Constants {
 
     public static final double followKickerMotorGearRatio = 1;
 
-    public static final int hoodServoMotorCanId = 22;
+    public static final int servoHubCanID = 22;
 
-    public static final int servoDefaultPosition = 1000;
+    public static final int servoDefaultPosition = 1000; //fully retracted position
 
+    // Shooter RPM bounds
+    public static final double SHOOTER_MIN_RPM = 0.0;
+    public static final double SHOOTER_MAX_RPM = 5000.0;
 }

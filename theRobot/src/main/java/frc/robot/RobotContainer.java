@@ -205,7 +205,7 @@ public class RobotContainer {
    */
   private void initializeHoodSubsystem() {
     if (InstalledHardware.hoodInstalled) {
-      subsystems.setHoodSubsystem(new HoodSubsystem(Constants.hoodServoMotorCanId));
+      subsystems.setHoodSubsystem(new HoodSubsystem(Constants.servoHubCanID));
       System.out.println("SUCCESS: initializeHood");
     } else {
       System.out.println("FAIL: initializeHood");
@@ -213,7 +213,7 @@ public class RobotContainer {
   }
 
   /**
-   * A method to init the hood subsystem
+   * A method to init the kicker subsystem
    */
   private void initializeKickerSubsystem() {
     if (InstalledHardware.kickerInstalled) {
