@@ -110,7 +110,7 @@ public final class Constants {
     public static final int kickerLeadTalonCanId = 18;
     public static final int kickerFollowTalonCanId = 19;
 
-    public static final double followKickerMotorGearRatio = 3;
+    public static final double followKickerMotorGearRatio = 1;
 
     public static final int hoodServoMotorCanId = 22;
 

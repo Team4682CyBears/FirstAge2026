@@ -79,6 +79,7 @@ public class KickerSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Kicker Real RPM", getRPM());
+        SmartDashboard.putNumber("Kicker Follow Real RPM", kickerFollowTalonFX.getVelocity().getValueAsDouble() * 60);
     }
 
     /*
@@ -103,7 +104,7 @@ public class KickerSubsystem extends SubsystemBase {
         talonMotorConfig.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
         talonMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         // motor direction
-        talonMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         StatusCode response = kickerLeadTalonFX.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {

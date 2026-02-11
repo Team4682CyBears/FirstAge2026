@@ -105,7 +105,7 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         double rpm = getRPM();
-        SmartDashboard.putNumber("Shooter RPM", rpm);
+        SmartDashboard.putNumber("Real Shooter RPM", rpm);
         speedLogEntry.append(rpm);
     }
 }
