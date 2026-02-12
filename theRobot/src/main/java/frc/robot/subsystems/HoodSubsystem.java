@@ -100,8 +100,6 @@ public class HoodSubsystem extends SubsystemBase {
      */
     public void setExtendoPosition(int position) {
         extendoPosition = MathUtil.clamp(position, HardwareConstants.HOOD_MIN_EXT, HardwareConstants.HOOD_MAX_EXT);
-
-        extendoPosition = position;
     }
 
     /**
