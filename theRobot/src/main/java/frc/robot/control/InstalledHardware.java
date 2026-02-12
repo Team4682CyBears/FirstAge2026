@@ -33,7 +33,7 @@ public class InstalledHardware {
 
     // DriveTrain Related Hardware
     public static final boolean drivetrainInstalled = true;
-    public static final boolean tardiDrivetrainInstalled = true;
+    public static final boolean bareDrivetrainInstalled = true;
 
     // Shooter related hardware
     public static final boolean shooterInstalled = true;
