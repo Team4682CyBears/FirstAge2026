@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -12,11 +13,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class AutoAimMovingCommand extends Command {
   private final DrivetrainSubsystem drivetrain;
   private final HoodSubsystem hood;
+  private final ShooterSubsystem shooter;
   private final ShooterAimer aimer;
 
-  public AutoAimMovingCommand(DrivetrainSubsystem drivetrain, HoodSubsystem hood, ShooterAimer aimer) {
+  public AutoAimMovingCommand(DrivetrainSubsystem drivetrain, HoodSubsystem hood, ShooterSubsystem shooter,
+      ShooterAimer aimer) {
     this.drivetrain = drivetrain;
     this.hood = hood;
+    this.shooter = shooter;
     this.aimer = aimer;
     addRequirements(hood);
   }
@@ -36,6 +40,8 @@ public class AutoAimMovingCommand extends Command {
       double distance = drivetrain.getRobotPosition().getTranslation().getDistance(predicted);
       int pulse = aimer.hoodPulseForDistance(distance);
       hood.setAnglePosition(pulse);
+      double rpm = aimer.shooterRpmForDistance(distance);
+      shooter.runRPM(rpm);
     }
   }
 

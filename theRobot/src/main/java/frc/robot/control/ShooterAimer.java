@@ -3,10 +3,17 @@ package frc.robot.control;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.common.LookupTableDouble;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 public class ShooterAimer {
   private final DrivetrainSubsystem drivetrain;
+
+  private final double[][] hoodAngleLookupTable = { {} };
+  private final double[][] shooterRpmLookupTable = { {} };
+
+  private final LookupTableDouble hoodAngleLookupTableImpl = new LookupTableDouble(hoodAngleLookupTable);
+  private final LookupTableDouble shooterRpmLookupTableImpl = new LookupTableDouble(shooterRpmLookupTable);
 
   public ShooterAimer(DrivetrainSubsystem drivetrain) {
     this.drivetrain = drivetrain;
@@ -36,10 +43,10 @@ public class ShooterAimer {
   }
 
   public int hoodPulseForDistance(double distanceMeters) {
-    double t = (distanceMeters - Constants.HOOD_MIN_DISTANCE_METERS)
-        / (Constants.HOOD_MAX_DISTANCE_METERS - Constants.HOOD_MIN_DISTANCE_METERS);
-    t = Math.max(0.0, Math.min(1.0, t));
-    int pulse = (int) Math.round(Constants.HOOD_MIN_PULSE + t * (Constants.HOOD_MAX_PULSE - Constants.HOOD_MIN_PULSE));
-    return pulse;
+    return (int) hoodAngleLookupTableImpl.queryTable(distanceMeters);
+  }
+
+  public double shooterRpmForDistance(double distanceMeters) {
+    return shooterRpmLookupTableImpl.queryTable(distanceMeters);
   }
 }
