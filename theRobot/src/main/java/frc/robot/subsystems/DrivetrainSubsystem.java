@@ -27,7 +27,7 @@ import frc.robot.generated.TardiTunerConstants;
 import frc.robot.generated.Telemetry;
 import frc.robot.control.SwerveDriveMode;
 import frc.robot.control.SwerveYawMode;
-import frc.robot.generated.TedTunerConstants;
+import frc.robot.generated.BareTunerConstants;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.common.MotorUtils;
 import frc.robot.common.VisionMeasurement;
@@ -108,10 +108,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
           odometryStdDev, visionStdDev,
           TardiTunerConstants.FrontLeft, TardiTunerConstants.FrontRight, TardiTunerConstants.BackLeft,
           TardiTunerConstants.BackRight)
-      : new TedTunerConstants.TunerSwerveDrivetrain(TedTunerConstants.DrivetrainConstants, 0,
+      : new BareTunerConstants.TunerSwerveDrivetrain(BareTunerConstants.DrivetrainConstants, 0,
           odometryStdDev, visionStdDev,
-          TedTunerConstants.FrontLeft, TedTunerConstants.FrontRight, TedTunerConstants.BackLeft,
-          TedTunerConstants.BackRight);
+          BareTunerConstants.FrontLeft, BareTunerConstants.FrontRight, BareTunerConstants.BackLeft,
+          BareTunerConstants.BackRight);
 
   private SwerveRequest.FieldCentric fieldCentricDriveController = new SwerveRequest.FieldCentric()
       .withDriveRequestType(com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType.OpenLoopVoltage);
