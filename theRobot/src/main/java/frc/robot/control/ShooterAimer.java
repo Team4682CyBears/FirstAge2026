@@ -1,6 +1,7 @@
 package frc.robot.control;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.common.LookupTableDouble;
@@ -43,10 +44,12 @@ public class ShooterAimer {
   }
 
   public int hoodPulseForDistance(double distanceMeters) {
-    return (int) hoodAngleLookupTableImpl.queryTable(distanceMeters);
+
+    return MathUtil.clamp((int) hoodAngleLookupTableImpl.queryTable(distanceMeters), Constants.HOOD_MIN_PULSE,
+        Constants.HOOD_MAX_PULSE);
   }
 
   public double shooterRpmForDistance(double distanceMeters) {
-    return shooterRpmLookupTableImpl.queryTable(distanceMeters);
+    return MathUtil.clamp(shooterRpmLookupTableImpl.queryTable(distanceMeters), 0.0, 6784);
   }
 }
