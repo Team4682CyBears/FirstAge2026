@@ -26,9 +26,6 @@ import frc.robot.control.SubsystemCollection;
  * - Create one ShotLogger instance (typically in RobotContainer or a subsystem helper)
  * - Call {@link #logShot(boolean)} when a shot event occurs (pass true if made)
  *
- * <p>Thread-safety: {@link #logShot(boolean)} is synchronized to allow safe calls from
- * different threads (for example, a command and an interrupting event).
- *
  * <p>Data paths written to the DataLog:
  * - /shots/timestamp (double)
  * - /shots/robotX (double)
@@ -78,7 +75,7 @@ public class ShotLogger {
      *
      * @param made true if the shot was successful (scored), false otherwise
      */
-    public synchronized void logShot(boolean made) {
+    public void logShot(boolean made) {
         double timestamp = Timer.getFPGATimestamp();
         double robotX = 0.0, robotY = 0.0, robotYaw = 0.0, shooterRPM = 0.0;
         int hoodPulse = 0, extendoPulse = 0;
