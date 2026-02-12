@@ -39,7 +39,12 @@ public final class Constants {
     public static final boolean putDiagnosticPaths = true;
 
     // *****************************************************************
-    // Field Constants
+    // Field Constants (These are in field-position, not FMAP coordinates)
+
+    // This is calculated using the bottom left corner of the field as (0,0). The y
+    // coordinate is the height of the field divided by 2 and the x is the distance
+    // to the center of the hub and the width of the field minus the distance to the
+    // center of the hub. These are all in meters
     public static final Translation2d blueHubPosition = new Translation2d(4.625594, 8.069326 / 2); // removed adding one
                                                                                                    // to this
     public static final Translation2d redHubPosition = new Translation2d(16.540988 - 4.625594, 8.069326 / 2);
@@ -92,6 +97,9 @@ public final class Constants {
     // considered ambiguous.
     public static final double TAG_AMBIGUITY_THRESHOLD = 0.6;
 
+    public static final double IMUassistAlpha = .01; // value between 0 and 1, higher values will cause the IMU to have
+                                                     // more influence on the final angle output
+
     // ********************************************************************
     // Controller Constants
     public static final double rumbleTimeSeconds = 0.15;
@@ -114,12 +122,15 @@ public final class Constants {
     public static final int kickerLeadTalonCanId = 18;
     public static final int kickerFollowTalonCanId = 19;
 
-    public static final double followKickerMotorGearRatio = 3;
+    public static final double followKickerMotorGearRatio = 1;
 
-    public static final int hoodServoMotorCanId = 22;
+    public static final int servoHubCanID = 22;
 
-    public static final int servoDefaultPosition = 1000;
+    public static final int servoDefaultPosition = 1000; // fully retracted position
 
+    // Shooter RPM bounds
+    public static final double SHOOTER_MIN_RPM = 0.0;
+    public static final double SHOOTER_MAX_RPM = 5000.0;
     // ********************************************************************
     // Shooting / aiming constants (tunable)
     public static final double PROJECTILE_SPEED_METERS_PER_SECOND = 12.0; //tune this

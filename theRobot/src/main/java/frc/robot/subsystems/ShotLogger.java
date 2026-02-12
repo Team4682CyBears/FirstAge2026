@@ -1,3 +1,13 @@
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Rebuilt - 2026
+// File: ShotLogger.java
+// Intent: Logs information about each shot
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
+
 package frc.robot.subsystems;
 
 import edu.wpi.first.util.datalog.*;
@@ -15,9 +25,6 @@ import frc.robot.control.SubsystemCollection;
  * <p>Usage:
  * - Create one ShotLogger instance (typically in RobotContainer or a subsystem helper)
  * - Call {@link #logShot(boolean)} when a shot event occurs (pass true if made)
- *
- * <p>Thread-safety: {@link #logShot(boolean)} is synchronized to allow safe calls from
- * different threads (for example, a command and an interrupting event).
  *
  * <p>Data paths written to the DataLog:
  * - /shots/timestamp (double)
@@ -68,7 +75,7 @@ public class ShotLogger {
      *
      * @param made true if the shot was successful (scored), false otherwise
      */
-    public synchronized void logShot(boolean made) {
+    public void logShot(boolean made) {
         double timestamp = Timer.getFPGATimestamp();
         double robotX = 0.0, robotY = 0.0, robotYaw = 0.0, shooterRPM = 0.0;
         int hoodPulse = 0, extendoPulse = 0;

@@ -28,6 +28,7 @@ import frc.robot.control.Constants;
  */
 public class KickerSubsystem extends SubsystemBase {
 
+    // TODO: Remove the follower in the final mechanism
     private TalonFX kickerLeadTalonFX = new TalonFX(Constants.kickerLeadTalonCanId);
     private TalonFX kickerFollowTalonFX = new TalonFX(Constants.kickerFollowTalonCanId);
 
@@ -50,11 +51,15 @@ public class KickerSubsystem extends SubsystemBase {
      * Sets the target rpm
      */
     public void runRPM(double rpm) {
-        this.targetRPS = rpm / 60.0;
+        this.targetRPS = rpmToRPS(rpm);
         leaderController.withVelocity(targetRPS);
         followerController.withVelocity(targetRPS * Constants.followKickerMotorGearRatio);
         kickerLeadTalonFX.setControl(leaderController);
         kickerFollowTalonFX.setControl(followerController);
+    }
+
+    private double rpmToRPS(double rpm) {
+        return rpm / 60.0;
     }
 
     /*
@@ -79,6 +84,7 @@ public class KickerSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Kicker Real RPM", getRPM());
+        SmartDashboard.putNumber("Kicker Follow Real RPM", kickerFollowTalonFX.getVelocity().getValueAsDouble() * 60);
     }
 
     /*
@@ -103,7 +109,7 @@ public class KickerSubsystem extends SubsystemBase {
         talonMotorConfig.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
         talonMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         // motor direction
-        talonMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         StatusCode response = kickerLeadTalonFX.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {

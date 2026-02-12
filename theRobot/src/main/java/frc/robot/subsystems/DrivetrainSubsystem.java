@@ -128,12 +128,19 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
-  private TrapezoidProfile.Constraints TrapProfConstraints = new TrapezoidProfile.Constraints(540, 920);
-  private ProfiledPIDController autoAnglePID = new ProfiledPIDController(2.0, 0.0, 0.001, TrapProfConstraints);
+  private double autoYawProfileConstraintsMaxVelocity = 540;
+  private double autoYawProfileConstraintsMaxAcceleration = 920;
 
-  private double autoAngleVelocity = 0.0;
-  private double minAngleVelocity = 0.25;
-  private double angleVelocityDeadband = 0.01;
+  // Trapezoid profile constrains motion by limiting max velocity and
+  // max acceleration so the setpoint follows a smooth accel->cruise->decel
+  // (trapezoidal) velocity profile used by the ProfiledPIDController.
+  private TrapezoidProfile.Constraints autoYawProfileConstraints = new TrapezoidProfile.Constraints(autoYawProfileConstraintsMaxVelocity, autoYawProfileConstraintsMaxAcceleration);
+  //TODO found via testing on Tardi drivetrain, needs to be changed for BareBones
+  private ProfiledPIDController autoYawPID = new ProfiledPIDController(2.0, 0.0, 0.001, autoYawProfileConstraints);
+
+  private double autoYawVelocityRadiansPerSecond = 0.0;
+  private double minYawVelocityRadiansPerSecond = 0.25;
+  private double yawVelocityDeadband = 0.01;
 
   /**
    * Constructor for this DrivetrainSubsystem
@@ -191,6 +198,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
     this.chassisSpeeds = updatedChassisSpeeds;
   }
 
+  /**
+   * Method avaliable so that callers can update the chassis speeds to induce
+   * changes in robot movement while maintaining a constant auto yaw velocity
+   * @param updatedChassisSpeeds
+   */
   public void driveFieldCentricShooting(ChassisSpeeds updatedChassisSpeeds){
     if (swerveDriveMode == SwerveDriveMode.ROBOT_CENTRIC_DRIVING) {
       this.previousChassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(previousChassisSpeeds, getGyroscopeRotation());
@@ -199,7 +211,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(
       updatedChassisSpeeds.vxMetersPerSecond,
       updatedChassisSpeeds.vyMetersPerSecond,
-      getAutoAngleVelocity());
+      getAutoYawVelocityRadiansPerSecond());
     this.chassisSpeeds = newChassisSpeeds;
   }
 
@@ -274,8 +286,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return drivetrain.getState().Pose.getRotation();
   }
 
-  public double getAutoAngleVelocity(){
-    return this.autoAngleVelocity;
+  /**
+   * Method to get the current auto yaw velocity in radians per second.
+   * @return the current auto yaw velocity in radians per second.
+   */
+  public double getAutoYawVelocityRadiansPerSecond(){
+    return this.autoYawVelocityRadiansPerSecond;
   }
 
   /**
@@ -310,6 +326,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return swerveDriveMode;
   }
 
+  /**
+   * A method to obtain the swerve yaw mode
+   * @return
+   */
   public SwerveYawMode getSwerveYawMode() {
     return swerveYawMode;
   }
@@ -332,7 +352,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * occurs during testing.
      */
     if (DriverStation.isDisabled()) {
-      LimelightHelpers.SetIMUMode("", 1);
+      LimelightHelpers.SetIMUMode("", 1); //set limelight IMU to seeding mode
 
       if (!m_hasAppliedOperatorPerspective) {
         DriverStation.getAlliance().ifPresent(allianceColor -> {
@@ -347,8 +367,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
       this.seedRobotPositionFromVision();
     }
     else{
-      LimelightHelpers.SetIMUMode("", 3);
-      LimelightHelpers.SetIMUAssistAlpha("", 0.01);
+      LimelightHelpers.SetIMUMode("", 3); //set limelight IMU to assist mode, where it uses the limelight botpose to assist the IMU's yaw angle estimation
+      LimelightHelpers.SetIMUAssistAlpha("", Constants.IMUassistAlpha);
     }
 
     if (InstalledHardware.limelightInstalled && cameraSubsystem != null) {
@@ -398,39 +418,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
           .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
     }
     if (swerveYawMode == SwerveYawMode.AUTO){
-      double robotYawDegrees = getRobotPosition().getRotation().getRadians();
-      Translation2d hubPosition = (shootingAimTarget != null)
-          ? shootingAimTarget
-          : (DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
-      double PIDout = autoAnglePID.calculate(MathUtil.angleModulus(robotYawDegrees - getYawToFaceTarget(hubPosition).getRadians()), 0.0);
-      setAutoAngleVelocity((Math.abs(PIDout) > angleVelocityDeadband) ? PIDout + Math.signum(PIDout) * minAngleVelocity : 0.0);
+      setAutoYawVelocityRadiansPerSecond();
     }
 
     displayDiagnostics();
   }
 
-  /**
-   * Set an aiming target (field-relative) for use while in AUTO yaw mode. Use
-   * null to clear.
-   *
-   * @param target field-relative translation for the aim target (meters). If
-   *               null the drivetrain will revert to the default hub position
-   *               behavior.
-   */
-  public void setShootingAimTarget(Translation2d target) {
-    this.shootingAimTarget = target;
-  }
-
-  /**
-   * Clear any manual shooting aim target so the drivetrain uses the default
-   * hub position.
-   */
-  public void clearShootingAimTarget() {
-    this.shootingAimTarget = null;
-  }
-
-  public void setAutoAngleVelocity(double newVelocity){
-    this.autoAngleVelocity = newVelocity;
+  private void setAutoYawVelocityRadiansPerSecond(){
+    double robotYawDegrees = getRobotPosition().getRotation().getRadians();
+      Translation2d hubPosition = (shootingAimTarget != null)
+          ? shootingAimTarget
+          : (DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
+      double PIDout = autoAnglePID.calculate(MathUtil.angleModulus(robotYawDegrees - getYawToFaceTarget(hubPosition).getRadians()), 0.0);
+      setAutoAngleVelocity((Math.abs(PIDout) > angleVelocityDeadband) ? PIDout + Math.signum(PIDout) * minAngleVelocity : 0.0);
+    this.autoYawVelocityRadiansPerSecond = (Math.abs(PIDout) > yawVelocityDeadband) ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond : 0.0;
   }
 
   /**
