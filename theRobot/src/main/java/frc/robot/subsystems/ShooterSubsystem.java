@@ -107,7 +107,7 @@ public class ShooterSubsystem extends SubsystemBase {
         SparkFlexConfig FollowerConfig = new SparkFlexConfig();
 
         FollowerConfig.idleMode(IdleMode.kCoast);
-        FollowerConfig.smartCurrentLimit(40);
+        FollowerConfig.smartCurrentLimit(HardwareConstants.shooterSmartCurrentLimitAmps);
         FollowerConfig.follow(LeadMotor, true);
 
         error = FollowMotor.configure(FollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
