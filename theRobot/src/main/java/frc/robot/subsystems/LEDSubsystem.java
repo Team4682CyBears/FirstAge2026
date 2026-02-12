@@ -4,7 +4,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: LEDSubsystem.java
 // Intent: Forms a subsystem to control the LEDs
 // ************************************************************
@@ -83,6 +83,8 @@ public class LEDSubsystem extends SubsystemBase {
       targetLedState = LEDState.Green;
     } else if (currentActions.containsKey(LEDState.Yellow) && currentActions.get(LEDState.Yellow).booleanValue()) {
       targetLedState = LEDState.Yellow;
+    } else if (currentActions.containsKey(LEDState.Red) && currentActions.get(LEDState.Red).booleanValue()) {
+      targetLedState = LEDState.Red;
     } else if (currentActions.containsKey(LEDState.OrangeSolid)
         && currentActions.get(LEDState.OrangeSolid).booleanValue()) {
       targetLedState = LEDState.OrangeSolid;
@@ -97,10 +99,16 @@ public class LEDSubsystem extends SubsystemBase {
         this.greenSolid();
       } else if (this.currentLEDState == LEDState.Yellow) {
         this.yellowSolid();
+      } else if (this.currentLEDState == LEDState.Red) {
+        this.redSolid();
       } else if (this.currentLEDState == LEDState.OrangeSolid) {
         this.orangeSolid();
       } else if (this.currentLEDState == LEDState.OrangeBlink) {
         this.orangeBlink();
+      } else if (this.currentLEDState == LEDState.RedBlink) {
+        this.redBlink();
+      } else if (this.currentLEDState == LEDState.GreenBlink) {
+        this.greenBlink();
       }
       /*
        * else if(this.currentLEDState == LEDState.Blue){
@@ -126,6 +134,24 @@ public class LEDSubsystem extends SubsystemBase {
     }
   }
 
+  // Sets leds to red blink
+  private void redBlink() {
+    if (this.currentBlinkState) {
+      this.setLedStringColor(255, 0, 0);
+    } else {
+      this.setLedStringColor(0, 0, 0);
+    }
+  }
+
+    // Sets leds to green blink
+  private void greenBlink() {
+    if (this.currentBlinkState) {
+      this.setLedStringColor(255, 200, 0);
+    } else {
+      this.setLedStringColor(0, 0, 0);
+    }
+  }
+
   // Sets leds to blue solid
   private void blueSolid() {
     this.setLedStringColor(0, 0, 225);
@@ -139,6 +165,11 @@ public class LEDSubsystem extends SubsystemBase {
   // Sets leds to yellow solid
   private void yellowSolid() {
     this.setLedStringColor(150, 150, 0);
+  }
+
+  // Sets leds to yellow solid
+  private void redSolid() {
+    this.setLedStringColor(150, 0, 0);
   }
 
   // Sets leds to green solid

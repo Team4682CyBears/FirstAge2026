@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: RobotContainer.java
 // Intent: main robot body
 // ************************************************************
@@ -38,14 +38,26 @@ public class RobotContainer {
     // init the pdp watcher
     this.initializePowerDistributionPanelWatcherSubsystem();
 
+    // init the leds (before camera)
+    this.initializeLEDSubsystem();
+
     // init the camera (before drivetrain)
     this.initializeCameraSubsystem();
 
-    // init the leds
-    this.initializeLEDSubsystem();
+    // init the shooter subsystem
+    this.initializeShooterSubsystem();
+
+    // init the hood subsystem
+    this.initializeHoodSubsystem();
+
+    // init the kicker subsystem
+    this.initializeKickerSubsystem();
 
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
+
+    // init the shot logger (after drivetrain, shooter and hood are initialized)
+    this.initializeShotLogger();
 
     // init the input system
     this.initializeManualInputInterfaces();
@@ -151,6 +163,12 @@ public class RobotContainer {
   private void initializeCameraSubsystem() {
     if (InstalledHardware.limelightInstalled) {
       subsystems.setCameraSubsystem(new CameraSubsystem());
+      if (subsystems.isLEDSubsystemAvailable()) {
+        subsystems.getLedSubsystem().registerStateAction(LEDState.Green,
+            () -> subsystems.getCameraSubsystem().getTagId() != -1);
+        subsystems.getLedSubsystem().registerStateAction(LEDState.Red,
+            () -> subsystems.getCameraSubsystem().getTagId() == -1);
+      }
       DataLogManager.log("SUCCESS: initializeCamera");
     } else {
       DataLogManager.log("FAIL: initializeCamera");
@@ -170,6 +188,43 @@ public class RobotContainer {
   }
 
   /**
+   * A method to init the shooter subsystem
+   */
+  private void initializeShooterSubsystem() {
+    if (InstalledHardware.shooterInstalled) {
+      subsystems.setShooterSubsystem(
+          new ShooterSubsystem(Constants.shooterLeadMotorCanId, Constants.shooterFollowMotorCanId));
+      System.out.println("SUCCESS: initializeShooter");
+    } else {
+      System.out.println("FAIL: initializeShooter");
+    }
+  }
+
+  /**
+   * A method to init the hood subsystem
+   */
+  private void initializeHoodSubsystem() {
+    if (InstalledHardware.hoodInstalled) {
+      subsystems.setHoodSubsystem(new HoodSubsystem(Constants.servoHubCanID));
+      System.out.println("SUCCESS: initializeHood");
+    } else {
+      System.out.println("FAIL: initializeHood");
+    }
+  }
+
+  /**
+   * A method to init the kicker subsystem
+   */
+  private void initializeKickerSubsystem() {
+    if (InstalledHardware.kickerInstalled) {
+      subsystems.setKickerSubsystem(new KickerSubsystem());
+      System.out.println("SUCCESS: initializeKicker");
+    } else {
+      System.out.println("FAIL: initializeKicker");
+    }
+  }
+
+  /**
    * A method to init the input interfaces
    */
   private void initializeManualInputInterfaces() {
@@ -183,6 +238,21 @@ public class RobotContainer {
       DataLogManager.log("SUCCESS: initializeManualInputInterfaces");
     } else {
       DataLogManager.log("FAIL: initializeManualInputInterfaces");
+    }
+  }
+
+  /**
+   * Initialize the shot logger helper that writes shot events to disk.
+   */
+  private void initializeShotLogger() {
+    // Require at minimum drivetrain and shooter/hood to be available to make logs
+    // useful
+    if (subsystems.isDriveTrainSubsystemAvailable() && subsystems.isShooterSubsystemAvailable()
+        && subsystems.isHoodSubsystemAvailable()) {
+      subsystems.setShotLogger(new frc.robot.subsystems.ShotLogger(subsystems));
+      DataLogManager.log("SUCCESS: initializeShotLogger");
+    } else {
+      DataLogManager.log("FAIL: initializeShotLogger - missing subsystems");
     }
   }
 

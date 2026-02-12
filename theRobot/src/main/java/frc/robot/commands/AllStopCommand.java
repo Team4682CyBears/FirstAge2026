@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: AllStopCommand.java
 // Intent: Forms a command to stop all subsystems.
 // ************************************************************
@@ -33,6 +33,12 @@ public class AllStopCommand extends Command {
         if (this.subsystems.isDriveTrainSubsystemAvailable()) {
             addRequirements(this.subsystems.getDriveTrainSubsystem());
         }
+        if (this.subsystems.isShooterSubsystemAvailable()) {
+            addRequirements(this.subsystems.getShooterSubsystem());
+        }
+        if (this.subsystems.isKickerSubsystemAvailable()) {
+            addRequirements(this.subsystems.getKickerSubsystem());
+        }
     }
 
     @Override
@@ -43,6 +49,12 @@ public class AllStopCommand extends Command {
     public void execute() {
         if (this.subsystems.isDriveTrainSubsystemAvailable()) {
             this.subsystems.getDriveTrainSubsystem().driveFieldCentric(new ChassisSpeeds(0.0, 0.0, 0.0));
+        }
+        if (this.subsystems.isShooterSubsystemAvailable()) {
+            this.subsystems.getShooterSubsystem().stop();
+        }
+        if (this.subsystems.isKickerSubsystemAvailable()) {
+            this.subsystems.getKickerSubsystem().stop();
         }
         CommandScheduler.getInstance().cancelAll();
         System.out.println("I CLEARED ALL COMMANDS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");

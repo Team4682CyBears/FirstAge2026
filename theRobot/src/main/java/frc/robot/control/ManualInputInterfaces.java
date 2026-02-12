@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: ManualInputInterfaces.java
 // Intent: Forms a class that grants access to driver controlled inputs.
 // ************************************************************
@@ -15,8 +15,9 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 
 public class ManualInputInterfaces {
@@ -85,12 +86,13 @@ public class ManualInputInterfaces {
         return -coDriverController.getLeftY();
     }
 
-/**
- * Checks if the right trigger on the co-driver's controller is currently being held.
- *
- * @return - a boolean if the right trigger is held
- */
-    public boolean isCoDriverRightTriggerHeld(){
+    /**
+     * Checks if the right trigger on the co-driver's controller is currently being
+     * held.
+     *
+     * @return - a boolean if the right trigger is held
+     */
+    public boolean isCoDriverRightTriggerHeld() {
         return coDriverController.rightTrigger().getAsBoolean();
     }
 
@@ -184,6 +186,17 @@ public class ManualInputInterfaces {
                                     "driverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
 
+            this.driverController.y().onTrue(
+                    new ParallelCommandGroup(
+                            new InstantCommand(() -> this.subsystemCollection.getDriveTrainSubsystem()
+                                    .setSwerveYawMode(SwerveYawMode.AUTO)),
+                            new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode AUTO")));
+
+            this.driverController.y().onFalse(
+                    new ParallelCommandGroup(
+                            new InstantCommand(() -> this.subsystemCollection.getDriveTrainSubsystem()
+                                    .setSwerveYawMode(SwerveYawMode.JOYSTICK)),
+                            new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode JOYSTICK")));
         }
     }
 
@@ -200,6 +213,76 @@ public class ManualInputInterfaces {
                             new ButtonPressCommand(
                                     "coDriverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
+
+            this.coDriverController.povUp().onTrue(new InstantCommand(() -> {
+                double currentRPM = SmartDashboard.getNumber("Shooter RPM", 0);
+                double newRPM = MathUtil.clamp(currentRPM + 50, Constants.SHOOTER_MIN_RPM,
+                        Constants.SHOOTER_MAX_RPM);
+                SmartDashboard.putNumber("Shooter RPM", newRPM);
+            }));
+            this.coDriverController.povDown().onTrue(new InstantCommand(() -> {
+                double currentRPM = SmartDashboard.getNumber("Shooter RPM", 0);
+                double newRPM = MathUtil.clamp(currentRPM - 50, Constants.SHOOTER_MIN_RPM,
+                        Constants.SHOOTER_MAX_RPM);
+                SmartDashboard.putNumber("Shooter RPM", newRPM);
+            }));
+            this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
+                double hoodExtention = SmartDashboard.getNumber("Hood Angle", HardwareConstants.HOOD_MIN_EXT);
+                double newAngle = MathUtil.clamp(hoodExtention - 50, HardwareConstants.HOOD_MIN_EXT,
+                        HardwareConstants.HOOD_MAX_EXT);
+                SmartDashboard.putNumber("Hood Angle", newAngle);
+            }));
+            this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
+                double hoodExtention = SmartDashboard.getNumber("Hood Angle", HardwareConstants.HOOD_MIN_EXT);
+                double newAngle = MathUtil.clamp(hoodExtention + 50, HardwareConstants.HOOD_MIN_EXT,
+                        HardwareConstants.HOOD_MAX_EXT);
+                SmartDashboard.putNumber("Hood Angle", newAngle);
+            }));
+            this.coDriverController.y().onTrue(new InstantCommand(() -> {
+                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT);
+                double newExt = MathUtil.clamp(hoodExtention - 50, HardwareConstants.HOOD_MIN_EXT,
+                        HardwareConstants.HOOD_MAX_EXT);
+                SmartDashboard.putNumber("Hood Extendo", newExt);
+            }));
+            this.coDriverController.b().onTrue(new InstantCommand(() -> {
+                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT);
+                double newExt = MathUtil.clamp(hoodExtention + 50, HardwareConstants.HOOD_MIN_EXT,
+                        HardwareConstants.HOOD_MAX_EXT);
+                SmartDashboard.putNumber("Hood Extendo", newExt);
+            }));
+            SmartDashboard.putNumber("Shooter RPM", 0);
+
+            if (InstalledHardware.shooterInstalled) {
+                this.coDriverController.leftTrigger()
+                        .whileTrue(new ShootCommand(this.subsystemCollection.getShooterSubsystem(), () -> {
+                            return SmartDashboard.getNumber("Shooter RPM", 0);
+                        }));
+            }
+            if (InstalledHardware.hoodInstalled) {
+                this.coDriverController.a().onTrue(new HoodAngleCommand(
+                        this.subsystemCollection.getHoodSubsystem(),
+                        () -> (int) SmartDashboard.getNumber("Hood Angle", HardwareConstants.HOOD_MIN_EXT),
+                        () -> (int) SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT)));
+            }
+
+            // Co-driver bumpers: log shot result (made / missed)
+            // Assumption: right bumper = made, left bumper = missed. Change as desired.
+            if (this.subsystemCollection.isShotLoggerAvailable()) {
+                this.coDriverController.rightBumper().onTrue(new InstantCommand(() -> {
+                    this.subsystemCollection.getShotLogger().logShot(true);
+                }));
+
+                this.coDriverController.leftBumper().onTrue(new InstantCommand(() -> {
+                    this.subsystemCollection.getShotLogger().logShot(false);
+                }));
+            }
+            SmartDashboard.putNumber("Kicker RPM", 0);
+            if (InstalledHardware.kickerInstalled) {
+                this.coDriverController.rightTrigger()
+                        .whileTrue(new KickerCommand(this.subsystemCollection.getKickerSubsystem(), () -> {
+                            return SmartDashboard.getNumber("Kicker RPM", 0);
+                        }));
+            }
         }
     }
 }

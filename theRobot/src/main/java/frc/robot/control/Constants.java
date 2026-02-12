@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: Constants.java
 // Intent: Forms key constants required for this robot.
 // ************************************************************
@@ -10,10 +10,9 @@
 
 package frc.robot.control;
 
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import static edu.wpi.first.units.Units.Inches;
 
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -38,7 +37,18 @@ public final class Constants {
     public static final PathConstraints autoAlignPathConstraints = new PathConstraints(3.0, 2.0, 540, 720);
     // Diagnostic Constants
     public static final boolean putDiagnosticPaths = true;
-    
+
+    // *****************************************************************
+    // Field Constants (These are in field-position, not FMAP coordinates)
+
+    // This is calculated using the bottom left corner of the field as (0,0). The y
+    // coordinate is the height of the field divided by 2 and the x is the distance
+    // to the center of the hub and the width of the field minus the distance to the
+    // center of the hub. These are all in meters
+    public static final Translation2d blueHubPosition = new Translation2d(4.625594, 8.069326 / 2); // removed adding one
+                                                                                                   // to this
+    public static final Translation2d redHubPosition = new Translation2d(16.540988 - 4.625594, 8.069326 / 2);
+
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
     public static final double DegreesPerRevolution = 360.0;
@@ -83,6 +93,9 @@ public final class Constants {
     public static final double limelightToWPIBlueXOffest = 8.75;
     public static final double limelightToWPIBlueYOffset = 4.0;
 
+    public static final double IMUassistAlpha = .01; // value between 0 and 1, higher values will cause the IMU to have
+                                                     // more influence on the final angle output
+
     // ********************************************************************
     // Controller Constants
     public static final double rumbleTimeSeconds = 0.15;
@@ -97,4 +110,21 @@ public final class Constants {
     // CAN IDs
     // TODO define CAN IDs here for all non drive train components
 
+    // shooter related can ids
+    public static final int shooterLeadMotorCanId = 21;
+    public static final int shooterFollowMotorCanId = 20;
+
+    // kicker can ids and constants
+    public static final int kickerLeadTalonCanId = 18;
+    public static final int kickerFollowTalonCanId = 19;
+
+    public static final double followKickerMotorGearRatio = 1;
+
+    public static final int servoHubCanID = 22;
+
+    public static final int servoDefaultPosition = 1000; // fully retracted position
+
+    // Shooter RPM bounds
+    public static final double SHOOTER_MIN_RPM = 0.0;
+    public static final double SHOOTER_MAX_RPM = 5000.0;
 }

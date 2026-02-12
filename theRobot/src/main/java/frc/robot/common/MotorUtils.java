@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: MotorUtils.java
 // Intent: Forms util class of methods that are commonly used on motor input/output.
 // ************************************************************

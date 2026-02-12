@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: LEDState.java
 // Intent: Forms enum to hold LED state options.
 // ************************************************************
@@ -15,8 +15,11 @@ package frc.robot.common;
  */
 public enum LEDState {
     Off,
+    RedBlink,
+    GreenBlink,
     OrangeBlink,
     OrangeSolid,
+    Red,
     Yellow,
     Green,
     Blue

@@ -2,17 +2,15 @@
 // Bishop Blanchet Robotics
 // Home of the Cybears
 // FRC - Rebuilt - 2026
-// File: public enum SwerveDriveMode.java
-// Intent: Forms enum to hold swerve drive modes.
+// File: public enum SwerveYawMode.java
+// Intent: Forms enum to hold swerve yaw modes.
 // ************************************************************
 
 // ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
 
 package frc.robot.control;
 
-public enum SwerveDriveMode {
-    FIELD_CENTRIC_DRIVING,
-    ROBOT_CENTRIC_DRIVING,
-    FIELD_CENTRIC_SHOOTING,
-    IMMOVABLE_STANCE
+public enum SwerveYawMode {
+    JOYSTICK,
+    AUTO
 }

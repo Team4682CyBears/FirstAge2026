@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: ManualInputInterfaces.java
 // Intent: Forms a class with trajcetories for testing swerve drives.
 // ************************************************************

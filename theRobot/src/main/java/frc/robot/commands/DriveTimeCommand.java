@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: DriveTimeCommand.java
 // Intent: Forms a command to drive the wheels according to input parameters (encoder dead reckoning and accelormeter for rotation).
 // ************************************************************

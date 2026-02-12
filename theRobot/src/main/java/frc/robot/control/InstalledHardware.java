@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: InstalledHardware.java
 // Intent: Forms a listing of switches that will help to debug code better as hardware is available (or not available).
 // ************************************************************
@@ -35,11 +35,18 @@ public class InstalledHardware {
     public static final boolean drivetrainInstalled = true;
     public static final boolean tardiDrivetrainInstalled = true;
 
+    // Shooter related hardware
+    public static final boolean shooterInstalled = true;
+    public static final boolean hoodInstalled = false;
+
+    // Kicker
+    public static final boolean kickerInstalled = true;
+
     // TOF Sensor Hardware
     // Important! You must disable any TOF sensor that is not installed!!
     // If you try to configure a TOF sensor that is not installed
     // the other TOF sensors that are installed will not work.
 
     // LED Hardware
-    public static final boolean LEDSInstalled = true;
+    public static final boolean LEDSInstalled = false;
 }

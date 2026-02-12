@@ -1,7 +1,7 @@
 // ************************************************************
 // Bishop Blanchet Robotics
 // Home of the Cybears
-// FRC - Reefscape - 2025
+// FRC - Rebuilt - 2026
 // File: HardwareConstants.java
 // Intent: Forms key HARDWARE-only constants required for this robot.
 // ************************************************************
@@ -18,6 +18,15 @@ public class HardwareConstants {
     public static final double ctreSupplyCurrentMaximumAmps = 50.0;
     public static final double ctreSupplyVoltageTimeConstant = 0.02;
 
+    // ********************************************************************
+    // Shooter Constants
+    public static final int shooterSmartCurrentLimitAmps = 40;
+    public static final double nominalVoltageCompensationVolts = 12.0;
+    
+    // ********************************************************************
+    // Servo Constants
+    public static final int HOOD_MIN_EXT = 1000;
+    public static final int HOOD_MAX_EXT = 2000;
     // ********************************************************************
     // CAN Optimization Constants
     // ctre

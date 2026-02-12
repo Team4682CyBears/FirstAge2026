@@ -1,0 +1,1 @@
+{"fiducials":[{"transform":[1,0,0,-4.0132,0,1,0,1.285875,0,0,1,0,0,0,0,1],"size":165.1,"id":0,"family":"apriltag3_36h11_classic","unique":1},{"transform":[1,0,0,4.0132,0,1,0,1.285875,0,0,1,0,0,0,0,1],"size":165.1,"id":1,"family":"apriltag3_36h11_classic","unique":1}],"type":"frc","fieldlength":16.541,"fieldwidth":8.0693}
