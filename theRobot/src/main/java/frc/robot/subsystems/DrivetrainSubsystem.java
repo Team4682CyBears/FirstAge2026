@@ -126,10 +126,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
+  private double autoYawProfileConstraintsMaxVelocity = 540;
+  private double autoYawProfileConstraintsMaxAcceleration = 920;
+
   // Trapezoid profile constrains motion by limiting max velocity and
   // max acceleration so the setpoint follows a smooth accel->cruise->decel
   // (trapezoidal) velocity profile used by the ProfiledPIDController.
-  private TrapezoidProfile.Constraints autoYawProfileConstraints = new TrapezoidProfile.Constraints(540, 920);
+  private TrapezoidProfile.Constraints autoYawProfileConstraints = new TrapezoidProfile.Constraints(autoYawProfileConstraintsMaxVelocity, autoYawProfileConstraintsMaxAcceleration);
   //TODO found via testing on Tardi drivetrain, needs to be changed for BareBones
   private ProfiledPIDController autoYawPID = new ProfiledPIDController(2.0, 0.0, 0.001, autoYawProfileConstraints);
 
@@ -417,17 +420,17 @@ public class DrivetrainSubsystem extends SubsystemBase {
           .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
     }
     if (swerveYawMode == SwerveYawMode.AUTO){
-      double robotYawDegrees = getRobotPosition().getRotation().getRadians();
-      Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
-      double PIDout = autoYawPID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0);
-      setAutoYawVelocityRadiansPerSecond((Math.abs(PIDout) > yawVelocityDeadband) ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond : 0.0);
+      setAutoYawVelocityRadiansPerSecond();
     }
 
     displayDiagnostics();
   }
 
-  public void setAutoYawVelocityRadiansPerSecond(double newVelocity){
-    this.autoYawVelocityRadiansPerSecond = newVelocity;
+  private void setAutoYawVelocityRadiansPerSecond(){
+    double robotYawDegrees = getRobotPosition().getRotation().getRadians();
+      Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
+      double PIDout = autoYawPID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0);
+      this.autoYawVelocityRadiansPerSecond = (Math.abs(PIDout) > yawVelocityDeadband) ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond : 0.0;
   }
 
   /**
