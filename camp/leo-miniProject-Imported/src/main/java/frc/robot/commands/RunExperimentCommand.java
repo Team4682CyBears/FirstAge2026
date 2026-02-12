@@ -136,7 +136,7 @@ public class RunExperimentCommand extends Command {
         double meanValue = 0;
         int skippedCycles = 0;
         double expectedCycleTime = 1.0 / (desiredSpeed / 60.0); // pole comes by 2 times per RPS
-        double cycleTimeTol = 1.25;
+        double cycleTimeTol = 1.8;
         double allowedCycleTime = cycleTimeTol * expectedCycleTime;
         double[] varianceData = new double[cyclesRun - 1];
         System.out.println("Here is the Final Data:");
@@ -150,6 +150,7 @@ public class RunExperimentCommand extends Command {
                 skippedCycles++;
             }
         }
+        System.out.println("Allowed cycle time:" + allowedCycleTime);
         System.out.println("Variance data for cycles: ");
         for (int i = 0; i < cyclesRun - 2; i++) {
             System.out.println(varianceData[i]);

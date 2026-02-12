@@ -45,7 +45,7 @@ public class TofSensorLaser {
         laserSensor = new LaserCan(canID);
         try {
             laserSensor.setRangingMode(LaserCan.RangingMode.SHORT);
-            laserSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
+            laserSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_20MS);
         } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
         } 
