@@ -28,6 +28,8 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
+
 public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED leds;
   private final AddressableLEDBuffer ledBuffer;
@@ -38,6 +40,13 @@ public class LEDSubsystem extends SubsystemBase {
   private boolean lastBlinkState = false;
   private LEDState currentLEDState = LEDState.Off;
   private LEDState targetLedState = LEDState.Off;
+  
+  private final Spark blinkin = new Spark(0);
+
+  public void setPattern(double pwm) {
+
+    blinkin.set(pwm);
+  }
 
   /**
    * LEDSubsystem

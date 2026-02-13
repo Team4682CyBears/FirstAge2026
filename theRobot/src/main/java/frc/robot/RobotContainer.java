@@ -158,24 +158,6 @@ public class RobotContainer {
   }
 
   /**
-   * A method to init the CameraSubsystem
-   */
-  private void initializeCameraSubsystem() {
-    if (InstalledHardware.limelightInstalled) {
-      subsystems.setCameraSubsystem(new CameraSubsystem());
-      if (subsystems.isLEDSubsystemAvailable()) {
-        subsystems.getLedSubsystem().registerStateAction(LEDState.Green,
-            () -> subsystems.getCameraSubsystem().getTagId() != -1);
-        subsystems.getLedSubsystem().registerStateAction(LEDState.Red,
-            () -> subsystems.getCameraSubsystem().getTagId() == -1);
-      }
-      DataLogManager.log("SUCCESS: initializeCamera");
-    } else {
-      DataLogManager.log("FAIL: initializeCamera");
-    }
-  }
-
-  /**
    * A method to init the LEDSubsystem
    */
   private void initializeLEDSubsystem() {
@@ -184,6 +166,35 @@ public class RobotContainer {
       System.out.println("SUCCESS: initializeLEDS");
     } else {
       System.out.println("FAIL: initializeLEDS");
+    }
+  }
+
+  /**
+   * A method to init the CameraSubsystem
+   */
+  private void initializeCameraSubsystem() {
+    if (InstalledHardware.limelightInstalled) {
+      subsystems.setCameraSubsystem(new CameraSubsystem());
+      if (subsystems.isLEDSubsystemAvailable()) {
+        //!!!!!!!!!!METHOD ONE!!!!!!!!!!!!!!!!
+        // subsystems.getLedSubsystem().registerStateAction(LEDState.Green,
+        //    () -> subsystems.getCameraSubsystem().getTagId() != -1);
+        //subsystems.getLedSubsystem().registerStateAction(LEDState.Red,
+        //    () -> subsystems.getCameraSubsystem().getTagId() == -1);
+
+        //!!!!!!!!!!METHOD TWO!!!!!!!!!!!!!!!!
+        //green if seen
+        if(subsystems.getCameraSubsystem().getTagId() != -1) {
+          subsystems.getLedSubsystem().setPattern(Constants.ledPWMGreen);
+        }
+         //red if not seen
+        if(subsystems.getCameraSubsystem().getTagId() == -1) {
+          subsystems.getLedSubsystem().setPattern(Constants.ledPWMRed);
+        }
+      }
+      DataLogManager.log("SUCCESS: initializeCamera");
+    } else {
+      DataLogManager.log("FAIL: initializeCamera");
     }
   }
 
