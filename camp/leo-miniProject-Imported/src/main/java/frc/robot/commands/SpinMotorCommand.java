@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.MotorSubsystem;
+import frc.robot.Constants;
 
 public class SpinMotorCommand extends Command {
 
@@ -15,6 +16,7 @@ public class SpinMotorCommand extends Command {
     @Override
     public void initialize() {
         motorSubsystem.setSpeed();
+        System.out.println("Motor is running at set speed of " + Constants.motorSpeed + " RPM");
     }
 
     @Override

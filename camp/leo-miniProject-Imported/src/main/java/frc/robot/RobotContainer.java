@@ -47,7 +47,7 @@ public class RobotContainer {
 
     SensorsSubsystem sensorSubsystem = new SensorsSubsystem(CTREEnabled, PWFEnabled, LaserEnabled);
     MotorSubsystem motorSubsystem = new MotorSubsystem(Constants.motorCanID); // initiazlie motor
-    new SpinMotorCommand(motorSubsystem); // start motor
+    // new SpinMotorCommand(motorSubsystem); // start motor
     new DetectSpinningFlagCommand(sensorSubsystem, motorSubsystem);
 
     

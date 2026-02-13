@@ -5,7 +5,6 @@
 // File: TofSensorCTRE.java
 // ************************************************************
 
-
 package frc.robot.common;
 
 import com.ctre.phoenix6.hardware.CANcoder;

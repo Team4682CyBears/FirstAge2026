@@ -2,7 +2,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.common.*;
+import frc.robot.common.TofSensor;
+import frc.robot.common.TofType;
 
 public class SensorsSubsystem extends SubsystemBase {
 
@@ -17,15 +18,15 @@ public class SensorsSubsystem extends SubsystemBase {
         //TofSensor LaserTofSensor = ((LaserEnabled) ? new TofSensor("Laser", Constants.rangeSensorCTRECanID) : null);
 
         if (CTREEnabled) {
-            this.CTRETofSensor = new TofSensor("CTRE", Constants.rangeSensorCTRECanID);
+            this.CTRETofSensor = new TofSensor(TofType.CTRE, Constants.rangeSensorCTRECanID);
             this.CTRETofSensor.publishTelemtry();
         }
         if (PWFEnabled) {
-            this.PWFTofSensor = new TofSensor("PWF", Constants.rangeSensorCTRECanID);
+            this.PWFTofSensor = new TofSensor(TofType.PWF, Constants.rangeSensorCTRECanID);
             this.PWFTofSensor.publishTelemtry();
         }
         if (LaserEnabled) {
-            this.LaserTofSensor = new TofSensor("Laser", Constants.rangeSensorCTRECanID);
+            this.LaserTofSensor = new TofSensor(TofType.Laser, Constants.rangeSensorCTRECanID);
             this.LaserTofSensor.publishTelemtry();
         }
     }
