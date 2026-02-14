@@ -350,7 +350,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * occurs during testing.
      */
     if (DriverStation.isDisabled()) {
-      LimelightHelpers.SetIMUMode("", 1); //set limelight IMU to seeding mode
+      //LimelightHelpers.SetIMUMode("", 1); //set limelight IMU to seeding mode
 
       if (!m_hasAppliedOperatorPerspective) {
         DriverStation.getAlliance().ifPresent(allianceColor -> {
@@ -365,8 +365,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
       this.seedRobotPositionFromVision();
     }
     else{
-      LimelightHelpers.SetIMUMode("", 3); //set limelight IMU to assist mode, where it uses the limelight botpose to assist the IMU's yaw angle estimation
-      LimelightHelpers.SetIMUAssistAlpha("", Constants.IMUassistAlpha);
+      //LimelightHelpers.SetIMUMode("", 3); //set limelight IMU to assist mode, where it uses the limelight botpose to assist the IMU's yaw angle estimation
+      //LimelightHelpers.SetIMUAssistAlpha("", Constants.IMUassistAlpha);
     }
 
     if (InstalledHardware.limelightInstalled) {
@@ -427,10 +427,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   private void setAutoYawVelocityRadiansPerSecond(){
-    double robotYawDegrees = getRobotPosition().getRotation().getRadians();
-      Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
-      double PIDout = autoYawPID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0);
-      this.autoYawVelocityRadiansPerSecond = (Math.abs(PIDout) > yawVelocityDeadband) ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond : 0.0;
+    double robotYawRadians = getRobotPosition().getRotation().getRadians();
+    System.out.println(robotYawRadians);
+    Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
+    System.out.println(hubPosition);
+    double PIDout = autoYawPID.calculate(MathUtil.angleModulus(robotYawRadians-getYawToFaceTarget(hubPosition).getRadians()), 0.0);
+    System.out.println(MathUtil.angleModulus(robotYawRadians-getYawToFaceTarget(hubPosition).getRadians()));
+    this.autoYawVelocityRadiansPerSecond = (Math.abs(PIDout) > yawVelocityDeadband) ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond : 0.0;
   }
 
   /**

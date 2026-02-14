@@ -71,7 +71,7 @@ public class CameraSubsystem extends SubsystemBase {
       Double timestamp = (botposeEntry.getLastChange() / this.microsecondsInSeconds)
           - (botpose[this.latencyIndex] / this.milisecondsInSeconds);
       Translation2d botTranslation = new Translation2d(botpose[this.fieldSpaceXIndex], botpose[this.fieldSpaceYIndex]);
-      Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]);
+      Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]).plus(Rotation2d.fromDegrees(-90));
       Pose2d realRobotPosition = new Pose2d(botTranslation, botYaw);
       visionMeasurement = new VisionMeasurement(realRobotPosition, Utils.fpgaToCurrentTime(timestamp));
     }
@@ -88,7 +88,7 @@ public class CameraSubsystem extends SubsystemBase {
       Double timestamp = (botposeEntry.getLastChange() / this.microsecondsInSeconds)
           - (botpose[this.latencyIndex] / this.milisecondsInSeconds);
       Translation2d botTranslation = new Translation2d(botpose[this.fieldSpaceXIndex], botpose[this.fieldSpaceYIndex]);
-      Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]);
+      Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]).plus(Rotation2d.fromDegrees(-90));
       Pose2d realRobotPosition = new Pose2d(botTranslation, botYaw);
       visionMeasurement = new VisionMeasurement(realRobotPosition, Utils.fpgaToCurrentTime(timestamp));
     }

@@ -263,6 +263,7 @@ public class ManualInputInterfaces {
                         this.subsystemCollection.getHoodSubsystem(),
                         () -> (int) SmartDashboard.getNumber("Hood Angle", HardwareConstants.HOOD_MIN_EXT),
                         () -> (int) SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT)));
+                
             }
 
             // Co-driver bumpers: log shot result (made / missed)
