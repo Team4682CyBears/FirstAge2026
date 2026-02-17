@@ -26,10 +26,8 @@ import frc.robot.commands.*;
  */
 public class AutonomousChooser {
     private final SendableChooser<AutonomousPath> autonomousPathChooser = new SendableChooser<>();
-
-    private Command testAuto;
     private Command DoNothing;
-    private Command Mobility;
+    private Command DropToMid;
 
     /**
      * Constructor for AutonomousChooser
@@ -42,17 +40,15 @@ public class AutonomousChooser {
         if (subsystems.isDriveTrainPowerSubsystemAvailable()) {
 
             autonomousPathChooser.setDefaultOption("Do Nothing", AutonomousPath.DONOTHING);
-            autonomousPathChooser.addOption("Test Auto", AutonomousPath.TESTAUTO);
-            autonomousPathChooser.addOption("Mobility", AutonomousPath.MOBILITY);
+            autonomousPathChooser.addOption("Drop To Mid", AutonomousPath.DROPTOMID);
             SmartDashboard.putData(autonomousPathChooser);
 
-            this.testAuto = getTestAuto();
             this.DoNothing = getDoNothing();
-            this.Mobility = getMobilityAuto();
+            this.DropToMid = getDropToMid();
         } else {
             DataLogManager.log(">>>>> NO auto routine becuase missing subsystems");
         }
-    }
+    }   
 
     /**
      * returns the path planner auto to be used in auto period
@@ -61,12 +57,10 @@ public class AutonomousChooser {
      */
     public Command getAutoPath() {
         switch (autonomousPathChooser.getSelected()) {
-            case TESTAUTO:
-                return this.testAuto;
             case DONOTHING:
                 return this.DoNothing;
-            case MOBILITY:
-                return this.Mobility;
+            case DROPTOMID:
+                return this.DropToMid;
         }
         return new InstantCommand();
     }
@@ -81,22 +75,17 @@ public class AutonomousChooser {
                 getAutoPath());
     }
 
-    private Command getTestAuto() {
-        return AutoBuilder.buildAuto("TestAuto");
+    private Command getDropToMid() {
+        return AutoBuilder.buildAuto("DropToMid");
     }
 
     private Command getDoNothing() {
         return new InstantCommand();
     }
 
-    private Command getMobilityAuto() {
-        return AutoBuilder.buildAuto("Mobility");
-    }
-
     private enum AutonomousPath {
-        TESTAUTO,
+        DROPTOMID,
         DONOTHING,
-        MOBILITY
     }
 
     /**
