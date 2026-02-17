@@ -350,7 +350,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * occurs during testing.
      */
     if (DriverStation.isDisabled()) {
-      //LimelightHelpers.SetIMUMode("", 1); //set limelight IMU to seeding mode
+      LimelightHelpers.SetIMUMode("", 1); //set limelight IMU to seeding mode
 
       if (!m_hasAppliedOperatorPerspective) {
         DriverStation.getAlliance().ifPresent(allianceColor -> {
@@ -365,8 +365,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
       this.seedRobotPositionFromVision();
     }
     else{
-      //LimelightHelpers.SetIMUMode("", 3); //set limelight IMU to assist mode, where it uses the limelight botpose to assist the IMU's yaw angle estimation
-      //LimelightHelpers.SetIMUAssistAlpha("", Constants.IMUassistAlpha);
+      LimelightHelpers.SetIMUMode("", 3); //set limelight IMU to assist mode, where it uses the limelight botpose to assist the IMU's yaw angle estimation
+      LimelightHelpers.SetIMUAssistAlpha("", Constants.IMUassistAlpha);
     }
 
     if (InstalledHardware.limelightInstalled) {
