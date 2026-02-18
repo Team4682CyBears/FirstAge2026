@@ -351,7 +351,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * occurs during testing.
      */
     if (DriverStation.isDisabled()) {
-      LimelightHelpers.SetIMUMode("", 1); // set limelight IMU to seeding mode
+      LimelightHelpers.SetIMUMode("limelight", 1); // set limelight IMU to seeding mode
 
       if (!m_hasAppliedOperatorPerspective) {
         DriverStation.getAlliance().ifPresent(allianceColor -> {
@@ -365,9 +365,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // When disabled countinually set the botpose to what the vision says
       this.seedRobotPositionFromVision();
     } else {
-      LimelightHelpers.SetIMUMode("", 3); // set limelight IMU to assist mode, where it uses the limelight botpose to
+      LimelightHelpers.SetIMUMode("limelight", 3); // set limelight IMU to assist mode, where it uses the limelight botpose to
                                           // assist the IMU's yaw angle estimation
-      LimelightHelpers.SetIMUAssistAlpha("", Constants.IMUassistAlpha);
+      LimelightHelpers.SetIMUAssistAlpha("limelight", Constants.IMUassistAlpha);
     }
 
     if (InstalledHardware.limelightInstalled) {
@@ -404,7 +404,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
           chassisSpeeds.omegaRadiansPerSecond * Math.min(1.0, this.speedReductionFactor * 1.25));
 
       // apply acceleration control
-      reducedChassisSpeeds = limitChassisSpeedsAccel(reducedChassisSpeeds);
+      //TODO figure this accel decell thing out
+      //reducedChassisSpeeds = limitChassisSpeedsAccel(reducedChassisSpeeds);
       previousChassisSpeeds = reducedChassisSpeeds;
 
       // send the requested chassis speeds to the sweve drive
@@ -504,7 +505,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     if (recentVisionYaws.size() != 0) {
       // TODO check the latency between SetRobotOrientation and being able to
       // getVisionBotPoseOrb based on that updated orientation being set
-      LimelightHelpers.SetRobotOrientation("", getMedianOfList(recentVisionYaws), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation("limelight", getMedianOfList(recentVisionYaws), 0, 0, 0, 0, 0);
       Pose2d visonBotPoseOrb = cameraSubsystem.getVisionBotPoseOrb().getRobotPosition();
       if (visonBotPoseOrb != null) {
         Pose2d combinedBotPose = new Pose2d(visonBotPoseOrb.getTranslation(),

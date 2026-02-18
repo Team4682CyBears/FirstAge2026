@@ -36,11 +36,11 @@ public class InstalledHardware {
     public static final boolean bareDrivetrainInstalled = true;
 
     // Shooter related hardware
-    public static final boolean shooterInstalled = true;
+    public static final boolean shooterInstalled = false;
     public static final boolean hoodInstalled = false;
 
     // Kicker
-    public static final boolean kickerInstalled = true;
+    public static final boolean kickerInstalled = false;
 
     // TOF Sensor Hardware
     // Important! You must disable any TOF sensor that is not installed!!
