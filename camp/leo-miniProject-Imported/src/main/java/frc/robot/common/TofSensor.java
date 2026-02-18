@@ -10,6 +10,8 @@ package frc.robot.common;
 
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.StatusSignal;
+
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import static edu.wpi.first.units.Units.Inches;
 
@@ -81,10 +83,17 @@ public class TofSensor {
      */
     public double getRangeInches() {
 
-        
-
-        StatusSignal<Distance> statSig = rangeSensor.getDistance();
-        Distance distance = statSig.getValue();
+        switch(tofType){
+            case CTRE:
+                return rangeSensor.getDistance().getValue().in(Inches);
+            case PWF:
+                return Units.metersToInches(tofSensor.getRange()/1000);
+            case Laser:
+                double measurement = laserSensor.getMeasurement().distance_mm;
+                return Units.metersToInches(measurement/1000);
+        }
+        StatusSignal<Distance> distanceInM = rangeSensor.getDistance();
+        Distance distance = distanceInM.getValue();
         SmartDashboard.putNumber(tofType.getName() + "_DistanceIn", distance.in(Inches));
 
         return (distance.in(Inches));
@@ -106,8 +115,13 @@ public class TofSensor {
      * Publishes distance in inches and range valid boolean
      */
     public void publishTelemtry() {
-        SmartDashboard.putNumber(tofType.getName() + " " + "Distance (in) ", getRangeInches());
-        SmartDashboard.putBoolean(tofType.getName() + " " + "Distance (in) ", isRangeValid());
+        String displayName = tofType.getName();
+        SmartDashboard.putNumber(displayName + " " + "Distance (in) ", getRangeInches());
+        SmartDashboard.putBoolean(displayName + " " + "Distance (in) ", isRangeValid());
+        if (tofType == TofType.PWF) {
+            SmartDashboard.putString(displayName + " TOF Status", this.tofSensor.getStatus().toString());
+        }
+
     }
 
 
