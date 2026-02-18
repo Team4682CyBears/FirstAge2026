@@ -26,7 +26,8 @@ import frc.robot.control.Constants;
 import frc.robot.control.HardwareConstants;
 
 /**
- * Subsystem for controlling the shooter hood angle and extendo using REV ServoHub.
+ * Subsystem for controlling the shooter hood angle and extendo using REV
+ * ServoHub.
  */
 public class HoodSubsystem extends SubsystemBase {
     private final ServoHubConfig config;
@@ -59,9 +60,12 @@ public class HoodSubsystem extends SubsystemBase {
      * Configures all servo channels with pulse ranges and default positions.
      */
     private void configureServos() {
-        configureServoChannel(rightAngleServoChannel, config.channel0, HardwareConstants.HOOD_MIN_EXT, (HardwareConstants.HOOD_MIN_EXT+HardwareConstants.HOOD_MAX_EXT)/2, HardwareConstants.HOOD_MAX_EXT);
-        configureServoChannel(leftAngleServoChannel, config.channel1, HardwareConstants.HOOD_MIN_EXT, (HardwareConstants.HOOD_MIN_EXT+HardwareConstants.HOOD_MAX_EXT)/2, HardwareConstants.HOOD_MAX_EXT);
-        configureServoChannel(extendoServoChannel, config.channel2, HardwareConstants.HOOD_MIN_EXT, (HardwareConstants.HOOD_MIN_EXT+HardwareConstants.HOOD_MAX_EXT)/2, HardwareConstants.HOOD_MAX_EXT);
+        configureServoChannel(rightAngleServoChannel, config.channel0, HardwareConstants.HOOD_MIN_EXT,
+                (HardwareConstants.HOOD_MIN_EXT + HardwareConstants.HOOD_MAX_EXT) / 2, HardwareConstants.HOOD_MAX_EXT);
+        configureServoChannel(leftAngleServoChannel, config.channel1, HardwareConstants.HOOD_MIN_EXT,
+                (HardwareConstants.HOOD_MIN_EXT + HardwareConstants.HOOD_MAX_EXT) / 2, HardwareConstants.HOOD_MAX_EXT);
+        configureServoChannel(extendoServoChannel, config.channel2, HardwareConstants.HOOD_MIN_EXT,
+                (HardwareConstants.HOOD_MIN_EXT + HardwareConstants.HOOD_MAX_EXT) / 2, HardwareConstants.HOOD_MAX_EXT);
 
         servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 20000);
 
@@ -71,13 +75,14 @@ public class HoodSubsystem extends SubsystemBase {
     /**
      * Configures a single servo channel with the given pulse range.
      *
-     * @param channel the servo channel to configure
+     * @param channel     the servo channel to configure
      * @param servoConfig the servo channel configuration
-     * @param minPulse the minimum pulse width
-     * @param midPulse the middle pulse width
-     * @param maxPulse the maximum pulse width
+     * @param minPulse    the minimum pulse width
+     * @param midPulse    the middle pulse width
+     * @param maxPulse    the maximum pulse width
      */
-    public void configureServoChannel(ServoChannel channel, ServoChannelConfig servoConfig, int minPulse, int midPulse, int maxPulse) {
+    public void configureServoChannel(ServoChannel channel, ServoChannelConfig servoConfig, int minPulse, int midPulse,
+            int maxPulse) {
         servoConfig.pulseRange(minPulse, midPulse, maxPulse);
         channel.setPowered(true);
         channel.setEnabled(true);
@@ -100,8 +105,6 @@ public class HoodSubsystem extends SubsystemBase {
      */
     public void setExtendoPosition(int position) {
         extendoPosition = MathUtil.clamp(position, HardwareConstants.HOOD_MIN_EXT, HardwareConstants.HOOD_MAX_EXT);
-
-        extendoPosition = position;
     }
 
     /**
