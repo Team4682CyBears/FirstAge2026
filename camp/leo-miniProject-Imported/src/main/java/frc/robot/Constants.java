@@ -18,14 +18,27 @@ package frc.robot;
 public final class Constants {
   public static final int talonCanID = 4;
 
+  // most of the distance sensors have this max range. 
+  public static final double MAX_RANGE_INCHES = 18.5; // 2 meter conversion
+  public static final double maxRangeLaserCanInches = 18.5; // 4 meters in inches low of non cardboard and high of carboard
+
+  //TODO IF WE ARE USING OTHER SENSORS ACOUNT FOR OFFSET IN IS VALID CHECK
+
+  // CAN Ids for sensors and spinner
+  public static final int rangeSensorCTRECanID = 32;
+  public static final int rangeSensorPWFCanID = 33;
+  public static final int rangeSensorLaserCanID = 34;
+  public static final int SPINNER_CAN_ID = 8;
+
+  // AMPS and Voltage constants for motor config 
   public static final double motorSupplyCurrentMaximumAmps = 50.0;
   public static final double motorSupplyVoltageTimeConstant = 0.2;
   public static final double falconMaxVoltage = 12.0;
   public static final double motorStatorCurrentMaximumAmps = 100.0;
 
-  public static final double motorSpeed = 10;
+  // Spinner motor speed constant measured in rpm
+  public static double motorSpeed = 10; //275;
 
 
   public static final int kDriverControllerPort = 0;
-  
 }
