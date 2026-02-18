@@ -89,7 +89,7 @@ public class Spinner extends SubsystemBase {
      */
     public void publishTelemetry() {
         SmartDashboard.putNumber("Spinner_Speed ", motor.getVelocity(true).getValueAsDouble());
-        SmartDashboard.putNumber("Desired Speed", Constants.motorSpeed );
+        Constants.motorSpeed = SmartDashboard.getNumber("Desired Speed", Constants.motorSpeed );
     }
 
 }

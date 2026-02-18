@@ -5,7 +5,6 @@
 // File: TofSensorLaser.java
 // ************************************************************
 
-
 package frc.robot.common;
 
 import edu.wpi.first.math.util.Units;
@@ -45,7 +44,7 @@ public class TofSensorLaser {
         laserSensor = new LaserCan(canID);
         try {
             laserSensor.setRangingMode(LaserCan.RangingMode.SHORT);
-            laserSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_20MS);
+            laserSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
         } catch (ConfigurationFailedException e) {
             System.out.println("Configuration failed! " + e);
         } 

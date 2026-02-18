@@ -21,6 +21,7 @@ public class RunExperimentCommand extends Command {
     boolean previousTofActivation2 = false;
     double dataValue;
     double[] dataValues;
+    double[] rpmValues;
     boolean experimentRunning = false;
     boolean spinnerEnabled;
 
@@ -40,6 +41,7 @@ public class RunExperimentCommand extends Command {
         this.constSpeed = constS;
         this.desiredCycles = cyc;
         this.dataValues = new double[cyc];
+        this.rpmValues = new double[cyc];
         this.spinnerEnabled = spinnerEnabled;
         addRequirements(tof);
         // if spinner enabled add req to spinner
@@ -75,7 +77,6 @@ public class RunExperimentCommand extends Command {
      */
     @Override
     public void execute() {
-        // TODO ADD IS TOFFALID CHECK AND RMMOVE ALL SENSORED USED
         // happens after fully initalized runs periodticly until subsytem is closed
         System.out.println("Experiment Running: " + experimentRunning);
         System.out.println("Currentspeed " + spiningMotor.getRPM());
@@ -90,6 +91,7 @@ public class RunExperimentCommand extends Command {
             tofActivated = tofSensor.getTofLazer().tofActivated();
             if (tofSensor.getTofLazer().tofActivated() && !previousTofActivation) {
                 dataValues[cyclesRun] = stopwatch.get(); // gets current stopwatch time
+                rpmValues[cyclesRun] = spiningMotor.getRPM();
                 cycles -= 1;
                 cyclesRun += 1;
                 System.out.println("Num cycles: " + ((Integer) cycles).toString());
@@ -135,6 +137,12 @@ public class RunExperimentCommand extends Command {
 
         double meanValue = 0;
         int skippedCycles = 0;
+        double avgSpeed = 0.0;
+        for (int i = 0; i < rpmValues.length; i++) {
+            avgSpeed += rpmValues[i];
+        }
+        avgSpeed /= rpmValues.length;
+        System.out.println("Avg Motor RPM: " + avgSpeed);
         double expectedCycleTime = 1.0 / (desiredSpeed / 60.0); // pole comes by 2 times per RPS
         double cycleTimeTol = 1.8;
         double allowedCycleTime = cycleTimeTol * expectedCycleTime;
@@ -147,7 +155,7 @@ public class RunExperimentCommand extends Command {
             meanValue += x;
             varianceData[i - 1] = x;
             if (x > allowedCycleTime) {
-                skippedCycles++;
+                skippedCycles += (int)(x/expectedCycleTime);
             }
         }
         System.out.println("Allowed cycle time:" + allowedCycleTime);
