@@ -93,6 +93,10 @@ public final class Constants {
     public static final double limelightToWPIBlueXOffest = 8.75;
     public static final double limelightToWPIBlueYOffset = 4.0;
 
+    // Threshold for limelight/AprilTag pose ambiguity above which detections are
+    // considered ambiguous.
+    public static final double TAG_AMBIGUITY_THRESHOLD = 0.6;
+
     public static final double IMUassistAlpha = .01; // value between 0 and 1, higher values will cause the IMU to have
                                                      // more influence on the final angle output
 
@@ -127,4 +131,15 @@ public final class Constants {
     // Shooter RPM bounds
     public static final double SHOOTER_MIN_RPM = 0.0;
     public static final double SHOOTER_MAX_RPM = 5000.0;
+    // ********************************************************************
+    // Shooting / aiming constants (tunable)
+    public static final double PROJECTILE_SPEED_METERS_PER_SECOND = 12.0; //tune this
+
+    // Hood servo pulse widths
+    public static final int HOOD_MIN_PULSE = 1000;
+    public static final int HOOD_MAX_PULSE = 2000;
+    // Distances corresponding to min and max hood positions
+    public static final double HOOD_MIN_DISTANCE_METERS = 1.0;
+    public static final double HOOD_MAX_DISTANCE_METERS = 8.0;
+
 }

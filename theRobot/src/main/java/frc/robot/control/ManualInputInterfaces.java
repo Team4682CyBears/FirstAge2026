@@ -227,25 +227,25 @@ public class ManualInputInterfaces {
                 SmartDashboard.putNumber("Shooter RPM", newRPM);
             }));
             this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
-                double hoodExtention = SmartDashboard.getNumber("Hood Angle", 1000);
+                double hoodExtention = SmartDashboard.getNumber("Hood Angle", HardwareConstants.HOOD_MIN_EXT);
                 double newAngle = MathUtil.clamp(hoodExtention - 50, HardwareConstants.HOOD_MIN_EXT,
                         HardwareConstants.HOOD_MAX_EXT);
                 SmartDashboard.putNumber("Hood Angle", newAngle);
             }));
             this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
-                double hoodExtention = SmartDashboard.getNumber("Hood Angle", 1000);
+                double hoodExtention = SmartDashboard.getNumber("Hood Angle", HardwareConstants.HOOD_MIN_EXT);
                 double newAngle = MathUtil.clamp(hoodExtention + 50, HardwareConstants.HOOD_MIN_EXT,
                         HardwareConstants.HOOD_MAX_EXT);
                 SmartDashboard.putNumber("Hood Angle", newAngle);
             }));
             this.coDriverController.y().onTrue(new InstantCommand(() -> {
-                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", 1000);
+                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT);
                 double newExt = MathUtil.clamp(hoodExtention - 50, HardwareConstants.HOOD_MIN_EXT,
                         HardwareConstants.HOOD_MAX_EXT);
                 SmartDashboard.putNumber("Hood Extendo", newExt);
             }));
             this.coDriverController.b().onTrue(new InstantCommand(() -> {
-                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", 1000);
+                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT);
                 double newExt = MathUtil.clamp(hoodExtention + 50, HardwareConstants.HOOD_MIN_EXT,
                         HardwareConstants.HOOD_MAX_EXT);
                 SmartDashboard.putNumber("Hood Extendo", newExt);
@@ -261,8 +261,8 @@ public class ManualInputInterfaces {
             if (InstalledHardware.hoodInstalled) {
                 this.coDriverController.a().onTrue(new HoodAngleCommand(
                         this.subsystemCollection.getHoodSubsystem(),
-                        () -> (int) SmartDashboard.getNumber("Hood Angle", 1000),
-                        () -> (int) SmartDashboard.getNumber("Hood Extendo", 1000)));
+                        () -> (int) SmartDashboard.getNumber("Hood Angle", HardwareConstants.HOOD_MIN_EXT),
+                        () -> (int) SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT)));
             }
 
             // Co-driver bumpers: log shot result (made / missed)

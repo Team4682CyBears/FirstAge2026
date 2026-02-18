@@ -103,6 +103,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private SwerveYawMode swerveYawMode = SwerveYawMode.JOYSTICK;
 
+  private Translation2d shootingAimTarget = null;
+
   private SwerveDrivetrain<TalonFX, TalonFX, CANcoder> drivetrain = InstalledHardware.tardiDrivetrainInstalled
       ? new TardiTunerConstants.TunerSwerveDrivetrain(TardiTunerConstants.DrivetrainConstants, 0,
           odometryStdDev, visionStdDev,
@@ -126,10 +128,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
+  private double autoYawProfileConstraintsMaxVelocity = 540;
+  private double autoYawProfileConstraintsMaxAcceleration = 920;
+
   // Trapezoid profile constrains motion by limiting max velocity and
   // max acceleration so the setpoint follows a smooth accel->cruise->decel
   // (trapezoidal) velocity profile used by the ProfiledPIDController.
-  private TrapezoidProfile.Constraints autoYawProfileConstraints = new TrapezoidProfile.Constraints(540, 920);
+  private TrapezoidProfile.Constraints autoYawProfileConstraints = new TrapezoidProfile.Constraints(autoYawProfileConstraintsMaxVelocity, autoYawProfileConstraintsMaxAcceleration);
   //TODO found via testing on Tardi drivetrain, needs to be changed for BareBones
   private ProfiledPIDController autoYawPID = new ProfiledPIDController(2.0, 0.0, 0.001, autoYawProfileConstraints);
 
@@ -366,7 +371,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       LimelightHelpers.SetIMUAssistAlpha("", Constants.IMUassistAlpha);
     }
 
-    if (InstalledHardware.limelightInstalled) {
+    if (InstalledHardware.limelightInstalled && cameraSubsystem != null) {
       VisionMeasurement visionMeasurement = cameraSubsystem.getVisionBotPose();
 
       if (visionMeasurement.getRobotPosition() != null) {
@@ -375,14 +380,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
           recentVisionYaws.remove(0);
         }
       }
+      // Only add the measurement once when enabled. (Avoid double-calling addVisionMeasurement.)
       if (DriverStation.isEnabled()) {
         this.addVisionMeasurement(visionMeasurement);
       }
-    }
-
-    // update robot position with vision
-    if (InstalledHardware.limelightInstalled && DriverStation.isEnabled()) {
-      this.addVisionMeasurement(cameraSubsystem.getVisionBotPose());
     }
 
     if (swerveDriveMode == SwerveDriveMode.IMMOVABLE_STANCE && chassisSpeedsAreZero()) {
@@ -417,17 +418,39 @@ public class DrivetrainSubsystem extends SubsystemBase {
           .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
     }
     if (swerveYawMode == SwerveYawMode.AUTO){
-      double robotYawDegrees = getRobotPosition().getRotation().getRadians();
-      Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
-      double PIDout = autoYawPID.calculate(MathUtil.angleModulus(robotYawDegrees-getYawToFaceTarget(hubPosition).getRadians()), 0.0);
-      setAutoYawVelocityRadiansPerSecond((Math.abs(PIDout) > yawVelocityDeadband) ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond : 0.0);
+      setAutoYawVelocityRadiansPerSecond();
     }
 
     displayDiagnostics();
   }
 
-  public void setAutoYawVelocityRadiansPerSecond(double newVelocity){
-    this.autoYawVelocityRadiansPerSecond = newVelocity;
+  /**
+   * Set an aiming target (field-relative) for use while in AUTO yaw mode. Use
+   * null to clear.
+   *
+   * @param target field-relative translation for the aim target (meters). If
+   *               null the drivetrain will revert to the default hub position
+   *               behavior.
+   */
+  public void setShootingAimTarget(Translation2d target) {
+    this.shootingAimTarget = target;
+  }
+
+  /**
+   * Clear any manual shooting aim target so the drivetrain uses the default
+   * hub position.
+   */
+  public void clearShootingAimTarget() {
+    this.shootingAimTarget = null;
+  }
+
+  private void setAutoYawVelocityRadiansPerSecond(){
+    double robotYawDegrees = getRobotPosition().getRotation().getRadians();
+      Translation2d hubPosition = (shootingAimTarget != null)
+          ? shootingAimTarget
+          : (DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
+      double PIDout = autoYawPID.calculate(MathUtil.angleModulus(robotYawDegrees - getYawToFaceTarget(hubPosition).getRadians()), 0.0);
+    this.autoYawVelocityRadiansPerSecond = (Math.abs(PIDout) > yawVelocityDeadband) ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond : 0.0;
   }
 
   /**
@@ -492,8 +515,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * otherwise not moving)
    */
   public void seedRobotPositionFromVision() {
-    if (recentVisionYaws.size() != 0) {
-      // TODO check the latency between SetRobotOrientation and being able to
+    if (recentVisionYaws.size() != 0 && cameraSubsystem != null) {
       // getVisionBotPoseOrb based on that updated orientation being set
       LimelightHelpers.SetRobotOrientation("", getMedianOfList(recentVisionYaws), 0, 0, 0, 0, 0);
       Pose2d visonBotPoseOrb = cameraSubsystem.getVisionBotPoseOrb().getRobotPosition();
