@@ -26,10 +26,10 @@ import frc.robot.commands.*;
  */
 public class AutonomousChooser {
     private final SendableChooser<AutonomousPath> autonomousPathChooser = new SendableChooser<>();
-
-    private Command testAuto;
     private Command DoNothing;
-    private Command Mobility;
+    private Command OutpostMidBotClimb;
+    private Command OutpostMidTopClimb;
+    private Command OutpostDepotTopClimb;
 
     /**
      * Constructor for AutonomousChooser
@@ -40,19 +40,20 @@ public class AutonomousChooser {
         // TODO add checks for all subsystems the autos rely on besides the drivetrain
         // here
         if (subsystems.isDriveTrainPowerSubsystemAvailable()) {
-
             autonomousPathChooser.setDefaultOption("Do Nothing", AutonomousPath.DONOTHING);
-            autonomousPathChooser.addOption("Test Auto", AutonomousPath.TESTAUTO);
-            autonomousPathChooser.addOption("Mobility", AutonomousPath.MOBILITY);
+            autonomousPathChooser.addOption("Outpost Mid Bot Climb", AutonomousPath.OUTPOSTMIDBOTCLIMB);
+            autonomousPathChooser.addOption("Outpost Mid Top Climb", AutonomousPath.OUTPOSTMIDTOPCLIMB);
+            autonomousPathChooser.addOption("Outpost Depot Top Climb", AutonomousPath.OUTPOSTDEPOTTOPCLIMB);
             SmartDashboard.putData(autonomousPathChooser);
 
-            this.testAuto = getTestAuto();
             this.DoNothing = getDoNothing();
-            this.Mobility = getMobilityAuto();
+            this.OutpostMidBotClimb = getOutpostMidBotClimb();
+            this.OutpostMidTopClimb = getOutpostMidTopClimb();
+            this.OutpostDepotTopClimb = getOutpostDepotTopClimb();
         } else {
             DataLogManager.log(">>>>> NO auto routine becuase missing subsystems");
         }
-    }
+    }   
 
     /**
      * returns the path planner auto to be used in auto period
@@ -61,12 +62,14 @@ public class AutonomousChooser {
      */
     public Command getAutoPath() {
         switch (autonomousPathChooser.getSelected()) {
-            case TESTAUTO:
-                return this.testAuto;
             case DONOTHING:
                 return this.DoNothing;
-            case MOBILITY:
-                return this.Mobility;
+            case OUTPOSTMIDBOTCLIMB:
+                return this.OutpostMidBotClimb;
+            case OUTPOSTMIDTOPCLIMB:
+                return this.OutpostMidTopClimb;
+            case OUTPOSTDEPOTTOPCLIMB:
+                return this.OutpostDepotTopClimb;
         }
         return new InstantCommand();
     }
@@ -81,22 +84,27 @@ public class AutonomousChooser {
                 getAutoPath());
     }
 
-    private Command getTestAuto() {
-        return AutoBuilder.buildAuto("TestAuto");
+    private Command getOutpostMidBotClimb() {
+        return AutoBuilder.buildAuto("OutpostMidBotClimb");
+    }
+
+    private Command getOutpostMidTopClimb() {
+        return AutoBuilder.buildAuto("OutpostMidTopClimb");
+    }
+
+    private Command getOutpostDepotTopClimb() {
+        return AutoBuilder.buildAuto("OutpostDepotTopClimb");
     }
 
     private Command getDoNothing() {
         return new InstantCommand();
     }
 
-    private Command getMobilityAuto() {
-        return AutoBuilder.buildAuto("Mobility");
-    }
-
     private enum AutonomousPath {
-        TESTAUTO,
+        OUTPOSTMIDBOTCLIMB,
+        OUTPOSTMIDTOPCLIMB,
+        OUTPOSTDEPOTTOPCLIMB,
         DONOTHING,
-        MOBILITY
     }
 
     /**

@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.538,
+        "y": 7.397757746292373
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.688462578082407,
+        "y": 5.5621372240896925
+      },
+      "isLocked": false,
+      "linkedName": "TopTrench"
+    },
+    {
+      "anchor": {
+        "x": 1.556,
+        "y": 3.3228632812499996
+      },
+      "prevControl": {
+        "x": 3.0025963694792717,
+        "y": 5.665052057691245
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "TopClimb"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 90.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}
