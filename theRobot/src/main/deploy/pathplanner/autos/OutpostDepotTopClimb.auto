@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "dropToMid"
+            "pathName": "OutpostToDepot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DepotToTopClimb"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

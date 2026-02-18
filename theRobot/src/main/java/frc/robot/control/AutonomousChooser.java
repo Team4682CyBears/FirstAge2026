@@ -27,7 +27,9 @@ import frc.robot.commands.*;
 public class AutonomousChooser {
     private final SendableChooser<AutonomousPath> autonomousPathChooser = new SendableChooser<>();
     private Command DoNothing;
-    private Command DropToMid;
+    private Command OutpostMidBotClimb;
+    private Command OutpostMidTopClimb;
+    private Command OutpostDepotTopClimb;
 
     /**
      * Constructor for AutonomousChooser
@@ -38,13 +40,14 @@ public class AutonomousChooser {
         // TODO add checks for all subsystems the autos rely on besides the drivetrain
         // here
         if (subsystems.isDriveTrainPowerSubsystemAvailable()) {
-
             autonomousPathChooser.setDefaultOption("Do Nothing", AutonomousPath.DONOTHING);
             autonomousPathChooser.addOption("Drop To Mid", AutonomousPath.DROPTOMID);
             SmartDashboard.putData(autonomousPathChooser);
 
             this.DoNothing = getDoNothing();
-            this.DropToMid = getDropToMid();
+            this.OutpostMidBotClimb = getOutpostMidBotClimb();
+            this.OutpostMidTopClimb = getOutpostMidTopClimb();
+            this.OutpostDepotTopClimb = getOutpostDepotTopClimb();
         } else {
             DataLogManager.log(">>>>> NO auto routine becuase missing subsystems");
         }
@@ -60,7 +63,11 @@ public class AutonomousChooser {
             case DONOTHING:
                 return this.DoNothing;
             case DROPTOMID:
-                return this.DropToMid;
+                return this.OutpostMidBotClimb;
+            case OUTPOSTMIDTOPCLIMB:
+                return this.OutpostMidTopClimb;
+            case OUTPOSTDEPOTTOPCLIMB:
+                return this.OutpostDepotTopClimb;
         }
         return new InstantCommand();
     }
@@ -75,8 +82,16 @@ public class AutonomousChooser {
                 getAutoPath());
     }
 
-    private Command getDropToMid() {
-        return AutoBuilder.buildAuto("DropToMid");
+    private Command getOutpostMidBotClimb() {
+        return AutoBuilder.buildAuto("OutpostMidBotClimb");
+    }
+
+    private Command getOutpostMidTopClimb() {
+        return AutoBuilder.buildAuto("OutpostMidTopClimb");
+    }
+
+    private Command getOutpostDepotTopClimb() {
+        return AutoBuilder.buildAuto("OutpostDepotTopClimb");
     }
 
     private Command getDoNothing() {
@@ -84,7 +99,9 @@ public class AutonomousChooser {
     }
 
     private enum AutonomousPath {
-        DROPTOMID,
+        OUTPOSTMIDBOTCLIMB,
+        OUTPOSTMIDTOPCLIMB,
+        OUTPOSTDEPOTTOPCLIMB,
         DONOTHING,
     }
 
