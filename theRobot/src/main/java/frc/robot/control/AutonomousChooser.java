@@ -41,7 +41,9 @@ public class AutonomousChooser {
         // here
         if (subsystems.isDriveTrainPowerSubsystemAvailable()) {
             autonomousPathChooser.setDefaultOption("Do Nothing", AutonomousPath.DONOTHING);
-            autonomousPathChooser.addOption("Drop To Mid", AutonomousPath.DROPTOMID);
+            autonomousPathChooser.addOption("Outpost Mid Bot Climb", AutonomousPath.OUTPOSTMIDBOTCLIMB);
+            autonomousPathChooser.addOption("Outpost Mid Top Climb", AutonomousPath.OUTPOSTMIDTOPCLIMB);
+            autonomousPathChooser.addOption("Outpost Depot Top Climb", AutonomousPath.OUTPOSTDEPOTTOPCLIMB);
             SmartDashboard.putData(autonomousPathChooser);
 
             this.DoNothing = getDoNothing();
@@ -62,7 +64,7 @@ public class AutonomousChooser {
         switch (autonomousPathChooser.getSelected()) {
             case DONOTHING:
                 return this.DoNothing;
-            case DROPTOMID:
+            case OUTPOSTMIDBOTCLIMB:
                 return this.OutpostMidBotClimb;
             case OUTPOSTMIDTOPCLIMB:
                 return this.OutpostMidTopClimb;
