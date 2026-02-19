@@ -261,7 +261,6 @@ public class ManualInputInterfaces {
             if (InstalledHardware.hoodInstalled) {
                 this.coDriverController.a().onTrue(new HoodAngleCommand(
                         this.subsystemCollection.getHoodSubsystem(),
-                        () -> (int) SmartDashboard.getNumber("Hood Angle", HardwareConstants.HOOD_MIN_EXT),
                         () -> (int) SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT)));
             }
 

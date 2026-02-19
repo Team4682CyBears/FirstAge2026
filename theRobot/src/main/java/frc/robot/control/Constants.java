@@ -124,7 +124,8 @@ public final class Constants {
 
     public static final double followKickerMotorGearRatio = 1;
 
-    public static final int servoHubCanID = 22;
+    public static final int hoodMotorCanID = 22;
+    public static final int hoodEncoderCanID = 23;
 
     public static final int servoDefaultPosition = 1000; // fully retracted position
 

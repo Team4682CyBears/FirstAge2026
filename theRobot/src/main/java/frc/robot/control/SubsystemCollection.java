@@ -19,6 +19,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.ShotLogger;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.NewHoodSubsystem;
 
 public class SubsystemCollection {
     // declaring input classes
@@ -32,7 +33,7 @@ public class SubsystemCollection {
     private LEDSubsystem ledSubsystem = null;
     private ShooterSubsystem shooterSubsystem = null;
     private KickerSubsystem kickerSubsystem = null;
-    private HoodSubsystem hoodSubsystem = null;
+    private NewHoodSubsystem hoodSubsystem = null;
     private ShotLogger shotLogger = null;
 
     /**
@@ -89,11 +90,11 @@ public class SubsystemCollection {
         return shooterSubsystem != null;
     }
 
-    public HoodSubsystem getHoodSubsystem() {
+    public NewHoodSubsystem getHoodSubsystem() {
         return hoodSubsystem;
     }
 
-    public void setHoodSubsystem(HoodSubsystem value) {
+    public void setHoodSubsystem(NewHoodSubsystem value) {
         hoodSubsystem = value;
     }
 
