@@ -176,25 +176,16 @@ public class RobotContainer {
     if (InstalledHardware.limelightInstalled) {
       subsystems.setCameraSubsystem(new CameraSubsystem());
       if (subsystems.isLEDSubsystemAvailable()) {
-        //!!!!!!!!!!METHOD ONE!!!!!!!!!!!!!!!!
-        // subsystems.getLedSubsystem().registerStateAction(LEDState.Green,
-        //    () -> subsystems.getCameraSubsystem().getTagId() != -1);
-        //subsystems.getLedSubsystem().registerStateAction(LEDState.Red,
-        //    () -> subsystems.getCameraSubsystem().getTagId() == -1);
-
-        //!!!!!!!!!!METHOD TWO!!!!!!!!!!!!!!!!
-        //green if seen
-        if(subsystems.getCameraSubsystem().getTagId() != -1) {
-          subsystems.getLedSubsystem().setPattern(Constants.ledPWMGreen);
-        }
-         //red if not seen
-        if(subsystems.getCameraSubsystem().getTagId() == -1) {
-          subsystems.getLedSubsystem().setPattern(Constants.ledPWMRed);
-        }
+        // Green if April tag seen
+        subsystems.getLedSubsystem().registerStateAction(LEDState.Green, 
+            () -> subsystems.getCameraSubsystem().getTagId() != -1);
+         // Red if not seen
+        subsystems.getLedSubsystem().registerStateAction(LEDState.Red, 
+            () -> subsystems.getCameraSubsystem().getTagId() == -1);
       }
-      DataLogManager.log("SUCCESS: initializeCamera");
+      DataLogManager.log("!!!!!!!!!!!!!!!!!!!SUCCESS: initializeCamera!!!!!!!!!!!!!!!!!!!!!!!!");
     } else {
-      DataLogManager.log("FAIL: initializeCamera");
+      DataLogManager.log("!!!!!!!!!!!!!!!!!!!FAIL: initializeCamera!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
   }
 

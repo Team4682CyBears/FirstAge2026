@@ -86,12 +86,13 @@ public final class Constants {
     public static final double ledBrightness = 0.5;
 
     // ******************************************************************
-    // led pwm constants. All of these constants are US pulse widths from
+    // LED PWM constants. All of these constants are US pulse widths from
     // 1000 to 2000 represented as a double ranging from -1 to 1
     public static final double ledPWMDarkGreen = 0.75;
     public static final double ledPWMYellow = 0.69;
     public static final double ledPWMGreen = 0.77;
     public static final double ledPWMRed = 0.61;
+    public static final double ledPWMBlack = 0.99;
 
     // ******************************************************************
     // camera constants

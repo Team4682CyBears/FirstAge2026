@@ -41,10 +41,11 @@ public class LEDSubsystem extends SubsystemBase {
   private LEDState currentLEDState = LEDState.Off;
   private LEDState targetLedState = LEDState.Off;
   
+  // The spark controller for our blinkin.
   private final Spark blinkin = new Spark(0);
 
+  // Method to set blinkin's PWM
   public void setPattern(double pwm) {
-
     blinkin.set(pwm);
   }
 
@@ -100,7 +101,15 @@ public class LEDSubsystem extends SubsystemBase {
     } else if (currentActions.containsKey(LEDState.OrangeBlink)
         && currentActions.get(LEDState.OrangeBlink).booleanValue()) {
       targetLedState = LEDState.OrangeBlink;
+    } else if (currentActions.containsKey(LEDState.RedBlink)
+        && currentActions.get(LEDState.RedBlink).booleanValue()) {
+      targetLedState = LEDState.RedBlink;
+    } else if (currentActions.containsKey(LEDState.GreenBlink)
+        && currentActions.get(LEDState.GreenBlink).booleanValue()) {
+      targetLedState = LEDState.GreenBlink;
     }
+
+    if (this.currentLEDState != targetLedState)
     // update the LED state when the target state has changed
     if (this.currentLEDState != targetLedState) {
       this.currentLEDState = targetLedState;
@@ -147,8 +156,10 @@ public class LEDSubsystem extends SubsystemBase {
   private void redBlink() {
     if (this.currentBlinkState) {
       this.setLedStringColor(255, 0, 0);
+      this.setPattern(0.61);
     } else {
       this.setLedStringColor(0, 0, 0);
+      this.setPattern(0.99);
     }
   }
 
@@ -156,8 +167,10 @@ public class LEDSubsystem extends SubsystemBase {
   private void greenBlink() {
     if (this.currentBlinkState) {
       this.setLedStringColor(255, 200, 0);
+      this.setPattern(0.77);
     } else {
       this.setLedStringColor(0, 0, 0);
+      this.setPattern(0.99);
     }
   }
 
@@ -179,11 +192,13 @@ public class LEDSubsystem extends SubsystemBase {
   // Sets leds to yellow solid
   private void redSolid() {
     this.setLedStringColor(150, 0, 0);
+    this.setPattern(0.61);
   }
 
   // Sets leds to green solid
   private void greenSolid() {
     this.setLedStringColor(0, 200, 0);
+    this.setPattern(0.77);
   }
 
   // Turns off leds
