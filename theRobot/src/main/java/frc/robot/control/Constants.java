@@ -127,6 +127,9 @@ public final class Constants {
     public static final int hoodMotorCanID = 22;
     public static final int hoodEncoderCanID = 23;
 
+    public static final double hoodMagnetOffset = 0.0;
+    public static final double hoodExtendoTolerance = 0.01;
+
     public static final int servoDefaultPosition = 1000; // fully retracted position
 
     // Shooter RPM bounds
@@ -134,7 +137,7 @@ public final class Constants {
     public static final double SHOOTER_MAX_RPM = 5000.0;
     // ********************************************************************
     // Shooting / aiming constants (tunable)
-    public static final double PROJECTILE_SPEED_METERS_PER_SECOND = 12.0; //tune this
+    public static final double PROJECTILE_SPEED_METERS_PER_SECOND = 12.0; // tune this
 
     // Hood servo pulse widths
     public static final int HOOD_MIN_PULSE = 1000;
