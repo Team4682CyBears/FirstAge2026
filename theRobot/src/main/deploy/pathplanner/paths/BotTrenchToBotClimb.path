@@ -3,47 +3,38 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5270457494703393,
-        "y": 0.6870146318855928
+        "x": 3.596627387152778,
+        "y": 0.5571825086805553
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8669409660107332,
-        "y": 0.6357781753130587
+        "x": 3.3499260573907597,
+        "y": 0.7895036489432279
       },
       "isLocked": false,
       "linkedName": "BotTrench"
     },
     {
       "anchor": {
-        "x": 1.5851341681574236,
-        "y": 3.149
+        "x": 1.4936129918981487,
+        "y": 3.116977430555555
       },
       "prevControl": {
-        "x": 2.591109123434704,
-        "y": 3.1182647584973164
+        "x": 1.7431396453638965,
+        "y": 2.834766376550509
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "BotClimb"
     }
   ],
-  "rotationTargets": [],
-  "constraintZones": [
+  "rotationTargets": [
     {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.3214285714285713,
-      "maxWaypointRelativePos": 1.0,
-      "constraints": {
-        "maxVelocity": 1.0,
-        "maxAcceleration": 3.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
+      "waypointRelativePos": 0.7521689967105263,
+      "rotationDegrees": 0.0
     }
   ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -55,14 +46,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 90.0
+    "velocity": 0.0,
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0.0,
-    "rotation": 180.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

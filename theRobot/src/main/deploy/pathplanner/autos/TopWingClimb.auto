@@ -7,19 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OutpostToBotTrench"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "BotTrenchToMid"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "MidToTopTrench"
+            "pathName": "TopWing"
           }
         },
         {
@@ -31,7 +19,7 @@
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

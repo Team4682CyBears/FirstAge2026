@@ -423,11 +423,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
           .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
     }
     if (swerveYawMode == SwerveYawMode.AUTO) {
-      double robotYawDegrees = getRobotPosition().getRotation().getRadians();
+      double robotYawRadians = getRobotPosition().getRotation().getRadians();
       Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition
           : Constants.redHubPosition;
       double PIDout = autoYawPID
-          .calculate(MathUtil.angleModulus(robotYawDegrees - getYawToFaceTarget(hubPosition).getRadians()), 0.0);
+          .calculate(MathUtil.angleModulus(robotYawRadians - getYawToFaceTarget(hubPosition).getRadians()), 0.0);
       setAutoYawVelocityRadiansPerSecond(
           (Math.abs(PIDout) > yawVelocityDeadband) ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond
               : 0.0);

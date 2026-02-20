@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "OutpostToDepot"
+            "pathName": "TopLoop"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DepotToTopClimb"
+            "pathName": "BotTrenchToBotClimb"
           }
         }
       ]

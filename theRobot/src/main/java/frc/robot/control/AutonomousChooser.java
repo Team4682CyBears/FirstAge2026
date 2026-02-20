@@ -27,10 +27,12 @@ import frc.robot.commands.*;
 public class AutonomousChooser {
     private final SendableChooser<AutonomousPath> autonomousPathChooser = new SendableChooser<>();
     private Command DoNothing;
-    private Command OutpostMidBotClimb;
-    private Command OutpostMidTopClimb;
-    private Command OutpostDepotTopClimb;
-
+    private Command HubOutpostDepoClimb;
+    private Command BotWingClimb;
+    private Command BotLoopClimb;
+    private Command TopWingClimb;
+    private Command TopLoopClimb;
+    
     /**
      * Constructor for AutonomousChooser
      * 
@@ -41,15 +43,19 @@ public class AutonomousChooser {
         // here
         if (subsystems.isDriveTrainPowerSubsystemAvailable()) {
             autonomousPathChooser.setDefaultOption("Do Nothing", AutonomousPath.DONOTHING);
-            autonomousPathChooser.addOption("Outpost Mid Bot Climb", AutonomousPath.OUTPOSTMIDBOTCLIMB);
-            autonomousPathChooser.addOption("Outpost Mid Top Climb", AutonomousPath.OUTPOSTMIDTOPCLIMB);
-            autonomousPathChooser.addOption("Outpost Depot Top Climb", AutonomousPath.OUTPOSTDEPOTTOPCLIMB);
+            autonomousPathChooser.addOption("HubOutpostDepoClimb", AutonomousPath.HUBOUTPOSTDEPOCLIMB);
+            autonomousPathChooser.addOption("Bot Wing", AutonomousPath.BOTWINGCLIMB);
+            autonomousPathChooser.addOption("Bot Loop", AutonomousPath.BOTLOOPCLIMB);
+            autonomousPathChooser.addOption("Top Wing", AutonomousPath.TOPWINGCLIMB);
+            autonomousPathChooser.addOption("Top Loop", AutonomousPath.TOPLOOPCLIMB);
             SmartDashboard.putData(autonomousPathChooser);
 
             this.DoNothing = getDoNothing();
-            this.OutpostMidBotClimb = getOutpostMidBotClimb();
-            this.OutpostMidTopClimb = getOutpostMidTopClimb();
-            this.OutpostDepotTopClimb = getOutpostDepotTopClimb();
+            this.HubOutpostDepoClimb = getHubOutpostDepoClimb();
+            this.BotWingClimb = getBotWingClimb();
+            this.BotLoopClimb = getBotLoopClimb();
+            this.TopWingClimb = getTopWingClimb();
+            this.TopLoopClimb = getTopLoopClimb();
         } else {
             DataLogManager.log(">>>>> NO auto routine becuase missing subsystems");
         }
@@ -64,12 +70,16 @@ public class AutonomousChooser {
         switch (autonomousPathChooser.getSelected()) {
             case DONOTHING:
                 return this.DoNothing;
-            case OUTPOSTMIDBOTCLIMB:
-                return this.OutpostMidBotClimb;
-            case OUTPOSTMIDTOPCLIMB:
-                return this.OutpostMidTopClimb;
-            case OUTPOSTDEPOTTOPCLIMB:
-                return this.OutpostDepotTopClimb;
+            case HUBOUTPOSTDEPOCLIMB:
+                return this.HubOutpostDepoClimb;
+            case BOTWINGCLIMB:
+                return this.BotWingClimb;
+            case BOTLOOPCLIMB:
+                return this.BotLoopClimb;
+            case TOPWINGCLIMB:
+                return this.TopWingClimb;
+            case TOPLOOPCLIMB:
+                return this.TopLoopClimb;
         }
         return new InstantCommand();
     }
@@ -84,16 +94,24 @@ public class AutonomousChooser {
                 getAutoPath());
     }
 
-    private Command getOutpostMidBotClimb() {
-        return AutoBuilder.buildAuto("OutpostMidBotClimb");
+    private Command getHubOutpostDepoClimb() {
+        return AutoBuilder.buildAuto("HubOutpostDepoClimb");
+    }
+    
+    private Command getBotWingClimb() {
+        return AutoBuilder.buildAuto("BotWingClimb");
     }
 
-    private Command getOutpostMidTopClimb() {
-        return AutoBuilder.buildAuto("OutpostMidTopClimb");
+    private Command getBotLoopClimb() {
+        return AutoBuilder.buildAuto("BotLoopClimb");
     }
 
-    private Command getOutpostDepotTopClimb() {
-        return AutoBuilder.buildAuto("OutpostDepotTopClimb");
+    private Command getTopWingClimb() {
+        return AutoBuilder.buildAuto("TopWingClimb");
+    }
+
+    private Command getTopLoopClimb() {
+        return AutoBuilder.buildAuto("TopLoopClimb");
     }
 
     private Command getDoNothing() {
@@ -101,9 +119,11 @@ public class AutonomousChooser {
     }
 
     private enum AutonomousPath {
-        OUTPOSTMIDBOTCLIMB,
-        OUTPOSTMIDTOPCLIMB,
-        OUTPOSTDEPOTTOPCLIMB,
+        HUBOUTPOSTDEPOCLIMB,
+        BOTWINGCLIMB,
+        BOTLOOPCLIMB,
+        TOPWINGCLIMB,
+        TOPLOOPCLIMB,
         DONOTHING,
     }
 
@@ -118,11 +138,7 @@ public class AutonomousChooser {
                 subsystems.getDriveTrainSubsystem()::getRobotPosition, // Pose supplier
                 subsystems.getDriveTrainSubsystem()::setRobotPosition, // Position setter
                 subsystems.getDriveTrainSubsystem()::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (speeds, feedforwards) -> subsystems.getDriveTrainSubsystem().driveRobotCentric(speeds), // Method that
-                                                                                                         // will drive
-                // the robot given ROBOT
-                // RELATIVE
-                // ChassisSpeeds
+                (speeds, feedforwards) -> subsystems.getDriveTrainSubsystem().driveRobotCentric(speeds), 
                 Constants.pathFollower,
                 subsystems.getDriveTrainSubsystem().getPathPlannerConfig(),
                 () -> getShouldMirrorPath(),
@@ -130,7 +146,19 @@ public class AutonomousChooser {
 
         // Register named commands
         if (subsystems.isDriveTrainPowerSubsystemAvailable()) {
-            // TODO add named commands here. 
+            NamedCommands.registerCommand("StartAiming", 
+                new InstantCommand(() -> {
+                    subsystems.getDriveTrainSubsystem().setSwerveYawMode(SwerveYawMode.AUTO);
+                    com.pathplanner.lib.controllers.PPHolonomicDriveController.overrideRotationFeedback(
+                        () -> subsystems.getDriveTrainSubsystem().getAutoYawVelocityRadiansPerSecond()
+                    );
+                }));
+
+            NamedCommands.registerCommand("StopAiming", 
+                new InstantCommand(() -> {
+                    subsystems.getDriveTrainSubsystem().setSwerveYawMode(SwerveYawMode.JOYSTICK); 
+                    com.pathplanner.lib.controllers.PPHolonomicDriveController.clearRotationFeedbackOverride();
+                }));
         }
     }
 

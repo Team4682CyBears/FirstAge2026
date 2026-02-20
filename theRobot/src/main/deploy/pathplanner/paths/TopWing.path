@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.45835440942796657,
-        "y": 0.6870146318855928
+        "x": 3.523537254050926,
+        "y": 7.52357761863426
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4583544094279666,
-        "y": 0.6870146318855928
+        "x": 8.270852936921296,
+        "y": 7.477912688078703
       },
       "isLocked": false,
-      "linkedName": "Outpost"
+      "linkedName": "TopTrench"
     },
     {
       "anchor": {
-        "x": 3.5270457494703393,
-        "y": 0.6870146318855928
+        "x": 7.9,
+        "y": 4.0
       },
       "prevControl": {
-        "x": 2.5270457494703393,
-        "y": 0.6870146318855929
+        "x": 7.861836877893518,
+        "y": 8.166167173032408
+      },
+      "nextControl": {
+        "x": 7.902289965781855,
+        "y": 3.7500104881065646
+      },
+      "isLocked": false,
+      "linkedName": "Mid"
+    },
+    {
+      "anchor": {
+        "x": 3.523537254050926,
+        "y": 7.52357761863426
+      },
+      "prevControl": {
+        "x": 8.168303674768518,
+        "y": 8.209273292824074
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "BotTrench"
+      "linkedName": "TopTrench"
     }
   ],
   "rotationTargets": [],
@@ -41,14 +57,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 2.0,
-    "rotation": 180.0
+    "velocity": 2.5,
+    "rotation": -90.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }
