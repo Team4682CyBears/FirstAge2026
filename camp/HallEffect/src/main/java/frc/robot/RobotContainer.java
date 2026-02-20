@@ -13,11 +13,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-
 import edu.wpi.first.wpilibj.DigitalInput;
-import frc.robot.subsystems.ImplementationTOF;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
@@ -31,16 +27,17 @@ public class RobotContainer {
   DigitalInput m_input = new DigitalInput(0);
   // The robot's subsystems and commands are defined here...
   //private final Spinner spinnerMotor = new Spinner();
-  ImplementationTOF tof = new ImplementationTOF();
-
+  // ImplementationTOF not present; remove unused field to fix compilation
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
   }
-
-  @Override 
+  /**
+   * Sends the sensor value for the hall effect sensor to the SmartDashboard. This method is called periodically in the Robot class.
+    *
+   */
   public void periodic(){
     SmartDashboard.putBoolean("Sensor Value", m_input.get());
   }
