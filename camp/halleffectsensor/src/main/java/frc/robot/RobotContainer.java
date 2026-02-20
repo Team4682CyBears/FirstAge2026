@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.time.LocalTime;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -15,10 +16,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class RobotContainer {
   DigitalInput input = new DigitalInput(0);
+  LocalTime time = LocalTime.now();
   public RobotContainer() {
-    
+
   }
   public void periodic() {
-    SmartDashboard.putBoolean("Sensor Value", input.get());
+    SmartDashboard.putBoolean("Sensor Value ", input.get());
   }
 }

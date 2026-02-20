@@ -49,6 +49,11 @@ public class Robot extends TimedRobot {
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    // RobotContainer#periodic() is not called automatically by WPILib because
+    // RobotContainer is not a Subsystem. If you put periodic code in
+    // RobotContainer (e.g. SmartDashboard updates), call it here so it runs
+    // every robot tick.
+    m_robotContainer.periodic();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -59,6 +64,9 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
   }
+  
+
+
 
   /**
    * This autonomous runs the autonomous command selected by your
