@@ -108,7 +108,7 @@ public class ShotLogger {
 
         // Hood & extendo encoder/pulse positions
         if (subsystems.isHoodSubsystemAvailable()) {
-            extendoPulse = subsystems.getHoodSubsystem().getHoodExtendo();
+            extendoPulse = subsystems.getHoodSubsystem().getHoodPosition();
         }
 
         // Append values to the log in a stable order. Consumers of the log can read

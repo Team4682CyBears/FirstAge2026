@@ -124,11 +124,15 @@ public final class Constants {
 
     public static final double followKickerMotorGearRatio = 1;
 
+    /// ******************************
+    /// Hood Constants
     public static final int hoodMotorCanID = 22;
     public static final int hoodEncoderCanID = 23;
 
-    public static final double hoodMagnetOffset = 0.0;
+    public static final double hoodEncoderAbsoluteOffset = 0.0;
     public static final double hoodExtendoTolerance = 0.01;
+    public static final double hoodMinPositionRotations = 0.0;
+    public static final double hoodMaxPositionRotations = 1.0; // TODO measure this on device
 
     public static final int servoDefaultPosition = 1000; // fully retracted position
 
