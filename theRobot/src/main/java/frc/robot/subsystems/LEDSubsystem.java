@@ -146,19 +146,19 @@ public class LEDSubsystem extends SubsystemBase {
   // Sets leds to orange blink
   private void orangeBlink() {
     if (this.currentBlinkState) {
-      this.setLedStringColor(255, 165, 0);
+      //this.setLedStringColor(255, 165, 0);
     } else {
-      this.setLedStringColor(0, 0, 0);
+      //this.setLedStringColor(0, 0, 0);
     }
   }
 
   // Sets leds to red blink
   private void redBlink() {
     if (this.currentBlinkState) {
-      this.setLedStringColor(255, 0, 0);
+      //this.setLedStringColor(255, 0, 0);
       this.setPattern(0.61);
     } else {
-      this.setLedStringColor(0, 0, 0);
+      //this.setLedStringColor(0, 0, 0);
       this.setPattern(0.99);
     }
   }
@@ -166,44 +166,44 @@ public class LEDSubsystem extends SubsystemBase {
     // Sets leds to green blink
   private void greenBlink() {
     if (this.currentBlinkState) {
-      this.setLedStringColor(255, 200, 0);
+      //this.setLedStringColor(255, 200, 0);
       this.setPattern(0.77);
     } else {
-      this.setLedStringColor(0, 0, 0);
+      //this.setLedStringColor(0, 0, 0);
       this.setPattern(0.99);
     }
   }
 
   // Sets leds to blue solid
   private void blueSolid() {
-    this.setLedStringColor(0, 0, 225);
+    //this.setLedStringColor(0, 0, 225);
   }
 
   // Sets leds to orange solid
   private void orangeSolid() {
-    this.setLedStringColor(255, 165, 0);
+    //this.setLedStringColor(255, 165, 0);
   }
 
   // Sets leds to yellow solid
   private void yellowSolid() {
-    this.setLedStringColor(150, 150, 0);
+    //this.setLedStringColor(150, 150, 0);
   }
 
   // Sets leds to yellow solid
   private void redSolid() {
-    this.setLedStringColor(150, 0, 0);
+    //this.setLedStringColor(150, 0, 0);
     this.setPattern(0.61);
   }
 
   // Sets leds to green solid
   private void greenSolid() {
-    this.setLedStringColor(0, 200, 0);
+    //this.setLedStringColor(0, 200, 0);
     this.setPattern(0.77);
   }
 
   // Turns off leds
   private void offState() {
-    this.setLedStringColor(0, 0, 0);
+    //this.setLedStringColor(0, 0, 0);
   }
 
   // Sets leds color
