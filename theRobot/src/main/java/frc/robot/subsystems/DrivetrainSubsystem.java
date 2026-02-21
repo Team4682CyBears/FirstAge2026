@@ -453,13 +453,38 @@ public class DrivetrainSubsystem extends SubsystemBase {
     this.shootingAimTarget = null;
   }
 
-  private void setAutoYawVelocityRadiansPerSecond() {
-    double robotYawDegrees = getRobotPosition().getRotation().getRadians();
-    Translation2d hubPosition = (shootingAimTarget != null)
-        ? shootingAimTarget
-        : (DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
-    double PIDout = autoYawPID
-        .calculate(MathUtil.angleModulus(robotYawDegrees - getYawToFaceTarget(hubPosition).getRadians()), 0.0);
+  /**
+   * Compute and set the current auto yaw velocity (radians/sec) using the
+   * physical shooter offsets and shooter yaw offset from Constants. This
+   * centralizes the auto-yaw math so callers only need to invoke this method.
+   */
+  public void setAutoYawVelocityRadiansPerSecond() {
+    if (swerveYawMode != SwerveYawMode.AUTO) {
+      return;
+    }
+
+    Pose2d robotPose = getRobotPosition();
+
+    Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition
+        : Constants.redHubPosition;
+
+    Translation2d shooterOffsetRobot = new Translation2d(Constants.shooterXOffsetFromCenterOfRobot,
+        Constants.shooterYOffsetFromCenterOfRobot);
+    Translation2d shooterOffsetField = shooterOffsetRobot.rotateBy(robotPose.getRotation());
+    Translation2d shooterFieldPosition = robotPose.getTranslation().plus(shooterOffsetField);
+
+    double dx = hubPosition.getX() - shooterFieldPosition.getX();
+    double dy = hubPosition.getY() - shooterFieldPosition.getY();
+    double desiredYawFromShooter = Math.atan2(dy, dx);
+
+    double shooterYawOffsetRad = Math.toRadians(Constants.shooterYawOffset);
+    double robotYawRadians = robotPose.getRotation().getRadians();
+    double shooterHeadingRadians = robotYawRadians + shooterYawOffsetRad;
+
+    double angularError = MathUtil.angleModulus(shooterHeadingRadians - desiredYawFromShooter);
+
+    double PIDout = autoYawPID.calculate(angularError, 0.0);
+
     this.autoYawVelocityRadiansPerSecond = (Math.abs(PIDout) > yawVelocityDeadband)
         ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond
         : 0.0;
