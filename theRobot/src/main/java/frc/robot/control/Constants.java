@@ -144,8 +144,8 @@ public final class Constants {
     public static final double SHOOTER_MIN_RPM = 0.0;
     public static final double SHOOTER_MAX_RPM = 5000.0;
     // ********************************************************************
-    // Shooting / aiming constants (tunable)
-    public static final double PROJECTILE_SPEED_METERS_PER_SECOND = 12.0; // tune this
+
+    public static final double PROJECTILE_TIME_OF_FLIGHT_SECONDS = 1.49;
 
     // Hood servo pulse widths
     public static final int HOOD_MIN_PULSE = 1000;
