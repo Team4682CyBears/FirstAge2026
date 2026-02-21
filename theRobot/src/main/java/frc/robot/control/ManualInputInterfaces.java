@@ -197,6 +197,56 @@ public class ManualInputInterfaces {
                             new InstantCommand(() -> this.subsystemCollection.getDriveTrainSubsystem()
                                     .setSwerveYawMode(SwerveYawMode.JOYSTICK)),
                             new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode JOYSTICK")));
+
+            // Single Controller Binds (REMOVE FOR FINAL ROBOT)
+            final boolean useSingleControllerBinds = true;
+            if (useSingleControllerBinds) {
+                this.driverController.povUp().onTrue(new InstantCommand(() -> {
+                    double currentRPM = SmartDashboard.getNumber("Shooter RPM", 0);
+                    double newRPM = MathUtil.clamp(currentRPM + 50, Constants.SHOOTER_MIN_RPM,
+                            Constants.SHOOTER_MAX_RPM);
+                    SmartDashboard.putNumber("Shooter RPM", newRPM);
+                }));
+                this.driverController.povDown().onTrue(new InstantCommand(() -> {
+                    double currentRPM = SmartDashboard.getNumber("Shooter RPM", 0);
+                    double newRPM = MathUtil.clamp(currentRPM - 50, Constants.SHOOTER_MIN_RPM,
+                            Constants.SHOOTER_MAX_RPM);
+                    SmartDashboard.putNumber("Shooter RPM", newRPM);
+                }));
+                this.driverController.povLeft().onTrue(new InstantCommand(() -> {
+                    double hoodExtention = SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT);
+                    double newAngle = MathUtil.clamp(hoodExtention - 50, HardwareConstants.HOOD_MIN_EXT,
+                            HardwareConstants.HOOD_MAX_EXT);
+                    SmartDashboard.putNumber("Hood Extendo", newAngle);
+                }));
+                this.driverController.povRight().onTrue(new InstantCommand(() -> {
+                    double hoodExtention = SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT);
+                    double newAngle = MathUtil.clamp(hoodExtention + 50, HardwareConstants.HOOD_MIN_EXT,
+                            HardwareConstants.HOOD_MAX_EXT);
+                    SmartDashboard.putNumber("Hood Extendo", newAngle);
+                }));
+
+                SmartDashboard.putNumber("Shooter RPM", 0);
+                if (InstalledHardware.shooterInstalled) {
+                    this.driverController.leftBumper()
+                            .whileTrue(new ShootCommand(this.subsystemCollection.getShooterSubsystem(), () -> {
+                                return SmartDashboard.getNumber("Shooter RPM", 0);
+                            }));
+                }
+                if (InstalledHardware.hoodInstalled) {
+                    this.driverController.a().onTrue(new HoodAngleCommand(
+                            this.subsystemCollection.getHoodSubsystem(),
+                            () -> (int) SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT)));
+                }
+                SmartDashboard.putNumber("Kicker RPM", 0);
+                if (InstalledHardware.kickerInstalled) {
+                    this.driverController.rightBumper()
+                            .whileTrue(new KickerCommand(this.subsystemCollection.getKickerSubsystem(), () -> {
+                                return SmartDashboard.getNumber("Kicker RPM", 0);
+                            }));
+                }
+
+            }
         }
     }
 
@@ -227,28 +277,16 @@ public class ManualInputInterfaces {
                 SmartDashboard.putNumber("Shooter RPM", newRPM);
             }));
             this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
-                double hoodExtention = SmartDashboard.getNumber("Hood Angle", HardwareConstants.HOOD_MIN_EXT);
+                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT);
                 double newAngle = MathUtil.clamp(hoodExtention - 50, HardwareConstants.HOOD_MIN_EXT,
                         HardwareConstants.HOOD_MAX_EXT);
-                SmartDashboard.putNumber("Hood Angle", newAngle);
+                SmartDashboard.putNumber("Hood Extendo", newAngle);
             }));
             this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
-                double hoodExtention = SmartDashboard.getNumber("Hood Angle", HardwareConstants.HOOD_MIN_EXT);
+                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT);
                 double newAngle = MathUtil.clamp(hoodExtention + 50, HardwareConstants.HOOD_MIN_EXT,
                         HardwareConstants.HOOD_MAX_EXT);
-                SmartDashboard.putNumber("Hood Angle", newAngle);
-            }));
-            this.coDriverController.y().onTrue(new InstantCommand(() -> {
-                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT);
-                double newExt = MathUtil.clamp(hoodExtention - 50, HardwareConstants.HOOD_MIN_EXT,
-                        HardwareConstants.HOOD_MAX_EXT);
-                SmartDashboard.putNumber("Hood Extendo", newExt);
-            }));
-            this.coDriverController.b().onTrue(new InstantCommand(() -> {
-                double hoodExtention = SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT);
-                double newExt = MathUtil.clamp(hoodExtention + 50, HardwareConstants.HOOD_MIN_EXT,
-                        HardwareConstants.HOOD_MAX_EXT);
-                SmartDashboard.putNumber("Hood Extendo", newExt);
+                SmartDashboard.putNumber("Hood Extendo", newAngle);
             }));
             SmartDashboard.putNumber("Shooter RPM", 0);
 
@@ -266,15 +304,16 @@ public class ManualInputInterfaces {
 
             // Co-driver bumpers: log shot result (made / missed)
             // Assumption: right bumper = made, left bumper = missed. Change as desired.
-            if (this.subsystemCollection.isShotLoggerAvailable()) {
-                this.coDriverController.rightBumper().onTrue(new InstantCommand(() -> {
-                    this.subsystemCollection.getShotLogger().logShot(true);
-                }));
+            // if (this.subsystemCollection.isShotLoggerAvailable()) {
+            //     this.coDriverController.rightBumper().onTrue(new InstantCommand(() -> {
+            //         this.subsystemCollection.getShotLogger().logShot(true);
+            //     }));
 
-                this.coDriverController.leftBumper().onTrue(new InstantCommand(() -> {
-                    this.subsystemCollection.getShotLogger().logShot(false);
-                }));
-            }
+            //     this.coDriverController.leftBumper().onTrue(new InstantCommand(() -> {
+            //         this.subsystemCollection.getShotLogger().logShot(false);
+            //     }));
+            // }
+
             SmartDashboard.putNumber("Kicker RPM", 0);
             if (InstalledHardware.kickerInstalled) {
                 this.coDriverController.rightTrigger()
