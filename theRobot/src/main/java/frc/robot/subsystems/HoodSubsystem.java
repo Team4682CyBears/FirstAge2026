@@ -73,7 +73,8 @@ public class HoodSubsystem extends SubsystemBase {
      * @return hood extendo in rotations
      */
     public double getHoodPosition() {
-        return encoder.getPosition().getValueAsDouble();
+        return InstalledHardware.hoodEncoderInstalled ? encoder.getPosition().getValueAsDouble()
+                : motor.getPosition().getValueAsDouble();
     }
 
     /**

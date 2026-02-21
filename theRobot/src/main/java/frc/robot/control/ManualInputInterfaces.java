@@ -233,7 +233,7 @@ public class ManualInputInterfaces {
                                 return SmartDashboard.getNumber("Shooter RPM", 0);
                             }));
                 }
-                if (InstalledHardware.hoodInstalled) {
+                if (InstalledHardware.hoodMotorInstalled) {
                     this.driverController.a().onTrue(new HoodAngleCommand(
                             this.subsystemCollection.getHoodSubsystem(),
                             () -> (int) SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT)));
@@ -296,7 +296,8 @@ public class ManualInputInterfaces {
                             return SmartDashboard.getNumber("Shooter RPM", 0);
                         }));
             }
-            if (InstalledHardware.hoodInstalled) {
+
+            if (InstalledHardware.hoodMotorInstalled) {
                 this.coDriverController.a().onTrue(new HoodAngleCommand(
                         this.subsystemCollection.getHoodSubsystem(),
                         () -> (int) SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT)));
@@ -305,13 +306,13 @@ public class ManualInputInterfaces {
             // Co-driver bumpers: log shot result (made / missed)
             // Assumption: right bumper = made, left bumper = missed. Change as desired.
             // if (this.subsystemCollection.isShotLoggerAvailable()) {
-            //     this.coDriverController.rightBumper().onTrue(new InstantCommand(() -> {
-            //         this.subsystemCollection.getShotLogger().logShot(true);
-            //     }));
+            // this.coDriverController.rightBumper().onTrue(new InstantCommand(() -> {
+            // this.subsystemCollection.getShotLogger().logShot(true);
+            // }));
 
-            //     this.coDriverController.leftBumper().onTrue(new InstantCommand(() -> {
-            //         this.subsystemCollection.getShotLogger().logShot(false);
-            //     }));
+            // this.coDriverController.leftBumper().onTrue(new InstantCommand(() -> {
+            // this.subsystemCollection.getShotLogger().logShot(false);
+            // }));
             // }
 
             SmartDashboard.putNumber("Kicker RPM", 0);
