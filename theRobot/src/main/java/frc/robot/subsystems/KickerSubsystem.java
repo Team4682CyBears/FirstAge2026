@@ -18,7 +18,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
@@ -28,12 +27,9 @@ import frc.robot.control.Constants;
  */
 public class KickerSubsystem extends SubsystemBase {
 
-    // TODO: Remove the follower in the final mechanism
-    private TalonFX kickerLeadTalonFX = new TalonFX(Constants.kickerLeadTalonCanId);
-    private TalonFX kickerFollowTalonFX = new TalonFX(Constants.kickerFollowTalonCanId);
+    private TalonFX kickerTalonFX = new TalonFX(Constants.kickerTalonCanId);
 
-    private final VelocityVoltage leaderController = new VelocityVoltage(0.0);
-    private final VelocityVoltage followerController = new VelocityVoltage(0.0);
+    private final VelocityVoltage motorController = new VelocityVoltage(0.0);
 
     private double targetRPS = 0.0;
 
@@ -52,10 +48,8 @@ public class KickerSubsystem extends SubsystemBase {
      */
     public void runRPM(double rpm) {
         this.targetRPS = rpmToRPS(rpm);
-        leaderController.withVelocity(targetRPS);
-        followerController.withVelocity(targetRPS * Constants.followKickerMotorGearRatio);
-        kickerLeadTalonFX.setControl(leaderController);
-        kickerFollowTalonFX.setControl(followerController);
+        motorController.withVelocity(targetRPS * Constants.kickerMotorGearRatio);
+        kickerTalonFX.setControl(motorController);
     }
 
     private double rpmToRPS(double rpm) {
@@ -66,7 +60,7 @@ public class KickerSubsystem extends SubsystemBase {
      * Get the rpm from the lead motor
      */
     public double getRPM() {
-        return kickerLeadTalonFX.getVelocity().getValueAsDouble() * 60;
+        return kickerTalonFX.getVelocity().getValueAsDouble() * 60;
     }
 
     /*
@@ -74,8 +68,7 @@ public class KickerSubsystem extends SubsystemBase {
      */
     public void stop() {
         targetRPS = 0.0;
-        kickerLeadTalonFX.stopMotor();
-        kickerFollowTalonFX.stopMotor();
+        kickerTalonFX.stopMotor();
     }
 
     /*
@@ -84,7 +77,6 @@ public class KickerSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Kicker Real RPM", getRPM());
-        SmartDashboard.putNumber("Kicker Follow Real RPM", kickerFollowTalonFX.getVelocity().getValueAsDouble() * 60);
     }
 
     /*
@@ -111,20 +103,10 @@ public class KickerSubsystem extends SubsystemBase {
         // motor direction
         talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        StatusCode response = kickerLeadTalonFX.getConfigurator().apply(talonMotorConfig);
+        StatusCode response = kickerTalonFX.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {
             System.out.println(
-                    "TalonFX ID " + kickerLeadTalonFX.getDeviceID() + " failed config with error "
-                            + response.toString());
-        }
-
-        // change invert for angleRightMotor
-        talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        // apply configs
-        response = kickerFollowTalonFX.getConfigurator().apply(talonMotorConfig);
-        if (!response.isOK()) {
-            DataLogManager.log(
-                    "TalonFX ID " + kickerFollowTalonFX.getDeviceID() + " failed config with error "
+                    "TalonFX ID " + kickerTalonFX.getDeviceID() + " failed config with error "
                             + response.toString());
         }
 
