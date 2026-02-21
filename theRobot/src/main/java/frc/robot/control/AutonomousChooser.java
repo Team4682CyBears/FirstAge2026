@@ -26,11 +26,13 @@ import frc.robot.commands.*;
  */
 public class AutonomousChooser {
     private final SendableChooser<AutonomousPath> autonomousPathChooser = new SendableChooser<>();
-
-    private Command testAuto;
     private Command DoNothing;
-    private Command Mobility;
-
+    private Command HubOutpostDepoClimb;
+    private Command BotWingClimb;
+    private Command BotLoopClimb;
+    private Command TopWingClimb;
+    private Command TopLoopClimb;
+    
     /**
      * Constructor for AutonomousChooser
      * 
@@ -40,19 +42,24 @@ public class AutonomousChooser {
         // TODO add checks for all subsystems the autos rely on besides the drivetrain
         // here
         if (subsystems.isDriveTrainPowerSubsystemAvailable()) {
-
             autonomousPathChooser.setDefaultOption("Do Nothing", AutonomousPath.DONOTHING);
-            autonomousPathChooser.addOption("Test Auto", AutonomousPath.TESTAUTO);
-            autonomousPathChooser.addOption("Mobility", AutonomousPath.MOBILITY);
+            autonomousPathChooser.addOption("HubOutpostDepoClimb", AutonomousPath.HUBOUTPOSTDEPOCLIMB);
+            autonomousPathChooser.addOption("Bot Wing", AutonomousPath.BOTWINGCLIMB);
+            autonomousPathChooser.addOption("Bot Loop", AutonomousPath.BOTLOOPCLIMB);
+            autonomousPathChooser.addOption("Top Wing", AutonomousPath.TOPWINGCLIMB);
+            autonomousPathChooser.addOption("Top Loop", AutonomousPath.TOPLOOPCLIMB);
             SmartDashboard.putData(autonomousPathChooser);
 
-            this.testAuto = getTestAuto();
             this.DoNothing = getDoNothing();
-            this.Mobility = getMobilityAuto();
+            this.HubOutpostDepoClimb = getHubOutpostDepoClimb();
+            this.BotWingClimb = getBotWingClimb();
+            this.BotLoopClimb = getBotLoopClimb();
+            this.TopWingClimb = getTopWingClimb();
+            this.TopLoopClimb = getTopLoopClimb();
         } else {
             DataLogManager.log(">>>>> NO auto routine becuase missing subsystems");
         }
-    }
+    }   
 
     /**
      * returns the path planner auto to be used in auto period
@@ -61,12 +68,18 @@ public class AutonomousChooser {
      */
     public Command getAutoPath() {
         switch (autonomousPathChooser.getSelected()) {
-            case TESTAUTO:
-                return this.testAuto;
             case DONOTHING:
                 return this.DoNothing;
-            case MOBILITY:
-                return this.Mobility;
+            case HUBOUTPOSTDEPOCLIMB:
+                return this.HubOutpostDepoClimb;
+            case BOTWINGCLIMB:
+                return this.BotWingClimb;
+            case BOTLOOPCLIMB:
+                return this.BotLoopClimb;
+            case TOPWINGCLIMB:
+                return this.TopWingClimb;
+            case TOPLOOPCLIMB:
+                return this.TopLoopClimb;
         }
         return new InstantCommand();
     }
@@ -81,22 +94,37 @@ public class AutonomousChooser {
                 getAutoPath());
     }
 
-    private Command getTestAuto() {
-        return AutoBuilder.buildAuto("TestAuto");
+    private Command getHubOutpostDepoClimb() {
+        return AutoBuilder.buildAuto("HubOutpostDepoClimb");
+    }
+    
+    private Command getBotWingClimb() {
+        return AutoBuilder.buildAuto("BotWingClimb");
+    }
+
+    private Command getBotLoopClimb() {
+        return AutoBuilder.buildAuto("BotLoopClimb");
+    }
+
+    private Command getTopWingClimb() {
+        return AutoBuilder.buildAuto("TopWingClimb");
+    }
+
+    private Command getTopLoopClimb() {
+        return AutoBuilder.buildAuto("TopLoopClimb");
     }
 
     private Command getDoNothing() {
         return new InstantCommand();
     }
 
-    private Command getMobilityAuto() {
-        return AutoBuilder.buildAuto("Mobility");
-    }
-
     private enum AutonomousPath {
-        TESTAUTO,
+        HUBOUTPOSTDEPOCLIMB,
+        BOTWINGCLIMB,
+        BOTLOOPCLIMB,
+        TOPWINGCLIMB,
+        TOPLOOPCLIMB,
         DONOTHING,
-        MOBILITY
     }
 
     /**
@@ -110,11 +138,7 @@ public class AutonomousChooser {
                 subsystems.getDriveTrainSubsystem()::getRobotPosition, // Pose supplier
                 subsystems.getDriveTrainSubsystem()::setRobotPosition, // Position setter
                 subsystems.getDriveTrainSubsystem()::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (speeds, feedforwards) -> subsystems.getDriveTrainSubsystem().driveRobotCentric(speeds), // Method that
-                                                                                                         // will drive
-                // the robot given ROBOT
-                // RELATIVE
-                // ChassisSpeeds
+                (speeds, feedforwards) -> subsystems.getDriveTrainSubsystem().driveRobotCentric(speeds), 
                 Constants.pathFollower,
                 subsystems.getDriveTrainSubsystem().getPathPlannerConfig(),
                 () -> getShouldMirrorPath(),
@@ -122,7 +146,19 @@ public class AutonomousChooser {
 
         // Register named commands
         if (subsystems.isDriveTrainPowerSubsystemAvailable()) {
-            // TODO add named commands here. 
+            NamedCommands.registerCommand("StartAiming", 
+                new InstantCommand(() -> {
+                    subsystems.getDriveTrainSubsystem().setSwerveYawMode(SwerveYawMode.AUTO);
+                    com.pathplanner.lib.controllers.PPHolonomicDriveController.overrideRotationFeedback(
+                        () -> subsystems.getDriveTrainSubsystem().getAutoYawVelocityRadiansPerSecond()
+                    );
+                }));
+
+            NamedCommands.registerCommand("StopAiming", 
+                new InstantCommand(() -> {
+                    subsystems.getDriveTrainSubsystem().setSwerveYawMode(SwerveYawMode.JOYSTICK); 
+                    com.pathplanner.lib.controllers.PPHolonomicDriveController.clearRotationFeedbackOverride();
+                }));
         }
     }
 

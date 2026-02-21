@@ -671,7 +671,7 @@ public class LimelightHelpers {
     static boolean profileJSON = false;
 
     static final String sanitizeName(String name) {
-        if ("".equals(name) || name == null) {
+        if ("limelight".equals(name) || name == null) {
             return "limelight";
         }
         return name;
