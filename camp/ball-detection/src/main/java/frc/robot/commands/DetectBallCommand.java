@@ -39,7 +39,12 @@ public class DetectBallCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+<<<<<<< Updated upstream
     System.out.println(LimelightHelpers.getTX("limelight"));
+=======
+    SmartDashboard.putBoolean("Ball detected", BallDetectionSubsystem.ballDetected("limelight"));
+    System.out.println(BallDetectionSubsystem.ballDetected("limelight"));
+>>>>>>> Stashed changes
   }
 
   // Called once the command ends or is interrupted.
