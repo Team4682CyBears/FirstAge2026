@@ -81,7 +81,7 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public void periodic() {
-    this.updateBlinkCounterState();
+    /* this.updateBlinkCounterState();
     // iterate through all of the states to get most recent action for each that
     // should be taken
     HashMap<LEDState, Boolean> currentActions = new HashMap<LEDState, Boolean>();
@@ -141,7 +141,8 @@ public class LEDSubsystem extends SubsystemBase {
     } else if (this.lastBlinkState != this.currentBlinkState && this.currentLEDState == LEDState.OrangeBlink) {
       System.out.println("**** BLINKING LED STATE TO " + this.currentLEDState.toString());
       this.orangeBlink();
-    }
+    } */
+    setPattern(0.87);
   }
   
   // Method to set blinkin's PWM
