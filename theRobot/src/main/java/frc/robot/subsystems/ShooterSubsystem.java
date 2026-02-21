@@ -108,7 +108,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         FollowerConfig.idleMode(IdleMode.kCoast);
         FollowerConfig.smartCurrentLimit(HardwareConstants.shooterSmartCurrentLimitAmps);
-        FollowerConfig.follow(LeadMotor, true);
+        FollowerConfig.follow(LeadMotor, true); // invert the follower motors
 
         error = FollowMotor.configure(FollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         if (error != REVLibError.kOk) {

@@ -33,7 +33,7 @@ public class KickerSubsystem extends SubsystemBase {
 
     private double targetRPS = 0.0;
 
-    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.09009009009).withKV(0.4504504505).withKP(0.4)
+    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.4)
             .withKD(0.0);
 
     /*
