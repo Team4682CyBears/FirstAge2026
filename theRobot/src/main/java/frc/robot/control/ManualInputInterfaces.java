@@ -199,8 +199,8 @@ public class ManualInputInterfaces {
                             new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode JOYSTICK")));
 
             // Single Controller Binds (REMOVE FOR FINAL ROBOT)
-            final boolean useSingleBinds = true;
-            if (useSingleBinds) {
+            final boolean useSingleControllerBinds = true;
+            if (useSingleControllerBinds) {
                 this.driverController.povUp().onTrue(new InstantCommand(() -> {
                     double currentRPM = SmartDashboard.getNumber("Shooter RPM", 0);
                     double newRPM = MathUtil.clamp(currentRPM + 50, Constants.SHOOTER_MIN_RPM,
