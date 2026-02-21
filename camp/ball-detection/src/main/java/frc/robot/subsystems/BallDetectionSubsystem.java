@@ -1,16 +1,23 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Rebuilt - 2026
+// File: CameraSubsystem.java
+// Intent: Forms the preliminary code for ball dectection with the limelight
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
 
-public class ExampleSubsystem extends SubsystemBase {
+public class BallDetectionSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
-  public ExampleSubsystem() {}
+  public BallDetectionSubsystem() {}
 
   /**
    * Example command factory method.
@@ -40,6 +47,8 @@ public class ExampleSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putBoolean("Ball detected", BallDetectionSubsystem.ballDetected("limelight"));
+    System.out.println(BallDetectionSubsystem.ballDetected("limelight"));
   }
 
   @Override
@@ -61,4 +70,12 @@ public class ExampleSubsystem extends SubsystemBase {
       }
     return false;
   }
+  public static boolean ballDetected(String name){
+    if(LimelightHelpers.getTV(name) == true){
+      return true;
+    }
+    return false;
+  }
 }
+
+
