@@ -130,8 +130,8 @@ public final class Constants {
 
     /// ******************************
     /// Hood Constants
-    public static final int hoodMotorCanID = 22;
-    public static final int hoodEncoderCanID = 23;
+    public static final int hoodMotorCanID = 30;
+    public static final int hoodEncoderCanID = 31;
 
     public static final double hoodEncoderAbsoluteOffset = 0.0;
     public static final double hoodExtendoTolerance = 0.01;
