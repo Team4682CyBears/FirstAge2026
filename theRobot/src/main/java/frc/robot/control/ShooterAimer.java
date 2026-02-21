@@ -33,14 +33,9 @@ public class ShooterAimer {
     Translation2d fieldVel = new Translation2d(chassis.vxMetersPerSecond, chassis.vyMetersPerSecond)
         .rotateBy(robotYaw);
 
-    double distance = drivetrain.getRobotPosition().getTranslation().getDistance(targetFieldTranslation);
-
-    double projectileSpeed = Constants.PROJECTILE_SPEED_METERS_PER_SECOND;
-    double flightTime = projectileSpeed > 0.001 ? (distance / projectileSpeed) : 0.0;
-
     Translation2d predicted = new Translation2d(
-        targetFieldTranslation.getX() - (fieldVel.getX() * flightTime),
-        targetFieldTranslation.getY() - (fieldVel.getY() * flightTime));
+        targetFieldTranslation.getX() - (fieldVel.getX() * Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS),
+        targetFieldTranslation.getY() - (fieldVel.getY() * Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS));
 
     return predicted;
   }
