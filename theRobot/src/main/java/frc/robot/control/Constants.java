@@ -50,6 +50,11 @@ public final class Constants {
     public static final Translation2d redHubPosition = new Translation2d(16.540988 - 4.625594, 8.069326 / 2);
 
     // *****************************************************************
+    // Physical Shooter Offsets
+    public static final double shooterXOffsetFromCenterOfRobot = 0.0; // in meters, positive is forward
+    public static final double shooterYOffsetFromCenterOfRobot = 0.0; // in meters, positive is to the left
+    public static final double shooterYawOffset = 0.0; // in degrees
+    // *****************************************************************
     // standard stuff constants - motors rotation, etc.
     public static final double DegreesPerRevolution = 360.0;
     // NEO maximum RPM
