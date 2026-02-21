@@ -13,13 +13,13 @@ package frc.robot.commands;
 import java.util.function.IntSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.NewHoodSubsystem;
+import frc.robot.subsystems.HoodSubsystem;
 
 /**
  * Command to set the hood angle and extendo position.
  */
 public class HoodAngleCommand extends Command {
-    private final NewHoodSubsystem hoodSubsystem;
+    private final HoodSubsystem hoodSubsystem;
     private final IntSupplier extendoSupplier;
 
     /**
@@ -28,7 +28,7 @@ public class HoodAngleCommand extends Command {
      * @param hoodSubsystem   the hood subsystem to control
      * @param extendoSupplier a supplier that provides the target extendo position
      */
-    public HoodAngleCommand(NewHoodSubsystem hoodSubsystem, IntSupplier extendoSupplier) {
+    public HoodAngleCommand(HoodSubsystem hoodSubsystem, IntSupplier extendoSupplier) {
         this.hoodSubsystem = hoodSubsystem;
         this.extendoSupplier = extendoSupplier;
         addRequirements(hoodSubsystem);

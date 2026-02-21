@@ -39,7 +39,7 @@ public class AutoAimMovingCommand extends Command {
 
       double distance = drivetrain.getRobotPosition().getTranslation().getDistance(predicted);
       int pulse = aimer.hoodPulseForDistance(distance);
-      hood.setAnglePosition(pulse);
+      hood.setExtendoPosition(pulse);
       double rpm = aimer.shooterRpmForDistance(distance);
       shooter.runRPM(rpm);
     }

@@ -214,7 +214,7 @@ public class RobotContainer {
    */
   private void initializeHoodSubsystem() {
     if (InstalledHardware.hoodInstalled) {
-      subsystems.setHoodSubsystem(new NewHoodSubsystem());
+      subsystems.setHoodSubsystem(new HoodSubsystem());
       System.out.println("SUCCESS: initializeHood");
     } else {
       System.out.println("FAIL: initializeHood");
