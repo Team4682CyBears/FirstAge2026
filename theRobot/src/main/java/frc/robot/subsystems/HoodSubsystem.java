@@ -18,12 +18,13 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
+import frc.robot.control.InstalledHardware;
 
 public class HoodSubsystem extends SubsystemBase {
 
     // Hood gearing
     private static final double hoodEncoderGearRatio = 1.0;
-    private static final double hoodExtendoLowVelocityTol = 10; // TODO test this on device with motion magic profile 
+    private static final double hoodExtendoLowVelocityTol = 10; // TODO test this on device with motion magic profile
 
     private TalonFXS motor;
     private CANcoder encoder;
@@ -36,15 +37,20 @@ public class HoodSubsystem extends SubsystemBase {
             .withKV(0.1).withKS(0.1); // TODO: Find real values. DO NOT SET KD!!
 
     public HoodSubsystem() {
-        this.encoder = new CANcoder(Constants.hoodEncoderCanID);
-        configureEncoder();
-        
-        this.motor = new TalonFXS(Constants.hoodMotorCanID);
-        configureMotor();
+        if (InstalledHardware.hoodEncoderInstalled) {
+            this.encoder = new CANcoder(Constants.hoodEncoderCanID);
+            configureEncoder();
+        }
+
+        if (InstalledHardware.hoodMotorInstalled) {
+            this.motor = new TalonFXS(Constants.hoodMotorCanID);
+            configureMotor();
+        }
     }
 
     public void setExtendoPosition(double position) {
-        desiredExtension = MathUtil.clamp(position, Constants.hoodMinPositionRotations, Constants.hoodMaxPositionRotations);
+        desiredExtension = MathUtil.clamp(position, Constants.hoodMinPositionRotations,
+                Constants.hoodMaxPositionRotations);
         hoodIsAtDesiredExtension = false;
     }
 
@@ -67,7 +73,7 @@ public class HoodSubsystem extends SubsystemBase {
      * @return hood extendo in rotations
      */
     public double getHoodPosition() {
-        return motor.getPosition().getValueAsDouble();
+        return encoder.getPosition().getValueAsDouble();
     }
 
     /**
