@@ -57,7 +57,8 @@ public class RobotContainer {
     this.initializeDrivetrainSubsystem();
 
     // init the shot logger (after drivetrain, shooter and hood are initialized)
-    this.initializeShotLogger();
+    // Disabled for now
+    // this.initializeShotLogger();
 
     // init the input system
     this.initializeManualInputInterfaces();
