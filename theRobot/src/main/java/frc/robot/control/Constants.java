@@ -126,7 +126,7 @@ public final class Constants {
     // kicker can ids and constants
     public static final int kickerTalonCanId = 19;
 
-    public static final double kickerMotorGearRatio = 1;
+    public static final double kickerMotorGearRatio = 3.0; // 3:1
 
     /// ******************************
     /// Hood Constants

@@ -86,6 +86,7 @@ public class ShooterSubsystem extends SubsystemBase {
         LeadConfig.idleMode(IdleMode.kCoast);
         LeadConfig.smartCurrentLimit(HardwareConstants.shooterSmartCurrentLimitAmps);
         LeadConfig.voltageCompensation(HardwareConstants.nominalVoltageCompensationVolts);
+        LeadConfig.inverted(true);
 
         // Derived values from testing on tardi
         LeadConfig.closedLoop
