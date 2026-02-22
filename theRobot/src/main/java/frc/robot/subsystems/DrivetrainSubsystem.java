@@ -42,6 +42,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -458,33 +459,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * physical shooter offsets and shooter yaw offset from Constants. This
    * centralizes the auto-yaw math so callers only need to invoke this method.
    */
-  public void setAutoYawVelocityRadiansPerSecond() {
-    if (swerveYawMode != SwerveYawMode.AUTO) {
-      return;
-    }
-
-    Pose2d robotPose = getRobotPosition();
-
-    Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition
-        : Constants.redHubPosition;
-
-    Translation2d shooterOffsetRobot = new Translation2d(Constants.shooterXOffsetFromCenterOfRobot,
-        Constants.shooterYOffsetFromCenterOfRobot);
-    Translation2d shooterOffsetField = shooterOffsetRobot.rotateBy(robotPose.getRotation());
-    Translation2d shooterFieldPosition = robotPose.getTranslation().plus(shooterOffsetField);
-
-    double dx = hubPosition.getX() - shooterFieldPosition.getX();
-    double dy = hubPosition.getY() - shooterFieldPosition.getY();
-    double desiredYawFromShooter = Math.atan2(dy, dx);
-
-    double shooterYawOffsetRad = Math.toRadians(Constants.shooterYawOffset);
-    double robotYawRadians = robotPose.getRotation().getRadians();
-    double shooterHeadingRadians = robotYawRadians + shooterYawOffsetRad;
-
-    double angularError = MathUtil.angleModulus(shooterHeadingRadians - desiredYawFromShooter);
-
-    double PIDout = autoYawPID.calculate(angularError, 0.0);
-
+  private void setAutoYawVelocityRadiansPerSecond() {
+    double robotYawDegrees = getRobotPosition().getRotation().getRadians();
+    Translation2d hubPosition = (shootingAimTarget != null)
+        ? shootingAimTarget
+        : (DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
+    double PIDout = autoYawPID
+        .calculate(MathUtil.angleModulus(robotYawDegrees - getYawToFaceTarget(hubPosition).getRadians() + Units.degreesToRadians(Constants.shooterYawOffset)), 0.0);
     this.autoYawVelocityRadiansPerSecond = (Math.abs(PIDout) > yawVelocityDeadband)
         ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond
         : 0.0;

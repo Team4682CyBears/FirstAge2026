@@ -85,7 +85,7 @@ public class CameraSubsystem extends SubsystemBase {
     try {
       LimelightHelpers.PoseEstimate pe;
       // Select helper based on alliance so we read the correct wpi entry
-      if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+      if (false && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
         pe = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
       } else {
         pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
@@ -116,7 +116,7 @@ public class CameraSubsystem extends SubsystemBase {
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
     try {
       LimelightHelpers.PoseEstimate pe;
-      if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+      if (false && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
         pe = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight");
       } else {
         pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
