@@ -33,7 +33,8 @@ public class KickerSubsystem extends SubsystemBase {
 
     private double targetRPS = 0.0;
 
-    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.4)
+    // Found based on experimentation on BearBones kicker V1
+    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.52)
             .withKD(0.0);
 
     /*
@@ -60,7 +61,7 @@ public class KickerSubsystem extends SubsystemBase {
      * Get the rpm from the lead motor
      */
     public double getRPM() {
-        return kickerTalonFX.getVelocity().getValueAsDouble() * 60;
+        return kickerTalonFX.getVelocity().getValueAsDouble() * 60 / Constants.kickerMotorGearRatio;
     }
 
     /*
