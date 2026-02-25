@@ -158,7 +158,7 @@ public class ShooterAimer {
 
     double hoodPos = subsystemCollection.isHoodSubsystemAvailable()
         ? subsystemCollection.getHoodSubsystem().getHoodPosition()
-        : 0.0;
+        : Constants.hoodMinPositionRotations;
     boolean hoodOk = Math.abs(hoodPos - targetHoodExtension) < Constants.hoodExtendoTolerance;
 
     double shooterRpm = subsystemCollection.isShooterSubsystemAvailable()
