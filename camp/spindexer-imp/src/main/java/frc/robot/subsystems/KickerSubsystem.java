@@ -20,27 +20,19 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.control.Constants;
-import frc.robot.common.TofSensorLaser;
+import frc.robot.Constants; 
 
 /* 
  * Runs the kicker which kicks the ball into the shooter consistiently
  */
-/*
- * 
- * a) a run method that runs the spindexer at a constant rate indepedent of the sensor state. 
-b) a run method that when set to run, if there is no ball in the kicker, the spindexer should run at the constant speed. If there is a ball in the kicker, the spindexer should stop. 
- */
-public class SpindexerSpinner extends SubsystemBase {
+public class KickerSubsystem extends SubsystemBase {
 
-    private TalonFX kickerTalonFX = new TalonFX(Constants.spindexerSensorLaserCanID);
-
-    private TofSensorLaser spindexerToF = new TofSensorLaser(Constants.spindexerSensorLaserCanID);
+    private TalonFX kickerTalonFX = new TalonFX(Constants.kickerTalonCanId);
 
     private final VelocityVoltage motorController = new VelocityVoltage(0.0);
 
-    private double targetRPS = Constants.spindexerSpeed;
-    private boolean staticMode = false;
+    private double targetRPS = 0.0;
+
     // Found based on experimentation on BearBones kicker V1
     private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.52)
             .withKD(0.0);
@@ -48,35 +40,18 @@ public class SpindexerSpinner extends SubsystemBase {
     /*
      * Initialize the kicker and configure the motor
      */
-    public void initializeKickerSubsystem() {
+    public KickerSubsystem() {
         configureMotor();
     }
 
-    /**
-     * Constructor for SpindexerSpinner. Takes in a boolean staticMode which determines whether the spindexer should run at a constant speed regardless of the sensor state (true) or if it should stop when the sensor detects a ball (false).
-     * @param staticMode
-     */
-    public SpindexerSpinner(boolean staticMode) {
-        this.staticMode = staticMode;
-        initializeKickerSubsystem();
-    }
-  
     /*
      * Sets the target rpm
      */
-    public void runRPMStatic(double rpm) {
-        this.targetRPS = rpmToRPS(rpm);
-    }
-    
     public void runRPM(double rpm) {
-        if (spindexerToF.tofActivated()){
-            stop();
-        } else {
-            runRPMStatic(rpm);
-        }
-        
+        this.targetRPS = rpmToRPS(rpm);
+        motorController.withVelocity(targetRPS * Constants.kickerMotorGearRatio);
+        kickerTalonFX.setControl(motorController);
     }
-
 
     private double rpmToRPS(double rpm) {
         return rpm / 60.0;
@@ -102,17 +77,8 @@ public class SpindexerSpinner extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        if (staticMode) { 
-          runRPMStatic(targetRPS);
-        } else {
-          runRPM(targetRPS);
-        }
-        motorController.withVelocity(targetRPS * Constants.kickerMotorGearRatio);
-        kickerTalonFX.setControl(motorController);
         SmartDashboard.putNumber("Kicker Real RPM", getRPM());
-        spindexerToF.publishTelemetery();
     }
-    
 
     /*
      * configures motor

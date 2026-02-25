@@ -20,8 +20,11 @@ import com.pathplanner.lib.path.PathConstraints;
 
 public final class Constants {
 
-
-    publi
+    //////// SPINDEXER CONSTANTS ///////////
+    // 10 balls per second / 4 balls per rotation 
+    public static final double spindexerSpeed  = 150;
+    public static final double laserInchDetectionRange = 2.0; 
+    public static final int spindexerSensorLaserCanID = 34;
 
     public final static double DriveVoltageScalar = 1.0;
 
