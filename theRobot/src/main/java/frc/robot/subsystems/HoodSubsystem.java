@@ -47,14 +47,14 @@ public class HoodSubsystem extends SubsystemBase {
     private Slot0Configs hoodMotorGainsForAbsoluteEncoder = new Slot0Configs().withKP(150).withKI(0.125).withKD(0.0)
             .withKV(0.1).withKS(0.1); // TODO: Find real values. DO NOT SET KD!!
 
-    public HoodSubsystem() {
+    public HoodSubsystem(int hoodMotorCanID, int hoodEncoderID) {
         if (InstalledHardware.hoodEncoderInstalled) {
-            this.encoder = new CANcoder(Constants.hoodEncoderCanID);
+            this.encoder = new CANcoder(hoodEncoderID);
             configureEncoder();
         }
 
         if (InstalledHardware.hoodMotorInstalled) {
-            this.motor = new TalonFXS(Constants.hoodMotorCanID);
+            this.motor = new TalonFXS(hoodMotorCanID);
             configureMotor();
         }
     }

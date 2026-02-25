@@ -27,7 +27,7 @@ import frc.robot.control.Constants;
  */
 public class KickerSubsystem extends SubsystemBase {
 
-    private TalonFX kickerTalonFX = new TalonFX(Constants.kickerTalonCanId);
+    private TalonFX kickerTalonFX;
 
     private final VelocityVoltage motorController = new VelocityVoltage(0.0);
 
@@ -40,7 +40,8 @@ public class KickerSubsystem extends SubsystemBase {
     /*
      * Initialize the kicker and configure the motor
      */
-    public KickerSubsystem() {
+    public KickerSubsystem(int kickerTalonCanID) {
+        this.kickerTalonFX = new TalonFX(kickerTalonCanID);
         configureMotor();
     }
 

@@ -219,7 +219,7 @@ public class RobotContainer {
    */
   private void initializeHoodSubsystem() {
     if (InstalledHardware.hoodEncoderInstalled || InstalledHardware.hoodMotorInstalled) {
-      subsystems.setHoodSubsystem(new HoodSubsystem());
+      subsystems.setHoodSubsystem(new HoodSubsystem(Constants.hoodMotorCanID, Constants.hoodEncoderCanID));
       System.out.println("SUCCESS: initializeHood");
     } else {
       System.out.println("FAIL: initializeHood");
@@ -231,7 +231,7 @@ public class RobotContainer {
    */
   private void initializeKickerSubsystem() {
     if (InstalledHardware.kickerInstalled) {
-      subsystems.setKickerSubsystem(new KickerSubsystem());
+      subsystems.setKickerSubsystem(new KickerSubsystem(Constants.kickerTalonCanId));
       System.out.println("SUCCESS: initializeKicker");
     } else {
       System.out.println("FAIL: initializeKicker");
