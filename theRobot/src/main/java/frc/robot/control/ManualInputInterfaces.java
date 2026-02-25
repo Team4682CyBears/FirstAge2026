@@ -246,6 +246,13 @@ public class ManualInputInterfaces {
                             }));
                 }
 
+                // Driver B toggles intake deploy/retract and runs/stops roller while deployed
+                if (this.subsystemCollection.isIntakeWristSubsystemAvailable() && this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
+                    this.driverController.b().onTrue(new ToggleIntakeDeployCommand(
+                            this.subsystemCollection.getIntakeWristSubsystem(),
+                            this.subsystemCollection.getIntakeRollerSubsystem()));
+                }
+
             }
         }
     }
