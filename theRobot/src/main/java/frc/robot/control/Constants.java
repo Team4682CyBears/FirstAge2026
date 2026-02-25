@@ -51,9 +51,10 @@ public final class Constants {
 
     // *****************************************************************
     // Physical Shooter Offsets
-    public static final double shooterXOffsetFromCenterOfRobot = 0.0; // in meters, positive is forward
-    public static final double shooterYOffsetFromCenterOfRobot = 0.0; // in meters, positive is to the left
-    public static final double shooterYawOffset = 0.0; // in degrees
+    public static final double shooterXOffsetFromCenterOfRobot = -.2159; // in meters, positive is forward
+    public static final double shooterYOffsetFromCenterOfRobot = -.1397; // in meters, positive is to the left
+    public static final Translation2d shooterOffsetFromCenterOfRobot = new Translation2d(shooterXOffsetFromCenterOfRobot, shooterYOffsetFromCenterOfRobot);
+    public static final double shooterYawOffset = 60.0; // in degrees
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
     public static final double DegreesPerRevolution = 360.0;
@@ -126,17 +127,17 @@ public final class Constants {
     // kicker can ids and constants
     public static final int kickerTalonCanId = 19;
 
-    public static final double kickerMotorGearRatio = 1;
+    public static final double kickerMotorGearRatio = 3.0; // 3:1
 
     /// ******************************
     /// Hood Constants
     public static final int hoodMotorCanID = 30;
     public static final int hoodEncoderCanID = 31;
 
-    public static final double hoodEncoderAbsoluteOffset = 0.0;
+    public static final double hoodEncoderAbsoluteOffset = -0.417;
     public static final double hoodExtendoTolerance = 0.01;
     public static final double hoodMinPositionRotations = 0.0;
-    public static final double hoodMaxPositionRotations = 1.0; // TODO measure this on device
+    public static final double hoodMaxPositionRotations = 0.635; // TODO measure this on device
 
     public static final int servoDefaultPosition = 1000; // fully retracted position
 

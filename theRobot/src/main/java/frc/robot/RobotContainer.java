@@ -22,6 +22,7 @@ import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 import frc.robot.control.AutonomousChooser;
 import frc.robot.control.Constants;
+import frc.robot.control.ShooterAimer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -55,6 +56,9 @@ public class RobotContainer {
 
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
+
+  // init the shooter aimer (needs drivetrain, shooter and hood)
+  this.initializeShooterAimer();
 
     // init the shot logger (after drivetrain, shooter and hood are initialized)
     // Disabled for now
@@ -248,6 +252,20 @@ public class RobotContainer {
       DataLogManager.log("SUCCESS: initializeManualInputInterfaces");
     } else {
       DataLogManager.log("FAIL: initializeManualInputInterfaces");
+    }
+  }
+
+  /**
+   * Initialize and wire the ShooterAimer helper (used for auto yaw calculations and aiming)
+   */
+  private void initializeShooterAimer() {
+    if (subsystems.isDriveTrainSubsystemAvailable() && subsystems.isHoodSubsystemAvailable()
+        && subsystems.isShooterSubsystemAvailable()) {
+      ShooterAimer aimer = new ShooterAimer(subsystems.getDriveTrainSubsystem(), subsystems.getHoodSubsystem(), subsystems.getShooterSubsystem());
+      subsystems.getDriveTrainSubsystem().setShooterAimer(aimer);
+      DataLogManager.log("SUCCESS: initializeShooterAimer");
+    } else {
+      DataLogManager.log("FAIL: initializeShooterAimer");
     }
   }
 

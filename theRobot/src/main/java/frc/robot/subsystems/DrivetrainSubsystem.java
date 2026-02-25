@@ -29,6 +29,7 @@ import frc.robot.control.SwerveDriveMode;
 import frc.robot.control.SwerveYawMode;
 import frc.robot.generated.BareTunerConstants;
 import frc.robot.control.SubsystemCollection;
+import frc.robot.control.ShooterAimer;
 import frc.robot.common.MotorUtils;
 import frc.robot.common.VisionMeasurement;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,8 +38,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.math.numbers.N1;
@@ -128,20 +127,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
-  private double autoYawProfileConstraintsMaxVelocity = 540;
-  private double autoYawProfileConstraintsMaxAcceleration = 920;
-
-  // Trapezoid profile constrains motion by limiting max velocity and
-  // max acceleration so the setpoint follows a smooth accel->cruise->decel
-  // (trapezoidal) velocity profile used by the ProfiledPIDController.
-  private TrapezoidProfile.Constraints autoYawProfileConstraints = new TrapezoidProfile.Constraints(
-      autoYawProfileConstraintsMaxVelocity, autoYawProfileConstraintsMaxAcceleration);
-  // TODO found via testing on Tardi drivetrain, needs to be changed for BareBones
-  private ProfiledPIDController autoYawPID = new ProfiledPIDController(2.0, 0.0, 0.001, autoYawProfileConstraints);
-
   private double autoYawVelocityRadiansPerSecond = 0.0;
-  private double minYawVelocityRadiansPerSecond = 0.25;
-  private double yawVelocityDeadband = 0.01;
 
   /**
    * Constructor for this DrivetrainSubsystem
@@ -179,6 +165,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * 50,
      * 1));
      */
+  }
+
+  private ShooterAimer shooterAimer = null;
+
+  public void setShooterAimer(ShooterAimer aimer) {
+    this.shooterAimer = aimer;
+  }
+
+  public ShooterAimer getShooterAimer() {
+    return this.shooterAimer;
   }
 
   /**
@@ -458,36 +454,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * physical shooter offsets and shooter yaw offset from Constants. This
    * centralizes the auto-yaw math so callers only need to invoke this method.
    */
-  public void setAutoYawVelocityRadiansPerSecond() {
-    if (swerveYawMode != SwerveYawMode.AUTO) {
-      return;
+  private void setAutoYawVelocityRadiansPerSecond() {
+    if (this.shooterAimer != null) {
+      this.autoYawVelocityRadiansPerSecond = shooterAimer.computeAutoYawVelocityRadiansPerSecond(shootingAimTarget);
+    } else {
+      // No aimer - clear auto yaw (drivetrain shouldn't attempt automatic yaw)
+      this.autoYawVelocityRadiansPerSecond = 0.0;
     }
-
-    Pose2d robotPose = getRobotPosition();
-
-    Translation2d hubPosition = DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition
-        : Constants.redHubPosition;
-
-    Translation2d shooterOffsetRobot = new Translation2d(Constants.shooterXOffsetFromCenterOfRobot,
-        Constants.shooterYOffsetFromCenterOfRobot);
-    Translation2d shooterOffsetField = shooterOffsetRobot.rotateBy(robotPose.getRotation());
-    Translation2d shooterFieldPosition = robotPose.getTranslation().plus(shooterOffsetField);
-
-    double dx = hubPosition.getX() - shooterFieldPosition.getX();
-    double dy = hubPosition.getY() - shooterFieldPosition.getY();
-    double desiredYawFromShooter = Math.atan2(dy, dx);
-
-    double shooterYawOffsetRad = Math.toRadians(Constants.shooterYawOffset);
-    double robotYawRadians = robotPose.getRotation().getRadians();
-    double shooterHeadingRadians = robotYawRadians + shooterYawOffsetRad;
-
-    double angularError = MathUtil.angleModulus(shooterHeadingRadians - desiredYawFromShooter);
-
-    double PIDout = autoYawPID.calculate(angularError, 0.0);
-
-    this.autoYawVelocityRadiansPerSecond = (Math.abs(PIDout) > yawVelocityDeadband)
-        ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond
-        : 0.0;
   }
 
   /**

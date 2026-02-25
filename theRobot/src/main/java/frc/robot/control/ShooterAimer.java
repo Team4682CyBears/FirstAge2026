@@ -2,13 +2,32 @@ package frc.robot.control;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.common.LookupTableDouble;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.HoodSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class ShooterAimer {
   private final DrivetrainSubsystem drivetrain;
+  private final HoodSubsystem hood;
+  private final ShooterSubsystem shooter;
+
+  private Translation2d targetAdjustment = new Translation2d(0.0, 0.0);
+
+  private double autoYawProfileConstraintsMaxVelocity = 540;
+  private double autoYawProfileConstraintsMaxAcceleration = 920;
+  private TrapezoidProfile.Constraints autoYawProfileConstraints = new TrapezoidProfile.Constraints(
+      autoYawProfileConstraintsMaxVelocity, autoYawProfileConstraintsMaxAcceleration);
+  private ProfiledPIDController autoYawPID = new ProfiledPIDController(2.0, 0.0, 0.001, autoYawProfileConstraints);
+  private double minYawVelocityRadiansPerSecond = 0.25;
+  private double yawVelocityDeadband = 0.01;
 
   private final double[][] hoodExtensionLookupTableData = { {} };
   private final double[][] shooterRpmLookupTableData = { {} };
@@ -18,8 +37,10 @@ public class ShooterAimer {
   private final LookupTableDouble shooterRpmLookupTable = new LookupTableDouble(shooterRpmLookupTableData);
   private final LookupTableDouble kickerRpmLookupTable = new LookupTableDouble(kickerRpmLookupTableData);
 
-  public ShooterAimer(DrivetrainSubsystem drivetrain) {
+  public ShooterAimer(DrivetrainSubsystem drivetrain, HoodSubsystem hood, ShooterSubsystem shooter) {
     this.drivetrain = drivetrain;
+    this.hood = hood;
+    this.shooter = shooter;
   }
 
   public Translation2d computePredictedTarget(Translation2d targetFieldTranslation) {
@@ -27,26 +48,93 @@ public class ShooterAimer {
       return null;
     }
 
+    // compute robot-relative field velocity
     ChassisSpeeds chassis = drivetrain.getChassisSpeeds(); // robot relative speeds
-
     Rotation2d robotYaw = drivetrain.getGyroscopeRotation();
     Translation2d fieldVel = new Translation2d(chassis.vxMetersPerSecond, chassis.vyMetersPerSecond)
         .rotateBy(robotYaw);
 
+    double distance = drivetrain.getRobotPosition().getTranslation().getDistance(targetFieldTranslation);
+    double tof = Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS;
+
     Translation2d predicted = new Translation2d(
-        targetFieldTranslation.getX() - (fieldVel.getX() * Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS),
-        targetFieldTranslation.getY() - (fieldVel.getY() * Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS));
+        targetFieldTranslation.getX() - (fieldVel.getX() * tof) + targetAdjustment.getX(),
+        targetFieldTranslation.getY() - (fieldVel.getY() * tof) + targetAdjustment.getY());
 
     return predicted;
   }
 
-  public int hoodPulseForDistance(double distanceMeters) {
-    return MathUtil.clamp((int) hoodExtensionLookupTable.queryTable(distanceMeters), Constants.HOOD_MIN_PULSE,
-        Constants.HOOD_MAX_PULSE);
+  /**
+   * Apply a small operator adjustment (meters) to aiming target (via d-pad).
+   */
+  public void applyTargetAdjustment(double dxMeters, double dyMeters) {
+    targetAdjustment = targetAdjustment.plus(new Translation2d(dxMeters, dyMeters));
+  }
+
+  public void resetTargetAdjustment() {
+    targetAdjustment = new Translation2d(0.0, 0.0);
+  }
+
+  /**
+   * Returns the desired hood extension (rotations or motor units) for a given distance.
+   * The hood subsystem expects a double position (rotations) rather than a servo pulse.
+   */
+  public double hoodExtensionForDistance(double distanceMeters) {
+    // Lookup table should return a double representing hood extension in rotations.
+    double ext = hoodExtensionLookupTable.queryTable(distanceMeters);
+    // Clamp to mechanical limits (use hood rotation bounds from Constants if available)
+    return MathUtil.clamp(ext, Constants.hoodMinPositionRotations, Constants.hoodMaxPositionRotations);
   }
 
   public double shooterRpmForDistance(double distanceMeters) {
     return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), 0.0, 6784.0);
+  }
+
+  /**
+   * Computes an auto-yaw velocity to command the drivetrain when aiming at a target.
+   * If aimTarget is null, defaults to alliance hub.
+   */
+  public double computeAutoYawVelocityRadiansPerSecond(Translation2d aimTarget) {
+    double robotYawRadians = drivetrain.getRobotPosition().getRotation().getRadians();
+  Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+  Translation2d hubPosition = (aimTarget != null) ? aimTarget
+    : (alliance == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
+    double angleToFace = drivetrain.getYawToFaceTarget(hubPosition).getRadians();
+    double error = MathUtil.angleModulus(robotYawRadians - angleToFace + Units.degreesToRadians(Constants.shooterYawOffset));
+    double pidOut = autoYawPID.calculate(error, 0.0);
+    double out = (Math.abs(pidOut) > yawVelocityDeadband)
+        ? pidOut + Math.signum(pidOut) * minYawVelocityRadiansPerSecond
+        : 0.0;
+    return out;
+  }
+
+  /**
+   * Helper to determine if a shot is feasible given ranges/lookup tables.
+   */
+  public boolean isShotFeasible(Translation2d target) {
+    if (target == null) return false;
+    double distance = drivetrain.getRobotPosition().getTranslation().getDistance(target);
+    // check hood lookup bounds (using Constants distances) and shooter rpm bounds
+    if (distance < Constants.HOOD_MIN_DISTANCE_METERS || distance > Constants.HOOD_MAX_DISTANCE_METERS) return false;
+    double rpm = shooterRpmForDistance(distance);
+    return rpm >= Constants.SHOOTER_MIN_RPM && rpm <= Constants.SHOOTER_MAX_RPM;
+  }
+
+  /**
+   * Check whether current robot yaw, hood extension and shooter velocity are at the target values
+   */
+  public boolean isAtPosition(double targetYawRadians, double targetHoodExtension, double targetShooterRpm) {
+    double currentYaw = drivetrain.getGyroscopeRotation().getRadians();
+    double yawErr = Math.abs(MathUtil.angleModulus(currentYaw - targetYawRadians));
+    boolean yawOk = yawErr < Math.toRadians(3.0); // 3 deg tolerance
+
+    double hoodPos = (hood != null) ? hood.getHoodPosition() : 0.0;
+    boolean hoodOk = Math.abs(hoodPos - targetHoodExtension) < Constants.hoodExtendoTolerance;
+
+    double shooterRpm = (shooter != null) ? shooter.getRPM() : 0.0;
+    boolean shooterOk = Math.abs(shooterRpm - targetShooterRpm) < 100.0; // 100 RPM tolerance
+
+    return yawOk && hoodOk && shooterOk;
   }
 
   public double kickerRpmForDistance(double distanceMeters) {
