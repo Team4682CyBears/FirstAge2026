@@ -3,9 +3,11 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
+import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
+import frc.robot.control.SubsystemCollection;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,15 +16,20 @@ public class AutoAimMovingCommand extends Command {
   private final DrivetrainSubsystem drivetrain;
   private final HoodSubsystem hood;
   private final ShooterSubsystem shooter;
+  private final KickerSubsystem kicker;
   private final ShooterAimer aimer;
 
-  public AutoAimMovingCommand(DrivetrainSubsystem drivetrain, HoodSubsystem hood, ShooterSubsystem shooter,
+  //
+  public AutoAimMovingCommand(SubsystemCollection subsystemCollection,
       ShooterAimer aimer) {
-    this.drivetrain = drivetrain;
-    this.hood = hood;
-    this.shooter = shooter;
+    this.drivetrain = subsystemCollection.getDriveTrainSubsystem();
+    this.hood = subsystemCollection.getHoodSubsystem();
+    this.shooter = subsystemCollection.getShooterSubsystem();
+    this.kicker = subsystemCollection.getKickerSubsystem();
     this.aimer = aimer;
-    addRequirements(hood);
+    // We are not declaring drivetrain subsystem as a requirement because it is only
+    // setting the swerve yaw mode
+    addRequirements();
   }
 
   public void initialize() {
@@ -38,10 +45,12 @@ public class AutoAimMovingCommand extends Command {
       drivetrain.setShootingAimTarget(predicted);
 
       double distance = drivetrain.getRobotPosition().getTranslation().getDistance(predicted);
-  double ext = aimer.hoodExtensionForDistance(distance);
-  hood.setExtendoPosition(ext);
-      double rpm = aimer.shooterRpmForDistance(distance);
-      shooter.runRPM(rpm);
+      double ext = aimer.hoodExtensionForDistance(distance);
+      hood.setExtendoPosition(ext);
+      double shooterRpm = aimer.shooterRpmForDistance(distance);
+      shooter.runRPM(shooterRpm);
+      double kickerRpm = aimer.kickerRpmForDistance(distance);
+      kicker.runRPM(kickerRpm);
     }
   }
 

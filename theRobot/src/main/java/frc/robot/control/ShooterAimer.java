@@ -16,8 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class ShooterAimer {
   private final DrivetrainSubsystem drivetrain;
-  private final HoodSubsystem hood;
-  private final ShooterSubsystem shooter;
+  private final SubsystemCollection subsystemCollection;
 
   private Translation2d targetAdjustment = new Translation2d(0.0, 0.0);
 
@@ -43,10 +42,9 @@ public class ShooterAimer {
   private final LookupTableDouble shooterRpmLookupTable = new LookupTableDouble(shooterRpmLookupTableData, 0.0);
   private final LookupTableDouble kickerRpmLookupTable = new LookupTableDouble(kickerRpmLookupTableData, 0.0);
 
-  public ShooterAimer(DrivetrainSubsystem drivetrain, HoodSubsystem hood, ShooterSubsystem shooter) {
+  public ShooterAimer(DrivetrainSubsystem drivetrain, SubsystemCollection subsystemCollection) {
     this.drivetrain = drivetrain;
-    this.hood = hood;
-    this.shooter = shooter;
+    this.subsystemCollection = subsystemCollection;
   }
 
   public Translation2d computePredictedTarget(Translation2d targetFieldTranslation) {
@@ -99,6 +97,10 @@ public class ShooterAimer {
     return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), 0.0, 6784.0);
   }
 
+  public double kickerRpmForDistance(double distanceMeters) {
+    return MathUtil.clamp(kickerRpmLookupTable.queryTable(distanceMeters), 0.0, 6000.0);
+  }
+
   /**
    * Computes an auto-yaw velocity to command the drivetrain when aiming at a
    * target.
@@ -137,21 +139,27 @@ public class ShooterAimer {
    * Check whether current robot yaw, hood extension and shooter velocity are at
    * the target values
    */
-  public boolean isAtPosition(double targetYawRadians, double targetHoodExtension, double targetShooterRpm) {
+  public boolean isAtPosition(double targetYawRadians, double targetHoodExtension, double targetShooterRpm,
+      double targetKickerRpm) {
     double currentYaw = drivetrain.getGyroscopeRotation().getRadians();
     double yawErr = Math.abs(MathUtil.angleModulus(currentYaw - targetYawRadians));
     boolean yawOk = yawErr < Math.toRadians(3.0); // 3 deg tolerance
 
-    double hoodPos = (hood != null) ? hood.getHoodPosition() : 0.0;
+    double hoodPos = subsystemCollection.isHoodSubsystemAvailable()
+        ? subsystemCollection.getHoodSubsystem().getHoodPosition()
+        : 0.0;
     boolean hoodOk = Math.abs(hoodPos - targetHoodExtension) < Constants.hoodExtendoTolerance;
 
-    double shooterRpm = (shooter != null) ? shooter.getRPM() : 0.0;
+    double shooterRpm = subsystemCollection.isShooterSubsystemAvailable()
+        ? subsystemCollection.getShooterSubsystem().getRPM()
+        : 0.0;
     boolean shooterOk = Math.abs(shooterRpm - targetShooterRpm) < 100.0; // 100 RPM tolerance
 
-    return yawOk && hoodOk && shooterOk;
-  }
+    double kickerRpm = subsystemCollection.isKickerSubsystemAvailable()
+        ? subsystemCollection.getKickerSubsystem().getRPM()
+        : 0.0;
+    boolean kickerOk = Math.abs(kickerRpm - targetKickerRpm) < 100.0; // 100 RPM tolerance
 
-  public double kickerRpmForDistance(double distanceMeters) {
-    return MathUtil.clamp(kickerRpmLookupTable.queryTable(distanceMeters), 0.0, 6000.0);
+    return yawOk && hoodOk && shooterOk && kickerOk;
   }
 }

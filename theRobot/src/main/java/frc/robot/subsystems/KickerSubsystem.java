@@ -49,8 +49,6 @@ public class KickerSubsystem extends SubsystemBase {
      */
     public void runRPM(double rpm) {
         this.targetRPS = rpmToRPS(rpm);
-        motorController.withVelocity(targetRPS * Constants.kickerMotorGearRatio);
-        kickerTalonFX.setControl(motorController);
     }
 
     private double rpmToRPS(double rpm) {
@@ -77,6 +75,8 @@ public class KickerSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
+        motorController.withVelocity(targetRPS * Constants.kickerMotorGearRatio);
+        kickerTalonFX.setControl(motorController);
         SmartDashboard.putNumber("Kicker Real RPM", getRPM());
     }
 
