@@ -53,7 +53,8 @@ public final class Constants {
     // Physical Shooter Offsets
     public static final double shooterXOffsetFromCenterOfRobot = -.2159; // in meters, positive is forward
     public static final double shooterYOffsetFromCenterOfRobot = -.1397; // in meters, positive is to the left
-    public static final Translation2d shooterOffsetFromCenterOfRobot = new Translation2d(shooterXOffsetFromCenterOfRobot, shooterYOffsetFromCenterOfRobot);
+    public static final Translation2d shooterOffsetFromCenterOfRobot = new Translation2d(
+            shooterXOffsetFromCenterOfRobot, shooterYOffsetFromCenterOfRobot);
     public static final double shooterYawOffset = 60.0; // in degrees
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
@@ -148,11 +149,8 @@ public final class Constants {
 
     public static final double PROJECTILE_TIME_OF_FLIGHT_SECONDS = 1.49;
 
-    // Hood servo pulse widths
-    public static final int HOOD_MIN_PULSE = 1000;
-    public static final int HOOD_MAX_PULSE = 2000;
     // Distances corresponding to min and max hood positions
     public static final double HOOD_MIN_DISTANCE_METERS = 1.0;
-    public static final double HOOD_MAX_DISTANCE_METERS = 8.0;
+    public static final double HOOD_MAX_DISTANCE_METERS = 9.0;
 
 }
