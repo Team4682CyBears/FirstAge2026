@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
@@ -129,6 +130,7 @@ public class HoodSubsystem extends SubsystemBase {
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
         // Borrowed from Crescendo2024 ShooterAngleSubsystem.java
         // TODO: Verify values
