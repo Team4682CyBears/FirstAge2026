@@ -10,6 +10,14 @@ public class LookupTableDouble {
         this.defaultValue = defaultValue;
     }
 
+    public double getMinInput() {
+        return lookupTable[0][0];
+    }
+
+    public double getMaxInput() {
+        return lookupTable[lookupTable.length - 1][0];
+    }
+
     public double queryTable(double input) {
         double lastInput = 0.0;
         double nextInput = 0.0;

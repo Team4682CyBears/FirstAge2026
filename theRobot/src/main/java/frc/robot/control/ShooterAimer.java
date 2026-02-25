@@ -94,11 +94,11 @@ public class ShooterAimer {
   }
 
   public double shooterRpmForDistance(double distanceMeters) {
-    return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), 0.0, 6784.0);
+    return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), Constants.SHOOTER_MIN_RPM, Constants.SHOOTER_MAX_RPM);
   }
 
   public double kickerRpmForDistance(double distanceMeters) {
-    return MathUtil.clamp(kickerRpmLookupTable.queryTable(distanceMeters), 0.0, 6000.0);
+    return MathUtil.clamp(kickerRpmLookupTable.queryTable(distanceMeters), Constants.KICKER_MIN_RPM, Constants.KICKER_MAX_RPM);
   }
 
   /**
@@ -108,6 +108,9 @@ public class ShooterAimer {
    */
   public double computeAutoYawVelocityRadiansPerSecond(Translation2d aimTarget) {
     double robotYawRadians = drivetrain.getRobotPosition().getRotation().getRadians();
+    if (DriverStation.getAlliance().isEmpty()) {
+      System.out.println("WARNING: DriverStation is reporting no alliance!");
+    }
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
     Translation2d hubPosition = (aimTarget != null) ? aimTarget
         : (alliance == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
@@ -129,10 +132,12 @@ public class ShooterAimer {
       return false;
     double distance = drivetrain.getRobotPosition().getTranslation().getDistance(target);
     // check hood lookup bounds (using Constants distances) and shooter rpm bounds
-    if (distance < Constants.HOOD_MIN_DISTANCE_METERS || distance > Constants.HOOD_MAX_DISTANCE_METERS)
+    if (distance < hoodExtensionLookupTable.getMinInput() || distance > hoodExtensionLookupTable.getMaxInput())
       return false;
-    double rpm = shooterRpmForDistance(distance);
-    return rpm >= Constants.SHOOTER_MIN_RPM && rpm <= Constants.SHOOTER_MAX_RPM;
+    double shooterRpm = shooterRpmForDistance(distance);
+    double kickerRpm = kickerRpmForDistance(distance);
+    return shooterRpm >= Constants.SHOOTER_MIN_RPM && shooterRpm <= Constants.SHOOTER_MAX_RPM
+        && kickerRpm >= Constants.SHOOTER_MIN_RPM && kickerRpm <= Constants.SHOOTER_MAX_RPM;
   }
 
   /**

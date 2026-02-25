@@ -132,13 +132,16 @@ public final class Constants {
 
     // Shooter RPM bounds
     public static final double SHOOTER_MIN_RPM = 0.0;
-    public static final double SHOOTER_MAX_RPM = 5000.0;
+    public static final double SHOOTER_MAX_RPM = 6500.0;
 
     // ********************************************************************
     // Kicker Constants
     public static final int kickerTalonCanId = 19;
 
     public static final double kickerMotorGearRatio = 3.0; // 3:1
+    // Kicker RPM bounds
+    public static final double KICKER_MIN_RPM = 0.0;
+    public static final double KICKER_MAX_RPM = 2000.0;
 
     /// ******************************
     /// Hood Constants
