@@ -29,11 +29,9 @@ import frc.robot.control.Constants;
 public class IntakeRollerSubsystem extends SubsystemBase {
 
     // TODO: Remove the follower in the final mechanism
-    private TalonFX IntakeLeadTalonFX = new TalonFX(Constants.intakeLeadTalonCanId);
-    private TalonFX IntakeFollowTalonFX = new TalonFX(Constants.intakeFollowTalonCanId);
+    private TalonFX intakeTalonFX;
 
     private final VelocityVoltage leaderController = new VelocityVoltage(0.0);
-    private final VelocityVoltage followerController = new VelocityVoltage(0.0);
 
     private double targetRPS = 0.0;
 
@@ -41,9 +39,10 @@ public class IntakeRollerSubsystem extends SubsystemBase {
             .withKD(0.0);
 
     /*
-     * Initialize the kicker and configure the motor
+     * Initialize the intake roller and configure the motor
      */
-    public IntakeRollerSubsystem() {
+    public IntakeRollerSubsystem(int motorCanID) {
+        intakeTalonFX = new TalonFX(motorCanID);
         configureMotor();
     }
 
@@ -52,10 +51,6 @@ public class IntakeRollerSubsystem extends SubsystemBase {
      */
     public void runRPM(double rpm) {
         this.targetRPS = rpmToRPS(rpm);
-        leaderController.withVelocity(targetRPS);
-        followerController.withVelocity(targetRPS * Constants.followKickerMotorGearRatio);
-        IntakeLeadTalonFX.setControl(leaderController);
-        IntakeFollowTalonFX.setControl(followerController);
     }
 
     private double rpmToRPS(double rpm) {
@@ -66,7 +61,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
      * Get the rpm from the lead motor
      */
     public double getRPM() {
-        return IntakeLeadTalonFX.getVelocity().getValueAsDouble() * 60;
+        return intakeTalonFX.getVelocity().getValueAsDouble() * 60;
     }
 
     /*
@@ -74,8 +69,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
      */
     public void stop() {
         targetRPS = 0.0;
-        IntakeLeadTalonFX.stopMotor();
-        IntakeFollowTalonFX.stopMotor();
+        intakeTalonFX.stopMotor();
     }
 
     /*
@@ -83,8 +77,10 @@ public class IntakeRollerSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
+        leaderController.withVelocity(targetRPS);
+        intakeTalonFX.setControl(leaderController);
         SmartDashboard.putNumber("Intake Real RPM", getRPM());
-        SmartDashboard.putNumber("Intake Follow Real RPM", IntakeFollowTalonFX.getVelocity().getValueAsDouble() * 60);
+        SmartDashboard.putNumber("Intake Follow Real RPM", intakeTalonFX.getVelocity().getValueAsDouble() * 60);
     }
 
     /*
@@ -111,22 +107,11 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         // motor direction
         talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        StatusCode response = IntakeLeadTalonFX.getConfigurator().apply(talonMotorConfig);
+        StatusCode response = intakeTalonFX.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {
             System.out.println(
-                    "TalonFX ID " + IntakeLeadTalonFX.getDeviceID() + " failed config with error "
+                    "TalonFX ID " + intakeTalonFX.getDeviceID() + " failed config with error "
                             + response.toString());
         }
-
-        // change invert for angleRightMotor
-        talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        // apply configs
-        response = IntakeFollowTalonFX.getConfigurator().apply(talonMotorConfig);
-        if (!response.isOK()) {
-            DataLogManager.log(
-                    "TalonFX ID " + IntakeFollowTalonFX.getDeviceID() + " failed config with error "
-                            + response.toString());
-        }
-
     }
 }
