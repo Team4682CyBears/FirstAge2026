@@ -119,7 +119,7 @@ public final class Constants {
 
     // ********************************************************************
     // Misc Constants
-    public static final double PROJECTILE_TIME_OF_FLIGHT_SECONDS = 1.49;
+    public static final double PROJECTILE_TIME_OF_FLIGHT_SECONDS = 1.255;
 
     // ********************************************************************
     // CAN IDs
@@ -151,5 +151,5 @@ public final class Constants {
     public static final double hoodMaxPositionRotations = 0.635;
     // Distances corresponding to min and max hood positions
     public static final double HOOD_MIN_DISTANCE_METERS = 1.0;
-    public static final double HOOD_MAX_DISTANCE_METERS = 9.0;
+    public static final double HOOD_MAX_DISTANCE_METERS = 8.27;
 }
