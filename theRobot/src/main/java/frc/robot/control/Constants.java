@@ -118,14 +118,24 @@ public final class Constants {
     public static final double overcurrentRumbleTimeSeconds = 0.25;
 
     // ********************************************************************
+    // Misc Constants
+    public static final double PROJECTILE_TIME_OF_FLIGHT_SECONDS = 1.49;
+
+    // ********************************************************************
     // CAN IDs
     // TODO define CAN IDs here for all non drive train components
 
-    // shooter related can ids
+    // ********************************************************************
+    // Shooter Constants
     public static final int shooterLeadMotorCanId = 21;
     public static final int shooterFollowMotorCanId = 20;
 
-    // kicker can ids and constants
+    // Shooter RPM bounds
+    public static final double SHOOTER_MIN_RPM = 0.0;
+    public static final double SHOOTER_MAX_RPM = 5000.0;
+
+    // ********************************************************************
+    // Kicker Constants
     public static final int kickerTalonCanId = 19;
 
     public static final double kickerMotorGearRatio = 3.0; // 3:1
@@ -138,19 +148,8 @@ public final class Constants {
     public static final double hoodEncoderAbsoluteOffset = -0.417;
     public static final double hoodExtendoTolerance = 0.01;
     public static final double hoodMinPositionRotations = 0.0;
-    public static final double hoodMaxPositionRotations = 0.635; // TODO measure this on device
-
-    public static final int servoDefaultPosition = 1000; // fully retracted position
-
-    // Shooter RPM bounds
-    public static final double SHOOTER_MIN_RPM = 0.0;
-    public static final double SHOOTER_MAX_RPM = 5000.0;
-    // ********************************************************************
-
-    public static final double PROJECTILE_TIME_OF_FLIGHT_SECONDS = 1.49;
-
+    public static final double hoodMaxPositionRotations = 0.635;
     // Distances corresponding to min and max hood positions
     public static final double HOOD_MIN_DISTANCE_METERS = 1.0;
     public static final double HOOD_MAX_DISTANCE_METERS = 9.0;
-
 }

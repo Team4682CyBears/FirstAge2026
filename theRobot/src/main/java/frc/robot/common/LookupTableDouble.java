@@ -3,9 +3,11 @@ package frc.robot.common;
 // This class assumes that the lookup table is ordered and in the format (Input, Output)
 public class LookupTableDouble {
     private final double[][] lookupTable;
+    private final double defaultValue;
 
-    public LookupTableDouble(double[][] lutInput) {
+    public LookupTableDouble(double[][] lutInput, double defaultValue) {
         this.lookupTable = lutInput;
+        this.defaultValue = defaultValue;
     }
 
     public double queryTable(double input) {
@@ -31,10 +33,9 @@ public class LookupTableDouble {
         if (!rangeFound) {
             System.out.println("ERROR: Value '" + input + "' does not exist in the range of lookup table with min of '"
                     + lookupTable[0][0] + "' and a max of '" + lookupTable[lookupTable.length][0] + "'");
-            // TODO: Figure out what to return when there is an error
-            return 0.0;
+            return defaultValue;
         } else {
-            // do interpolation on speed to get shot speed
+            // do interpolation on input to get output
             double numerator = (lastOutput * (nextInput - input)) + (nextOutput * (input - lastInput));
             double denominator = (nextInput - lastInput);
             return (numerator / denominator);

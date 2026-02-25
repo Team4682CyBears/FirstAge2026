@@ -39,9 +39,9 @@ public class ShooterAimer {
   private final double[][] kickerRpmLookupTableData = { { Constants.hoodMinPositionRotations, 2000 },
       { Constants.hoodMaxPositionRotations, 2000 } };
 
-  private final LookupTableDouble hoodExtensionLookupTable = new LookupTableDouble(hoodExtensionLookupTableData);
-  private final LookupTableDouble shooterRpmLookupTable = new LookupTableDouble(shooterRpmLookupTableData);
-  private final LookupTableDouble kickerRpmLookupTable = new LookupTableDouble(kickerRpmLookupTableData);
+  private final LookupTableDouble hoodExtensionLookupTable = new LookupTableDouble(hoodExtensionLookupTableData, 0.0);
+  private final LookupTableDouble shooterRpmLookupTable = new LookupTableDouble(shooterRpmLookupTableData, 0.0);
+  private final LookupTableDouble kickerRpmLookupTable = new LookupTableDouble(kickerRpmLookupTableData, 0.0);
 
   public ShooterAimer(DrivetrainSubsystem drivetrain, HoodSubsystem hood, ShooterSubsystem shooter) {
     this.drivetrain = drivetrain;
