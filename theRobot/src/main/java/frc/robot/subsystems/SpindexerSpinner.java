@@ -33,8 +33,8 @@ b) a run method that when set to run, if there is no ball in the kicker, the spi
  */
 public class SpindexerSpinner extends SubsystemBase {
 
-    private TalonFX kickerTalonFX = new TalonFX(Constants.spindexerSensorLaserCanID);
-
+    private TalonFX spindexerTalonFX = new TalonFX(Constants.spindexerSensorLaserCanID);
+    //kickerTalonFX
     private TofSensorLaser spindexerToF = new TofSensorLaser(Constants.spindexerSensorLaserCanID);
 
     private final VelocityVoltage motorController = new VelocityVoltage(0.0);
@@ -86,7 +86,7 @@ public class SpindexerSpinner extends SubsystemBase {
      * Get the rpm from the lead motor
      */
     public double getRPM() {
-        return kickerTalonFX.getVelocity().getValueAsDouble() * 60 / Constants.kickerMotorGearRatio;
+        return spindexerTalonFX.getVelocity().getValueAsDouble() * 60 / Constants.kickerMotorGearRatio;
     }
 
     /*
@@ -94,7 +94,7 @@ public class SpindexerSpinner extends SubsystemBase {
      */
     public void stop() {
         targetRPS = 0.0;
-        kickerTalonFX.stopMotor();
+        spindexerTalonFX.stopMotor();
     }
 
     /*
@@ -108,11 +108,11 @@ public class SpindexerSpinner extends SubsystemBase {
           runRPM(targetRPS);
         }
         motorController.withVelocity(targetRPS * Constants.kickerMotorGearRatio);
-        kickerTalonFX.setControl(motorController);
+        spindexerTalonFX.setControl(motorController);
         SmartDashboard.putNumber("Kicker Real RPM", getRPM());
         spindexerToF.publishTelemetery();
     }
-    
+
 
     /*
      * configures motor
@@ -138,10 +138,10 @@ public class SpindexerSpinner extends SubsystemBase {
         // motor direction
         talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        StatusCode response = kickerTalonFX.getConfigurator().apply(talonMotorConfig);
+        StatusCode response = spindexerTalonFX.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {
             System.out.println(
-                    "TalonFX ID " + kickerTalonFX.getDeviceID() + " failed config with error "
+                    "TalonFX ID " + spindexerTalonFX.getDeviceID() + " failed config with error "
                             + response.toString());
         }
 
