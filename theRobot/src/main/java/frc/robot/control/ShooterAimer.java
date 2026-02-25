@@ -27,6 +27,9 @@ public class ShooterAimer {
   private ProfiledPIDController autoYawPID = new ProfiledPIDController(2.0, 0.0, 0.001, autoYawProfileConstraints);
   private double minYawVelocityRadiansPerSecond = 0.25;
   private double yawVelocityDeadband = 0.01;
+  private double yawToleranceDegrees = 3;
+  private double shooterRpmTolerance = 100;
+  private double kickerRpmTolerance = 100;
 
   private final double[][] hoodExtensionLookupTableData = { { 1.0000, 0 },
       { 1.3037, 0 },
@@ -94,11 +97,13 @@ public class ShooterAimer {
   }
 
   public double shooterRpmForDistance(double distanceMeters) {
-    return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), Constants.SHOOTER_MIN_RPM, Constants.SHOOTER_MAX_RPM);
+    return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), Constants.SHOOTER_MIN_RPM,
+        Constants.SHOOTER_MAX_RPM);
   }
 
   public double kickerRpmForDistance(double distanceMeters) {
-    return MathUtil.clamp(kickerRpmLookupTable.queryTable(distanceMeters), Constants.KICKER_MIN_RPM, Constants.KICKER_MAX_RPM);
+    return MathUtil.clamp(kickerRpmLookupTable.queryTable(distanceMeters), Constants.KICKER_MIN_RPM,
+        Constants.KICKER_MAX_RPM);
   }
 
   /**
@@ -141,14 +146,15 @@ public class ShooterAimer {
   }
 
   /**
-   * Check whether current robot yaw, hood extension and shooter velocity are at
+   * Check whether current robot yaw, hood extension, shooter velocity and kicker
+   * velocity are at
    * the target values
    */
   public boolean isAtPosition(double targetYawRadians, double targetHoodExtension, double targetShooterRpm,
       double targetKickerRpm) {
     double currentYaw = drivetrain.getGyroscopeRotation().getRadians();
     double yawErr = Math.abs(MathUtil.angleModulus(currentYaw - targetYawRadians));
-    boolean yawOk = yawErr < Math.toRadians(3.0); // 3 deg tolerance
+    boolean yawOk = yawErr < Math.toRadians(yawToleranceDegrees); // 3 deg tolerance
 
     double hoodPos = subsystemCollection.isHoodSubsystemAvailable()
         ? subsystemCollection.getHoodSubsystem().getHoodPosition()
@@ -158,12 +164,12 @@ public class ShooterAimer {
     double shooterRpm = subsystemCollection.isShooterSubsystemAvailable()
         ? subsystemCollection.getShooterSubsystem().getRPM()
         : 0.0;
-    boolean shooterOk = Math.abs(shooterRpm - targetShooterRpm) < 100.0; // 100 RPM tolerance
+    boolean shooterOk = Math.abs(shooterRpm - targetShooterRpm) < shooterRpm;
 
     double kickerRpm = subsystemCollection.isKickerSubsystemAvailable()
         ? subsystemCollection.getKickerSubsystem().getRPM()
         : 0.0;
-    boolean kickerOk = Math.abs(kickerRpm - targetKickerRpm) < 100.0; // 100 RPM tolerance
+    boolean kickerOk = Math.abs(kickerRpm - targetKickerRpm) < kickerRpm;
 
     return yawOk && hoodOk && shooterOk && kickerOk;
   }
