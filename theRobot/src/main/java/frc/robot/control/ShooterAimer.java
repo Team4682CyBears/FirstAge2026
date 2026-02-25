@@ -164,12 +164,12 @@ public class ShooterAimer {
     double shooterRpm = subsystemCollection.isShooterSubsystemAvailable()
         ? subsystemCollection.getShooterSubsystem().getRPM()
         : 0.0;
-    boolean shooterOk = Math.abs(shooterRpm - targetShooterRpm) < shooterRpm;
+    boolean shooterOk = Math.abs(shooterRpm - targetShooterRpm) < shooterRpmTolerance;
 
     double kickerRpm = subsystemCollection.isKickerSubsystemAvailable()
         ? subsystemCollection.getKickerSubsystem().getRPM()
         : 0.0;
-    boolean kickerOk = Math.abs(kickerRpm - targetKickerRpm) < kickerRpm;
+    boolean kickerOk = Math.abs(kickerRpm - targetKickerRpm) < kickerRpmTolerance;
 
     return yawOk && hoodOk && shooterOk && kickerOk;
   }
