@@ -29,6 +29,7 @@ import frc.robot.control.SwerveDriveMode;
 import frc.robot.control.SwerveYawMode;
 import frc.robot.generated.BareTunerConstants;
 import frc.robot.control.SubsystemCollection;
+import frc.robot.control.ShooterAimer;
 import frc.robot.common.MotorUtils;
 import frc.robot.common.VisionMeasurement;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,12 +38,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -129,20 +127,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
-  private double autoYawProfileConstraintsMaxVelocity = 540;
-  private double autoYawProfileConstraintsMaxAcceleration = 920;
-
-  // Trapezoid profile constrains motion by limiting max velocity and
-  // max acceleration so the setpoint follows a smooth accel->cruise->decel
-  // (trapezoidal) velocity profile used by the ProfiledPIDController.
-  private TrapezoidProfile.Constraints autoYawProfileConstraints = new TrapezoidProfile.Constraints(
-      autoYawProfileConstraintsMaxVelocity, autoYawProfileConstraintsMaxAcceleration);
-  // TODO found via testing on Tardi drivetrain, needs to be changed for BareBones
-  private ProfiledPIDController autoYawPID = new ProfiledPIDController(2.0, 0.0, 0.001, autoYawProfileConstraints);
-
   private double autoYawVelocityRadiansPerSecond = 0.0;
-  private double minYawVelocityRadiansPerSecond = 0.25;
-  private double yawVelocityDeadband = 0.01;
 
   /**
    * Constructor for this DrivetrainSubsystem
@@ -180,6 +165,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * 50,
      * 1));
      */
+  }
+
+  private ShooterAimer shooterAimer = null;
+
+  public void setShooterAimer(ShooterAimer aimer) {
+    this.shooterAimer = aimer;
+  }
+
+  public ShooterAimer getShooterAimer() {
+    return this.shooterAimer;
   }
 
   /**
@@ -460,15 +455,12 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * centralizes the auto-yaw math so callers only need to invoke this method.
    */
   private void setAutoYawVelocityRadiansPerSecond() {
-    double robotYawDegrees = getRobotPosition().getRotation().getRadians();
-    Translation2d hubPosition = (shootingAimTarget != null)
-        ? shootingAimTarget
-        : (DriverStation.getAlliance().get() == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
-    double PIDout = autoYawPID
-        .calculate(MathUtil.angleModulus(robotYawDegrees - getYawToFaceTarget(hubPosition).getRadians() + Units.degreesToRadians(Constants.shooterYawOffset)), 0.0);
-    this.autoYawVelocityRadiansPerSecond = (Math.abs(PIDout) > yawVelocityDeadband)
-        ? PIDout + Math.signum(PIDout) * minYawVelocityRadiansPerSecond
-        : 0.0;
+    if (this.shooterAimer != null) {
+      this.autoYawVelocityRadiansPerSecond = shooterAimer.computeAutoYawVelocityRadiansPerSecond(shootingAimTarget);
+    } else {
+      // No aimer - clear auto yaw (drivetrain shouldn't attempt automatic yaw)
+      this.autoYawVelocityRadiansPerSecond = 0.0;
+    }
   }
 
   /**
