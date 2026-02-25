@@ -43,6 +43,9 @@ public class InstalledHardware {
     // Kicker
     public static final boolean kickerInstalled = true;
 
+    // Intake wrist encoder
+    public static final boolean intakeWristEncoderInstalled = true;
+
     // TOF Sensor Hardware
     // Important! You must disable any TOF sensor that is not installed!!
     // If you try to configure a TOF sensor that is not installed

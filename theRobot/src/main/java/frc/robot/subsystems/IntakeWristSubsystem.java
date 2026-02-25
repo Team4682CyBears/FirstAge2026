@@ -37,10 +37,17 @@ public class IntakeWristSubsystem extends SubsystemBase {
             .withKV(0.1).withKS(0.1); // TODO: Find real values. DO NOT SET KD!!
 
     public IntakeWristSubsystem(int motorCanID, int encoderCanID) {
-        this.encoder = new CANcoder(encoderCanID);
         this.motor = new TalonFX(motorCanID);
         this.encodeCanID = encoderCanID;
-        configureEncoder();
+
+        // Only create/configure encoder if hardware is present
+        if (frc.robot.control.InstalledHardware.intakeWristEncoderInstalled) {
+            this.encoder = new CANcoder(encoderCanID);
+            configureEncoder();
+        } else {
+            this.encoder = null;
+        }
+
         configureMotor();
     }
 
@@ -56,7 +63,10 @@ public class IntakeWristSubsystem extends SubsystemBase {
      * @return hood extendo in rotations
      */
     public double getHoodPosition() {
-            return motor.getPosition().getValueAsDouble();
+        if (encoder != null) {
+        return encoder.getPosition().getValueAsDouble();
+        }
+        return motor.getPosition().getValueAsDouble();
     }
 
     /**
@@ -71,9 +81,12 @@ public class IntakeWristSubsystem extends SubsystemBase {
             // keep moving until it reaches target extendo
             intakeWristIsAtDesiredExtension = isExtendoWithinTolerance(desiredExtension);
         }
-        SmartDashboard.putNumber("Hood Absolute Position",
-                encoder.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Hood Motor Encoder Extendo", getHoodPosition());
+        if (encoder != null) {
+            SmartDashboard.putNumber("IntakeWrist Absolute Position", encoder.getPosition().getValueAsDouble());
+        } else {
+            SmartDashboard.putNumber("IntakeWrist Absolute Position", Double.NaN);
+        }
+        SmartDashboard.putNumber("IntakeWrist Motor Encoder Extendo", getHoodPosition());
     }
 
     /**
@@ -94,8 +107,9 @@ public class IntakeWristSubsystem extends SubsystemBase {
 
     private void configureEncoder() {
         CANcoderConfiguration ccConfig = new CANcoderConfiguration();
-        ccConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
-        ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+    ccConfig.MagnetSensor.MagnetOffset = Constants.intakeWristEncoderAbsoluteOffset;
+    ccConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
+    ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         // apply configs
         StatusCode response = encoder.getConfigurator().apply(ccConfig);
         if (!response.isOK()) {
@@ -106,8 +120,10 @@ public class IntakeWristSubsystem extends SubsystemBase {
 
     private void configureMotor() {
         TalonFXConfiguration config = new TalonFXConfiguration();
-        config.Feedback.FeedbackRemoteSensorID = encodeCanID;
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder; 
+        if (encoder != null) {
+            config.Feedback.FeedbackRemoteSensorID = encodeCanID;
+            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        }
         config.Slot0 = slot0Configs;
         config.Feedback.SensorToMechanismRatio = intakeWristEncoderGearRatio;
 
@@ -131,11 +147,11 @@ public class IntakeWristSubsystem extends SubsystemBase {
         config.MotionMagic.MotionMagicJerk = 800;
 
         // Software limit switches
-        config.SoftwareLimitSwitch = new SoftwareLimitSwitchConfigs()
-                .withForwardSoftLimitEnable(true)
-                .withForwardSoftLimitThreshold(Constants.hoodMaxPositionRotations)
-                .withReverseSoftLimitEnable(true)
-                .withReverseSoftLimitThreshold(Constants.hoodMinPositionRotations);
+    config.SoftwareLimitSwitch = new SoftwareLimitSwitchConfigs()
+        .withForwardSoftLimitEnable(true)
+        .withForwardSoftLimitThreshold(Constants.intakeWristDeployedPositionRotations)
+        .withReverseSoftLimitEnable(true)
+        .withReverseSoftLimitThreshold(Constants.intakeWristRetractedPositionRotations);
 
         StatusCode response = motor.getConfigurator().apply(config);
         if (!response.isOK()) {
