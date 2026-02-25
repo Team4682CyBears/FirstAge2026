@@ -144,6 +144,19 @@ public final class Constants {
     // Shooter RPM bounds
     public static final double SHOOTER_MIN_RPM = 0.0;
     public static final double SHOOTER_MAX_RPM = 5000.0;
+
+    /// Intake COnstants
+    public static final int intakeWristMotorCanID = 30;
+    public static final int intakeWristEncoderCanID = 31;
+
+    public static final double intakeWristEncoderAbsoluteOffset = -0.417;
+    public static final double intakeWristExtendoTolerance = 0.01;
+    public static final double intakeWristMinPositionRotations = 0.0;
+    public static final double intakeWristMaxPositionRotations = 0.635; // TODO measure this on device
+
+    public static final int intakeRollerLeadMotorCanId = 21;
+    public static final int intakeRollerFollowMotorCanId = 20;
+    
     // ********************************************************************
 
     public static final double PROJECTILE_TIME_OF_FLIGHT_SECONDS = 1.49;
