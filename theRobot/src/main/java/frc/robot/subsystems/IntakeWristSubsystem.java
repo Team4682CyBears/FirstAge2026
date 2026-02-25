@@ -74,13 +74,9 @@ public class IntakeWristSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        if (!intakeWristIsAtDesiredExtension) {
-            // use motionMagic voltage control
-            motor.setControl(
-                    voltageController.withPosition(desiredExtension));
-            // keep moving until it reaches target extendo
-            intakeWristIsAtDesiredExtension = isExtendoWithinTolerance(desiredExtension);
-        }
+        motor.setControl(voltageController.withPosition(desiredExtension));
+        intakeWristIsAtDesiredExtension = isExtendoWithinTolerance(desiredExtension);
+        
         if (encoder != null) {
             SmartDashboard.putNumber("IntakeWrist Absolute Position", encoder.getPosition().getValueAsDouble());
         } else {
