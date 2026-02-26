@@ -120,8 +120,11 @@ public class ShooterAimer {
     Translation2d hubPosition = (aimTarget != null) ? aimTarget
         : (alliance == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
     double angleToFace = drivetrain.getYawToFaceTarget(hubPosition).getRadians();
+    System.out.println("angleToFace: " + Units.radiansToDegrees(angleToFace));
+
     double error = MathUtil
         .angleModulus(robotYawRadians - angleToFace + Units.degreesToRadians(Constants.shooterYawOffset));
+    System.out.println("error: " + Units.radiansToDegrees(error));
     double pidOut = autoYawPID.calculate(error, 0.0);
     double out = (Math.abs(pidOut) > yawVelocityDeadband)
         ? pidOut + Math.signum(pidOut) * minYawVelocityRadiansPerSecond
