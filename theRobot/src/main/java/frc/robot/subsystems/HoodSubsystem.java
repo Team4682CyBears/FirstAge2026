@@ -34,7 +34,7 @@ import frc.robot.control.InstalledHardware;
 public class HoodSubsystem extends SubsystemBase {
 
     // Hood gearing
-    private static final double hoodEncoderGearRatio = (18 / 24) * (18 / 24);
+    private static final double hoodMotorToMechanismGearRatio = (18.0 / 24.0) * (18.0 / 24.0);
     private static final double hoodExtendoLowVelocityTol = 10; // TODO test this on device with motion magic profile
 
     private TalonFXS motor;
@@ -98,6 +98,9 @@ public class HoodSubsystem extends SubsystemBase {
         
         if (!hoodIsAtDesiredExtension) {
             // use motionMagic voltage control
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!SETTING HOOD TO MOTION MAGIC !!!!!! " + desiredExtension * positionEffectiveRatio);
+            System.out.println("Desired extension " + desiredExtension);
+            System.out.print("is at desired extension " + hoodIsAtDesiredExtension);
             motor.setControl(
                     voltageController.withPosition(desiredExtension));
             // keep moving until it reaches target extendo
@@ -106,7 +109,7 @@ public class HoodSubsystem extends SubsystemBase {
         SmartDashboard.putBoolean("Hood Within Tolerance", hoodIsAtDesiredExtension);
         SmartDashboard.putNumber("Hood Absolute Position",
                 encoder.getAbsolutePosition().getValueAsDouble());
-        SmartDashboard.putNumber("Hood Motor Encoder Extendo", getHoodPosition());
+        SmartDashboard.putNumber("Hood Motor Encoder Extendo", motor.getPosition().getValueAsDouble());
     }
 
     /**
@@ -131,7 +134,7 @@ public class HoodSubsystem extends SubsystemBase {
         config.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.RemoteCANcoder;
         config.Slot0 = hoodMotorGainsForAbsoluteEncoder;
         config.ExternalFeedback.SensorToMechanismRatio = 1.0;
-        config.ExternalFeedback.RotorToSensorRatio = 1.0 / hoodEncoderGearRatio;
+        config.ExternalFeedback.RotorToSensorRatio = 1.0 / hoodMotorToMechanismGearRatio;
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -149,9 +152,9 @@ public class HoodSubsystem extends SubsystemBase {
 
         // Borrowed from Crescendo2024 ShooterAngleSubsystem.java
         // TODO: Verify values
-        config.MotionMagic.MotionMagicCruiseVelocity = 3.0;
-        config.MotionMagic.MotionMagicAcceleration = 1;
-        config.MotionMagic.MotionMagicJerk = 10;
+        config.MotionMagic.MotionMagicCruiseVelocity = 800.0;
+        config.MotionMagic.MotionMagicAcceleration = 160;
+        config.MotionMagic.MotionMagicJerk = 800;
 
         // Software limit switches
         config.SoftwareLimitSwitch = new SoftwareLimitSwitchConfigs()
