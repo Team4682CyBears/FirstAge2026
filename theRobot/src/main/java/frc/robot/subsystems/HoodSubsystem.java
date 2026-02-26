@@ -44,8 +44,8 @@ public class HoodSubsystem extends SubsystemBase {
     private boolean hoodIsAtDesiredExtension = true;
     private double desiredExtension;
 
-    private Slot0Configs hoodMotorGainsForAbsoluteEncoder = new Slot0Configs().withKP(150).withKI(0.125).withKD(0.0)
-            .withKV(0.1).withKS(0.1); // TODO: Find real values. DO NOT SET KD!!
+    private Slot0Configs hoodMotorGainsForAbsoluteEncoder = new Slot0Configs().withKP(0.6).withKI(0.0).withKD(0.0)
+            .withKV(0.4).withKS(0.75); // TODO: Find real values. DO NOT SET KD!!
 
     public HoodSubsystem(int hoodMotorCanID, int hoodEncoderID) {
         if (InstalledHardware.hoodEncoderInstalled) {
@@ -98,7 +98,7 @@ public class HoodSubsystem extends SubsystemBase {
         
         if (!hoodIsAtDesiredExtension) {
             // use motionMagic voltage control
-            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!SETTING HOOD TO MOTION MAGIC !!!!!! " + desiredExtension * positionEffectiveRatio);
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!SETTING HOOD TO MOTION MAGIC !!!!!! " + desiredExtension);
             System.out.println("Desired extension " + desiredExtension);
             System.out.print("is at desired extension " + hoodIsAtDesiredExtension);
             motor.setControl(
@@ -150,11 +150,10 @@ public class HoodSubsystem extends SubsystemBase {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
 
-        // Borrowed from Crescendo2024 ShooterAngleSubsystem.java
         // TODO: Verify values
         config.MotionMagic.MotionMagicCruiseVelocity = 800.0;
-        config.MotionMagic.MotionMagicAcceleration = 160;
-        config.MotionMagic.MotionMagicJerk = 800;
+        config.MotionMagic.MotionMagicAcceleration = 160.0;
+        config.MotionMagic.MotionMagicJerk = 800.0;
 
         // Software limit switches
         config.SoftwareLimitSwitch = new SoftwareLimitSwitchConfigs()
