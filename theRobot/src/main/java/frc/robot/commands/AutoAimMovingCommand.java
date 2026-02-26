@@ -29,7 +29,7 @@ public class AutoAimMovingCommand extends Command {
     this.aimer = aimer;
     // We are not declaring drivetrain subsystem as a requirement because it is only
     // setting the swerve yaw mode
-    addRequirements();
+    addRequirements(hood, shooter, kicker);
   }
 
   public void initialize() {

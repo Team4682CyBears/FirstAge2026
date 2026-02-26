@@ -221,6 +221,7 @@ public class ManualInputInterfaces {
                                 return SmartDashboard.getNumber("Shooter RPM", 0);
                             }));
                 }
+                SmartDashboard.putNumber("Hood Extendo", 0.0);
                 if (InstalledHardware.hoodMotorInstalled) {
                     this.driverController.a().onTrue(new HoodAngleCommand(
                             this.subsystemCollection.getHoodSubsystem(),
