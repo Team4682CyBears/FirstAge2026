@@ -148,8 +148,8 @@ public final class Constants {
     public static final int hoodMotorCanID = 30;
     public static final int hoodEncoderCanID = 31;
 
-    public static final double hoodEncoderAbsoluteOffset = -0.417;
-    public static final double hoodExtendoTolerance = 0.01;
+    public static final double hoodEncoderAbsoluteOffset = -1.28369140625 - 0.42822265625 + 2;
+    public static final double hoodExtendoTolerance = 0.04;
     public static final double hoodMinPositionRotations = 0.0;
     public static final double hoodMaxPositionRotations = 0.635;
     // Distances corresponding to min and max hood positions

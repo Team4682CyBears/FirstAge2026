@@ -37,7 +37,7 @@ public class InstalledHardware {
 
     // Shooter related hardware
     public static final boolean shooterInstalled = true;
-    public static final boolean hoodMotorInstalled = false;
+    public static final boolean hoodMotorInstalled = true;
     public static final boolean hoodEncoderInstalled = true;
 
     // Kicker
