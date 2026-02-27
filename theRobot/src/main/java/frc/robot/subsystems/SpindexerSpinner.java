@@ -42,7 +42,7 @@ public class SpindexerSpinner extends SubsystemBase {
     private double targetRPS = Constants.spindexerSpeed;
     private boolean staticMode = false;
     // Found based on experimentation on BearBones kicker V1
-    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.52)
+    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.4)
             .withKD(0.0);
 
     /*
