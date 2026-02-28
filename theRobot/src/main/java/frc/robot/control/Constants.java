@@ -41,13 +41,15 @@ public final class Constants {
     // *****************************************************************
     // Field Constants (These are in field-position, not FMAP coordinates)
 
-    // This is calculated using the bottom left corner of the field as (0,0). The y
-    // coordinate is the height of the field divided by 2 and the x is the distance
-    // to the center of the hub and the width of the field minus the distance to the
-    // center of the hub. These are all in meters
-    public static final Translation2d blueHubPosition = new Translation2d(4.625594, 8.069326 / 2); // removed adding one
-                                                                                                   // to this
-    public static final Translation2d redHubPosition = new Translation2d(16.540988 - 4.625594, 8.069326 / 2);
+    // Total field dimensions in meters
+   public static final double FIELD_LENGTH = 16.540988; // 651.22 inches
+   public static final double FIELD_WIDTH = 8.069326;   // 317.69 inches
+
+   // Blue Hub is 182.11 inches from the alliance wall
+   public static final Translation2d blueHubPosition = new Translation2d(4.625594, FIELD_WIDTH / 2.0);
+
+   // Red Hub is mirrored (Field length - Blue X)
+   public static final Translation2d redHubPosition = new Translation2d(FIELD_LENGTH - blueHubPosition.getX(), FIELD_WIDTH / 2.0);
 
     // *****************************************************************
     // Physical Shooter Offsets
