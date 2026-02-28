@@ -93,6 +93,8 @@ public final class Constants {
     public static final double ledPWMGreen = 0.77;
     public static final double ledPWMRed = 0.61;
     public static final double ledPWMBlack = 0.99;
+    public static final double ledPWMOrange = 0.65;
+    public static final double ledPWMBlue = 0.87;
 
     // ******************************************************************
     // camera constants

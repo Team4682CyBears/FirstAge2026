@@ -44,6 +44,14 @@ public class LEDSubsystem extends SubsystemBase {
 
   private boolean useBlinkin = true; 
 
+    public void changeLEDMethod() {
+    if(useBlinkin) {
+      useBlinkin = false;
+    } else {
+      useBlinkin = true;
+    }
+  }
+
   /**
    * LEDSubsystem
    * 
@@ -81,7 +89,7 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public void periodic() {
-    /* this.updateBlinkCounterState();
+    this.updateBlinkCounterState();
     // iterate through all of the states to get most recent action for each that
     // should be taken
     HashMap<LEDState, Boolean> currentActions = new HashMap<LEDState, Boolean>();
@@ -116,114 +124,139 @@ public class LEDSubsystem extends SubsystemBase {
     // update the LED state when the target state has changed
     if (this.currentLEDState != targetLedState) {
       this.currentLEDState = targetLedState;
-      if (this.currentLEDState == LEDState.Green) {
-        this.greenSolid();
-      } else if (this.currentLEDState == LEDState.Yellow) {
-        this.yellowSolid();
-      } else if (this.currentLEDState == LEDState.Red) {
-        this.redSolid();
-      } else if (this.currentLEDState == LEDState.OrangeSolid) {
-        this.orangeSolid();
-      } else if (this.currentLEDState == LEDState.OrangeBlink) {
-        this.orangeBlink();
-      } else if (this.currentLEDState == LEDState.RedBlink) {
-        this.redBlink();
-      } else if (this.currentLEDState == LEDState.GreenBlink) {
-        this.greenBlink();
-      } else if(this.currentLEDState == LEDState.Blue){
-       this.blueSolid();
-      }
-      else {
+      if(useBlinkin) {
+        switch(currentLEDState) {
+          case Green:
+            setPattern(0.77);
+          break;
+          case Red:
+            setPattern(0.61);
+          break;
+          case RedBlink:
+            if (this.currentBlinkState) {
+              this.setPattern(0.61);
+            } else {
+              this.setPattern(0.99);
+            }
+          break;
+          case GreenBlink:
+            if (this.currentBlinkState) {
+              this.setPattern(0.77);
+            } else {
+              this.setPattern(0.99);
+            }
+          break;
+          case OrangeBlink:
+            if (this.currentBlinkState) {
+              this.setPattern(0.65);
+            } else {
+              this.setPattern(0.99);
+            }
+          break;
+          case OrangeSolid:
+            setPattern(0.65);
+          break;
+          case Yellow:
+            setPattern(0.69);
+          break;
+          case Blue:
+            setPattern(0.87);
+          break;
+          default:
+            setPattern(0.87);
+          break;
+        }
+      } else {
+        if (this.currentLEDState == LEDState.Green) {
+          this.greenSolid();
+        } else if (this.currentLEDState == LEDState.Yellow) {
+          this.yellowSolid();
+        } else if (this.currentLEDState == LEDState.Red) {
+          this.redSolid();
+        } else if (this.currentLEDState == LEDState.OrangeSolid) {
+          this.orangeSolid();
+        } else if (this.currentLEDState == LEDState.OrangeBlink) {
+          this.orangeBlink();
+        } else if (this.currentLEDState == LEDState.RedBlink) {
+          this.redBlink();
+        } else if (this.currentLEDState == LEDState.GreenBlink) {
+          this.greenBlink();
+        } else if(this.currentLEDState == LEDState.Blue){
         this.blueSolid();
+        }
+        else {
+          this.blueSolid();
+        }
       }
 
       System.out.println("**** UPDATING LED STATE TO " + this.currentLEDState.toString());
     } else if (this.lastBlinkState != this.currentBlinkState && this.currentLEDState == LEDState.OrangeBlink) {
       System.out.println("**** BLINKING LED STATE TO " + this.currentLEDState.toString());
       this.orangeBlink();
-    } */
-    setPattern(0.87);
+    }
   }
   
   // Method to set blinkin's PWM
   public void setPattern(double pwm) {
     blinkin.set(pwm);
-    if(pwm == 0.87) {
-      System.out.println("!!!!!!!!!!!!!!!!!!BLUUUUUUUUUUUUEEEEEEEEEEE!!!!!!!!!!!!!!!!!!!!!!!!");
-    } else {
-      System.out.println("!!!!!!!!!!!!!!!!!SETTING PWM!!!!!!!!!!!!!!!!!!!!!!!!");
-    }
+    System.out.println("!!!!!!!!!!!!!!!!!SETTING PWM TO " + pwm + " !!!!!!!!!!!!!!!!!!!!!!!!");
   }
 
   // Sets leds to orange blink
   private void orangeBlink() {
     if (this.currentBlinkState) {
-      //this.setLedStringColor(255, 165, 0);
+      this.setLedStringColor(255, 165, 0);
     } else {
-      //this.setLedStringColor(0, 0, 0);
+      this.setLedStringColor(0, 0, 0);
     }
   }
 
   // Sets leds to red blink
   private void redBlink() {
     if (this.currentBlinkState) {
-      //this.setLedStringColor(255, 0, 0);
-      this.setPattern(0.61);
-      System.out.println("!!!!!!!!!!!!!!!REDBLINK!!!!!!!!!!!!!!!!!!!!!");
+      this.setLedStringColor(255, 0, 0);
     } else {
-      //this.setLedStringColor(0, 0, 0);
-      this.setPattern(0.99);
+      this.setLedStringColor(0, 0, 0);
     }
   }
 
     // Sets leds to green blink
   private void greenBlink() {
     if (this.currentBlinkState) {
-      //this.setLedStringColor(255, 200, 0);
-      this.setPattern(0.77);
-      System.out.println("!!!!!!!!!!!!!!GREENBLINK!!!!!!!!!!!!!!!!!!!!");
+      this.setLedStringColor(255, 200, 0);
     } else {
-      //this.setLedStringColor(0, 0, 0);
-      this.setPattern(0.99);
+      this.setLedStringColor(0, 0, 0);
     }
   }
 
   // Sets leds to blue solid
   private void blueSolid() {
-    //this.setLedStringColor(0, 0, 225);
-    this.setPattern(0.87);
-    System.out.println("!!!!!!!!!!!!!!!!!!!!!!BLUE!!!!!!!!!!!!!!!!!!!!!");
+    this.setLedStringColor(0, 0, 225);
   }
 
   // Sets leds to orange solid
   private void orangeSolid() {
-    //this.setLedStringColor(255, 165, 0);
-    System.out.println("!!!!!!!!!!!!!!!!!!!!!ORANGE!!!!!!!!!!!!!!!!!!!!!!");
+    this.setLedStringColor(255, 165, 0);
   }
 
   // Sets leds to yellow solid
   private void yellowSolid() {
-    //this.setLedStringColor(150, 150, 0);
-    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!YELLOW!!!!!!!!!!!!!!!!!!!!!!!");
+    this.setLedStringColor(150, 150, 0);
   }
 
   // Sets leds to yellow solid
   private void redSolid() {
-    //this.setLedStringColor(150, 0, 0);
-    this.setPattern(0.61);
-    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!RED!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    this.setLedStringColor(150, 0, 0);
   }
 
   // Sets leds to green solid
   private void greenSolid() {
-    //this.setLedStringColor(0, 200, 0);
-    this.setPattern(0.77);
-    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!GREEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    this.setLedStringColor(0, 200, 0);
   }
 
   // Turns off leds
   private void offState() {
-    //this.setLedStringColor(0, 0, 0);
+    this.setLedStringColor(0, 0, 0);
   }
 
   // Sets leds color
