@@ -44,8 +44,8 @@ public class HoodSubsystem extends SubsystemBase {
     private boolean hoodIsAtDesiredExtension = true;
     private double desiredExtension;
 
-    private Slot0Configs hoodMotorGainsForAbsoluteEncoder = new Slot0Configs().withKP(0.6).withKI(0.0).withKD(0.0)
-            .withKV(0.4).withKS(0.75); // TODO: Find real values. DO NOT SET KD!!
+    private Slot0Configs hoodMotorGainsForAbsoluteEncoder = new Slot0Configs().withKP(0.4).withKI(0.01).withKD(0.0)
+            .withKV(0.495).withKS(0.1).withKG(0.02); 
 
     public HoodSubsystem(int hoodMotorCanID, int hoodEncoderID) {
         if (InstalledHardware.hoodEncoderInstalled) {
