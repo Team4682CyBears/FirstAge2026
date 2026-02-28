@@ -34,7 +34,7 @@ import frc.robot.control.InstalledHardware;
 public class HoodSubsystem extends SubsystemBase {
 
     // Hood gearing
-    private static final double hoodMotorToMechanismGearRatio = (18.0 / 24.0) * (18.0 / 24.0);
+    private static final double hoodMotorToMechanismGearRatio = (12.0 / 29.0) * (14.0 / 27.0);
     private static final double hoodExtendoLowVelocityTol = 10; // TODO test this on device with motion magic profile
 
     private TalonFXS motor;
@@ -131,7 +131,7 @@ public class HoodSubsystem extends SubsystemBase {
     private void configureMotor() {
         TalonFXSConfiguration config = new TalonFXSConfiguration();
         config.ExternalFeedback.FeedbackRemoteSensorID = Constants.hoodEncoderCanID;
-        config.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.RemoteCANcoder;
+        config.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.SyncCANcoder;
         config.Slot0 = hoodMotorGainsForAbsoluteEncoder;
         config.ExternalFeedback.SensorToMechanismRatio = 1.0;
         config.ExternalFeedback.RotorToSensorRatio = 1.0 / hoodMotorToMechanismGearRatio;
