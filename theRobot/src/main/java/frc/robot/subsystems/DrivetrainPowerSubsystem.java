@@ -19,7 +19,7 @@ public class DrivetrainPowerSubsystem extends SubsystemBase {
 
     private final double maximumSpeedReductionFactor = 1.0;
     private final double defaultSpeedReductionFactor = 1.0;
-    private final double reducedSpeedReductionFactor = 0.4; // used for fine control
+    private final double reducedSpeedReductionFactor = 0.1; // used for fine control
     private double speedReductionFactor = defaultSpeedReductionFactor;
     private double speedReductionFactorIncrement = 0.1;
 

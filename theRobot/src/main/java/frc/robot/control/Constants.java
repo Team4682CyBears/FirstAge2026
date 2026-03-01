@@ -121,7 +121,7 @@ public final class Constants {
 
     // ********************************************************************
     // Misc Constants
-    public static final double PROJECTILE_TIME_OF_FLIGHT_SECONDS = 1.255;
+    public static final double PROJECTILE_TIME_OF_FLIGHT_SECONDS = 1.43;
 
     // ********************************************************************
     // CAN IDs

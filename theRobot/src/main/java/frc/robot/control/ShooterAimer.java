@@ -58,15 +58,14 @@ public class ShooterAimer {
     // compute robot-relative field velocity
     ChassisSpeeds chassis = drivetrain.getChassisSpeeds(); // robot relative speeds
     Rotation2d robotYaw = drivetrain.getGyroscopeRotation();
-    Translation2d fieldVel = new Translation2d(chassis.vxMetersPerSecond, chassis.vyMetersPerSecond)
-        .rotateBy(robotYaw);
+    ChassisSpeeds fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(chassis, robotYaw);
 
-    double distance = drivetrain.getRobotPosition().getTranslation().getDistance(targetFieldTranslation);
+
     double tof = Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS;
 
     Translation2d predicted = new Translation2d(
-        targetFieldTranslation.getX() - (fieldVel.getX() * tof) + targetAdjustment.getX(),
-        targetFieldTranslation.getY() - (fieldVel.getY() * tof) + targetAdjustment.getY());
+        targetFieldTranslation.getX() - (fieldSpeeds.vxMetersPerSecond * tof) + targetAdjustment.getX(),
+        targetFieldTranslation.getY() - (fieldSpeeds.vyMetersPerSecond * tof) + targetAdjustment.getY());
 
     return predicted;
   }
