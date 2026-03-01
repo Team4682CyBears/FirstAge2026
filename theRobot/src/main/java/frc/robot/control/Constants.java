@@ -144,6 +144,7 @@ public final class Constants {
     // Kicker RPM bounds
     public static final double KICKER_MIN_RPM = 0.0;
     public static final double KICKER_MAX_RPM = 2000.0;
+    public static final double KICKER_RPM = 2000.0;
 
     /// ******************************
     /// Hood Constants
@@ -151,7 +152,7 @@ public final class Constants {
     public static final int hoodEncoderCanID = 31;
 
     public static final double hoodEncoderAbsoluteOffset = 0.7220;
-    public static final double hoodExtendoTolerance = 0.04;
+    public static final double hoodExtendoTolerance = 0.01;
     public static final double hoodMinPositionRotations = 0.0;
     public static final double hoodMaxPositionRotations = 0.635;
     // Distances corresponding to min and max hood positions

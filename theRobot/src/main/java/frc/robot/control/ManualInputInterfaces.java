@@ -186,17 +186,22 @@ public class ManualInputInterfaces {
                                     "driverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
 
-            this.driverController.y().onTrue(
-                    new ParallelCommandGroup(
-                            new InstantCommand(() -> this.subsystemCollection.getDriveTrainSubsystem()
-                                    .setSwerveYawMode(SwerveYawMode.AUTO)),
-                            new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode AUTO")));
+            // this.driverController.y().onTrue(
+            // new ParallelCommandGroup(
+            // new InstantCommand(() -> this.subsystemCollection.getDriveTrainSubsystem()
+            // .setSwerveYawMode(SwerveYawMode.AUTO)),
+            // new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode
+            // AUTO")));
 
-            this.driverController.y().onFalse(
-                    new ParallelCommandGroup(
-                            new InstantCommand(() -> this.subsystemCollection.getDriveTrainSubsystem()
-                                    .setSwerveYawMode(SwerveYawMode.JOYSTICK)),
-                            new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode JOYSTICK")));
+            // this.driverController.y().onFalse(
+            // new ParallelCommandGroup(
+            // new InstantCommand(() -> this.subsystemCollection.getDriveTrainSubsystem()
+            // .setSwerveYawMode(SwerveYawMode.JOYSTICK)),
+            // new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode
+            // JOYSTICK")));
+
+            this.driverController.y().whileTrue(new AutoAimMovingCommand(subsystemCollection,
+                    subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
 
             // Single Controller Binds (REMOVE FOR FINAL ROBOT)
             final boolean useSingleControllerBinds = true;
@@ -227,11 +232,11 @@ public class ManualInputInterfaces {
                             this.subsystemCollection.getHoodSubsystem(),
                             () -> SmartDashboard.getNumber("Hood Extendo", 0.0)));
                 }
-                SmartDashboard.putNumber("Kicker RPM", 0);
+                SmartDashboard.putNumber("Kicker RPM", Constants.KICKER_RPM);
                 if (InstalledHardware.kickerInstalled) {
                     this.driverController.rightBumper()
                             .whileTrue(new KickerCommand(this.subsystemCollection.getKickerSubsystem(), () -> {
-                                return SmartDashboard.getNumber("Kicker RPM", 0);
+                                return SmartDashboard.getNumber("Kicker RPM", Constants.KICKER_RPM);
                             }));
                 }
 

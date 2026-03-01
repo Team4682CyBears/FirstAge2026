@@ -10,6 +10,7 @@ import frc.robot.control.ShooterAimer;
 import frc.robot.control.SubsystemCollection;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class AutoAimMovingCommand extends Command {
@@ -29,7 +30,7 @@ public class AutoAimMovingCommand extends Command {
     this.aimer = aimer;
     // We are not declaring drivetrain subsystem as a requirement because it is only
     // setting the swerve yaw mode
-    addRequirements(hood, shooter, kicker);
+    addRequirements(hood, shooter);
   }
 
   public void initialize() {
@@ -49,14 +50,17 @@ public class AutoAimMovingCommand extends Command {
       hood.setExtendoPosition(ext);
       double shooterRpm = aimer.shooterRpmForDistance(distance);
       shooter.runRPM(shooterRpm);
-      double kickerRpm = aimer.kickerRpmForDistance(distance);
-      kicker.runRPM(kickerRpm);
+      SmartDashboard.putNumber("Calc Shooter Speed", shooterRpm);
+      SmartDashboard.putNumber("Calced Hood Extendo", ext);
+      // double kickerRpm = aimer.kickerRpmForDistance(distance);
+      // kicker.runRPM(kickerRpm);
     }
   }
 
   public void end(boolean interrupted) {
     drivetrain.clearShootingAimTarget();
     drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.JOYSTICK);
+    shooter.stop();
   }
 
   public boolean isFinished() {

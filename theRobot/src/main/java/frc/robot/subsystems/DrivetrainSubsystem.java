@@ -71,7 +71,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public static final double MAX_DECELERATION_METERS_PER_SECOND_SQUARED = 100.0;
 
   private final Telemetry logger = new Telemetry(MAX_VELOCITY_METERS_PER_SECOND);
-  /**
+  /**.
    * The maximum angular velocity of the robot in radians per second.
    * This is a measure of how fast the robot can rotate in place.
    */
