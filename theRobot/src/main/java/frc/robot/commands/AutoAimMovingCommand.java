@@ -61,6 +61,7 @@ public class AutoAimMovingCommand extends Command {
     drivetrain.clearShootingAimTarget();
     drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.JOYSTICK);
     shooter.stop();
+    hood.retract();
   }
 
   public boolean isFinished() {

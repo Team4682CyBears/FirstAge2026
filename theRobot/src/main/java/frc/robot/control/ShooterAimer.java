@@ -31,19 +31,25 @@ public class ShooterAimer {
   private double shooterRpmTolerance = 100;
   private double kickerRpmTolerance = 100;
 
-  private final double[][] hoodExtensionLookupTableData = { { 1.0000, 0 },
+  // NOTE: these three LUTs need to have the same min input and max input range. 
+  private final double[][] hoodExtensionLookupTableData = { 
+      { 1.0000, 0 },
       { 1.3037, 0 },
       { 3.4408, 0.45 },
       { 4.7448, 0.637 },
       { 8.2705, 0.637 } };
-  private final double[][] shooterRpmLookupTableData = { { 1, 2912 }, { 1.3037, 3000 }, { 4.7448, 4000 },
+  private final double[][] shooterRpmLookupTableData = { 
+      { 1.0, 2912 }, 
+      { 1.3037, 3000 }, 
+      { 4.7448, 4000 },
       { 8.2705, 6500 } };
-  private final double[][] kickerRpmLookupTableData = { { Constants.hoodMinPositionRotations, 2000 },
-      { Constants.hoodMaxPositionRotations, 2000 } };
+  private final double[][] kickerRpmLookupTableData = { 
+      { 1.0, 2000 },
+      { 8.2705, 2000 } };
 
-  private final LookupTableDouble hoodExtensionLookupTable = new LookupTableDouble(hoodExtensionLookupTableData, 0.0);
-  private final LookupTableDouble shooterRpmLookupTable = new LookupTableDouble(shooterRpmLookupTableData, 0.0);
-  private final LookupTableDouble kickerRpmLookupTable = new LookupTableDouble(kickerRpmLookupTableData, 0.0);
+  private final LookupTableDouble hoodExtensionLookupTable = new LookupTableDouble(hoodExtensionLookupTableData);
+  private final LookupTableDouble shooterRpmLookupTable = new LookupTableDouble(shooterRpmLookupTableData);
+  private final LookupTableDouble kickerRpmLookupTable = new LookupTableDouble(kickerRpmLookupTableData);
 
   public ShooterAimer(DrivetrainSubsystem drivetrain, SubsystemCollection subsystemCollection) {
     this.drivetrain = drivetrain;
@@ -118,6 +124,7 @@ public class ShooterAimer {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
     Translation2d hubPosition = (aimTarget != null) ? aimTarget
         : (alliance == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
+    //TODO pull this out of drivetran and into this class. 
     double angleToFace = drivetrain.getYawToFaceTarget(hubPosition).getRadians();
     System.out.println("angleToFace: " + Units.radiansToDegrees(angleToFace));
 
@@ -139,12 +146,8 @@ public class ShooterAimer {
       return false;
     double distance = drivetrain.getRobotPosition().getTranslation().getDistance(target);
     // check hood lookup bounds (using Constants distances) and shooter rpm bounds
-    if (distance < hoodExtensionLookupTable.getMinInput() || distance > hoodExtensionLookupTable.getMaxInput())
-      return false;
-    double shooterRpm = shooterRpmForDistance(distance);
-    double kickerRpm = kickerRpmForDistance(distance);
-    return shooterRpm >= Constants.SHOOTER_MIN_RPM && shooterRpm <= Constants.SHOOTER_MAX_RPM
-        && kickerRpm >= Constants.SHOOTER_MIN_RPM && kickerRpm <= Constants.SHOOTER_MAX_RPM;
+    // assume hood, shooter, and kicker are all defined over the same min and max distance
+    return distance >= hoodExtensionLookupTable.getMinInput() && distance <= hoodExtensionLookupTable.getMaxInput();
   }
 
   /**
