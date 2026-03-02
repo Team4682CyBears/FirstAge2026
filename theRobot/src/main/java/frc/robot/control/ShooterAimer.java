@@ -63,10 +63,7 @@ public class ShooterAimer {
     }
 
     // compute robot-relative field velocity
-    ChassisSpeeds chassis = drivetrain.getChassisSpeeds(); // robot relative speeds
-    Rotation2d robotYaw = drivetrain.getGyroscopeRotation();
-    ChassisSpeeds fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(chassis, robotYaw);
-
+    ChassisSpeeds fieldSpeeds = drivetrain.getChassisSpeedsFieldCentric(); 
 
     double tof = Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS;
 

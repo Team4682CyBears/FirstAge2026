@@ -137,7 +137,7 @@ public class AutonomousChooser {
         AutoBuilder.configure(
                 subsystems.getDriveTrainSubsystem()::getRobotPosition, // Pose supplier
                 subsystems.getDriveTrainSubsystem()::setRobotPosition, // Position setter
-                subsystems.getDriveTrainSubsystem()::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                subsystems.getDriveTrainSubsystem()::getChassisSpeedsRobotCentric, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 (speeds, feedforwards) -> subsystems.getDriveTrainSubsystem().driveRobotCentric(speeds), 
                 Constants.pathFollower,
                 subsystems.getDriveTrainSubsystem().getPathPlannerConfig(),

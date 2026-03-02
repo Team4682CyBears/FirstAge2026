@@ -133,7 +133,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * Constructor for this DrivetrainSubsystem
    */
   public DrivetrainSubsystem(SubsystemCollection subsystems) {
-    if (InstalledHardware.limelightInstalled) {
+    if (subsystems.isCameraSubsystemAvailable()) {
       cameraSubsystem = subsystems.getCameraSubsystem();
     }
 
@@ -211,6 +211,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         updatedChassisSpeeds.vyMetersPerSecond,
         getAutoYawVelocityRadiansPerSecond());
     this.chassisSpeeds = newChassisSpeeds;
+    System.out.println("Setting chassis speeds in drivetrain to " + chassisSpeeds + "based on updated " + updatedChassisSpeeds);
   }
 
   /**
@@ -239,8 +240,27 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * 
    * @return chassis speeds
    */
-  public ChassisSpeeds getChassisSpeeds() {
-    return drivetrain.getState().Speeds;
+  public ChassisSpeeds getChassisSpeedsRobotCentric() {
+    if (swerveDriveMode == SwerveDriveMode.ROBOT_CENTRIC_DRIVING){
+      return drivetrain.getState().Speeds;
+    }
+    else {
+      return ChassisSpeeds.fromFieldRelativeSpeeds(drivetrain.getState().Speeds, getGyroscopeRotation());
+    }
+  }
+
+  /**
+   * returns chassis speeds (field relative)
+   * 
+   * @return chassis speeds
+   */
+  public ChassisSpeeds getChassisSpeedsFieldCentric() {
+    if (swerveDriveMode == SwerveDriveMode.ROBOT_CENTRIC_DRIVING){
+      return ChassisSpeeds.fromRobotRelativeSpeeds(drivetrain.getState().Speeds, getGyroscopeRotation());
+    }
+    else {
+      return drivetrain.getState().Speeds;
+    }
   }
 
   /**
@@ -642,8 +662,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private void displayDiagnostics() {
     if (displayOdometryDiagnostics) {
-      VisionMeasurement visionBotPose = cameraSubsystem.getVisionBotPose();
-      if (visionBotPose.getRobotPosition() != null) {
+      VisionMeasurement visionBotPose = cameraSubsystem != null ? cameraSubsystem.getVisionBotPose() : null;
+      if (visionBotPose != null && visionBotPose.getRobotPosition() != null) {
         SmartDashboard.putNumber("vision x", visionBotPose.getRobotPosition().getX());
         SmartDashboard.putNumber("vision y", visionBotPose.getRobotPosition().getY());
         SmartDashboard.putNumber("vision theta", visionBotPose.getRobotPosition().getRotation().getDegrees());
