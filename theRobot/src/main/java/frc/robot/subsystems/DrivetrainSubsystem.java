@@ -304,20 +304,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   /**
-   * @param targetX meters
-   * @param targetY meters
-   * @return desired field relative Rotation2d for the robot to face the target
-   */
-  public Rotation2d getYawToFaceTarget(Translation2d targetTranslation) {
-    Pose2d botPos = getRobotPosition();
-    double dx = targetTranslation.getX() - botPos.getX();
-    double dy = targetTranslation.getY() - botPos.getY();
-
-    double angleRad = Math.atan2(dy, dx);
-    return Rotation2d.fromRadians(angleRad);
-  }
-
-  /**
    * A method to obtain the swerve drive mode
    * 
    * @return the mode

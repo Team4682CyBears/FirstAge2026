@@ -5,6 +5,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.common.LookupTableDouble;
@@ -88,6 +89,20 @@ public class ShooterAimer {
   }
 
   /**
+   * @param targetX meters
+   * @param targetY meters
+   * @return desired field relative Rotation2d for the robot to face the target
+   */
+  public Rotation2d getYawToFaceTarget(Translation2d targetTranslation) {
+    Pose2d botPos = drivetrain.getRobotPosition();
+    double dx = targetTranslation.getX() - botPos.getX();
+    double dy = targetTranslation.getY() - botPos.getY();
+
+    double angleRad = Math.atan2(dy, dx);
+    return Rotation2d.fromRadians(angleRad);
+  }
+
+  /**
    * Returns the desired hood extension (rotations or motor units) for a given
    * distance.
    * The hood subsystem expects a double position (rotations) rather than a servo
@@ -124,8 +139,7 @@ public class ShooterAimer {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
     Translation2d hubPosition = (aimTarget != null) ? aimTarget
         : (alliance == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
-    //TODO pull this out of drivetran and into this class. 
-    double angleToFace = drivetrain.getYawToFaceTarget(hubPosition).getRadians();
+    double angleToFace = getYawToFaceTarget(hubPosition).getRadians();
     System.out.println("angleToFace: " + Units.radiansToDegrees(angleToFace));
 
     double error = MathUtil

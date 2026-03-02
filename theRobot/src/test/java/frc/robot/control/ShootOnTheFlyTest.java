@@ -3,10 +3,12 @@ package frc.robot.control;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.control.ShooterAimer;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.robot.common.LookupTableDouble;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,66 +32,6 @@ class ShootOnTheFlyTest {
   @AfterEach // this method will run after each test
   void shutdown() throws Exception {
     // need to close drivetrain and shooterAimer here...
-  }
-
-  @Test
-  void singleValueLUTGreaterThanMaxReturnsDefault(){
-    // a LUT with a single entry returns default when query value is greater 
-    double[][] lookupTable = {{30, 200}};
-    LookupTableDouble LUT = new LookupTableDouble(lookupTable, 1000.0); 
-    assertEquals(
-      1000.0, LUT.queryTable(40.0)
-    );
-  }
-
-  @Test
-  void LUTGreaterThanMaxReturnsClamp(){
-    // a LUT returns max output when query value is greater 
-    double[][] lookupTable = {{30, 200}, {35, 300}};
-    LookupTableDouble LUT = new LookupTableDouble(lookupTable); 
-    assertEquals(
-      300.0, LUT.queryTable(40.0)
-    );
-  }
-
-  @Test
-  void singleValueLUTLessThanMinReturnsDefault(){
-    // a LUT with a single entry returns default value when query value is lower
-    double[][] lookupTable = {{30, 200}};
-    LookupTableDouble LUT = new LookupTableDouble(lookupTable, 1000.0); 
-    assertEquals(
-      1000.0, LUT.queryTable(20.0)
-    );
-  }
-
-  @Test
-  void LUTLessThanMinReturnsClamp(){
-    // a LUT returns min output value when query value is lower
-    double[][] lookupTable = {{30, 200}, {35, 300}};
-    LookupTableDouble LUT = new LookupTableDouble(lookupTable); 
-    assertEquals(
-      200.0, LUT.queryTable(20.0)
-    );
-  }
-
-  @Test
-  void singleValueLUTInBoundsReturnsValue(){
-    // a LUT with a single entry returns output value when query matches
-    double[][] lookupTable = {{30, 200}};
-    LookupTableDouble LUT = new LookupTableDouble(lookupTable, 1000.0); 
-    assertEquals(
-      200.0, LUT.queryTable(30.0)
-    );
-  }
-
-  @Test
-  void LUTInBoundsReturnsValue(){
-    // a LUT returns interpolated output value when query in bounds
-    double[][] lookupTable = {{30, 200}, {36, 300}};
-    LookupTableDouble LUT = new LookupTableDouble(lookupTable); 
-    assertEquals(
-      250.0, LUT.queryTable(33.0)
-    );
   }
 
   @Test 
@@ -117,8 +59,8 @@ class ShootOnTheFlyTest {
   }
 
   @Test 
-  void hoodExtensionDefaultBelowMin() {
-    // known lookup table value
+  void hoodExtensionClampBelowMin() {
+    // clamp to min when input below min
     double input = 0.5; // below min
     double output = Constants.hoodMinPositionRotations;
     double hoodPosition = shooterAimer.hoodExtensionForDistance(input);
@@ -127,13 +69,81 @@ class ShootOnTheFlyTest {
   }
 
   @Test 
-  void hoodExtensionDefaultAboveMax() {
-    // known lookup table value
+  void hoodExtensionClampAboveMax() {
+    // clamp to max when input above max
     double input = 9.0; // below min
     double output = Constants.hoodMaxPositionRotations;
     double hoodPosition = shooterAimer.hoodExtensionForDistance(input);
     assertEquals(
         output , hoodPosition, DELTA); 
   }
+
+  @Test 
+  void shooterRPMValidValue() {
+    // known lookup table value
+    double input = 1.3037;
+    double output = 3000;
+    double hoodPosition = shooterAimer.shooterRpmForDistance(input);
+    assertEquals(
+        output , hoodPosition, DELTA); 
+  }
+
+  @Test 
+  void shooterRPMInterpolatedValue() {
+    // interpolated lookup table value
+    // { 1.3037, 3000 }, 
+    //  { 4.7448, 4000 },
+    double input = 4.0;
+    double numerator = (3000 * (4.7448- input)) + (4000 * (input - 1.3037));
+    double denominator = (4.7448 - 1.3037);
+    double output = numerator / denominator;
+    double hoodPosition = shooterAimer.shooterRpmForDistance(input);
+    assertEquals(
+         output, hoodPosition, DELTA); 
+  }
+
+  @Test 
+  void shooterRPMClampBelowMin() {
+    // clamp to min when input below min
+    double input = 0.5; // below min
+    double output = 2912;
+    double hoodPosition = shooterAimer.shooterRpmForDistance(input);
+    assertEquals(
+        output , hoodPosition, DELTA); 
+  }
+
+  @Test 
+  void ShooterRPMClampAboveMax() {
+    // clamp to max when input above max
+    double input = 9.0; // below min
+    double output = 6500;
+    double hoodPosition = shooterAimer.shooterRpmForDistance(input);
+    assertEquals(
+        output , hoodPosition, DELTA); 
+  }
+
+  @Test
+  void RobotYawTargetDeadOn(){
+    // robot yaw should be 180 when dead on to target
+    drivetrain.setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0,0.0)), new Rotation2d(0.0)));
+    assertEquals(180.0, shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).getDegrees());
+  }
+
+  @Test
+  void RobotYawTarget45degrees(){
+    // robot yaw should be -135 (-180+45) degrees when offset equal amounts in x/y
+    drivetrain.setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0,1.0)), new Rotation2d(0.0)));
+    assertEquals(-180.0+45.0, shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).getDegrees());
+  }
+
+  @Test
+  void RobotYawTarget90degrees(){
+    // robot yaw should be -90 when to the side of target
+    drivetrain.setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(0.0,1.0)), new Rotation2d(0.0)));
+    assertEquals(-90.0, shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).getDegrees());
+  }
+
+  
+
 }
 
