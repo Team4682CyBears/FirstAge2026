@@ -3,11 +3,15 @@ package frc.robot.control;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import frc.robot.control.ShooterAimer;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -161,23 +165,36 @@ class ShootOnTheFlyTest {
     // robot yaw should be 180 when dead on to target
     // target should move farther when driving away
     // start 1m from target in x
+
+    // enable driver station
+    DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+    DriverStationSim.setEnabled(true);
+    DriverStationSim.notifyNewData();
+    // delay 100ms to allow enable to take effect
+    Timer.delay(0.100);
+    // set target
+    shooterAimer.setDesiredTarget(shooterAimer.getHubPositionFromAlliance());
+    // setup drivetrain
     drivetrain
         .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), new Rotation2d(0.0)));
-    double vx = 1.0;
+    assertEquals(180.0, shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).getDegrees());
+    drivetrain
+        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), shooterAimer.getYawToFaceTarget(Constants.blueHubPosition)));
+    double vx = -1.0;
     double vy = 0.0;
     // drive 1mps away from target in x
     drivetrain.driveFieldCentricShooting(new ChassisSpeeds(vx, vy, 0.0));
-    // create new shooterAimer with this drivetrain
-    shooterAimer = new ShooterAimer(drivetrain, subsystemCollection);
+    // run 1 periodic
+    drivetrain.periodic();
+    System.out.println("field centric chassis speeds " + drivetrain.getChassisSpeedsFieldCentric());
 
     Translation2d expectedTarget = Constants.blueHubPosition.plus(
       new Translation2d(-vx * Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS, -vy * Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS));
-    assertEquals(180.0, shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).getDegrees());
+
     System.out.println("original target " + Constants.blueHubPosition);
     System.out.println("expected target " + expectedTarget);
-    System.out.println("actual target " + shooterAimer.computePredictedTarget(Constants.blueHubPosition));
-    System.out.println("chassis speeds " + drivetrain.getChassisSpeedsFieldCentric());
-    assertTrue(expectedTarget.equals(shooterAimer.computePredictedTarget(Constants.blueHubPosition)));
+    System.out.println("actual target " + shooterAimer.computePredictedTarget());
+    assertTrue(expectedTarget.equals(shooterAimer.computePredictedTarget()));
   }
 
 }

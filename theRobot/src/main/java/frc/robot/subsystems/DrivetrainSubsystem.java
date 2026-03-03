@@ -43,6 +43,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -101,8 +102,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private SwerveDriveMode swerveDriveMode = SwerveDriveMode.FIELD_CENTRIC_DRIVING;
 
   private SwerveYawMode swerveYawMode = SwerveYawMode.JOYSTICK;
-
-  private Translation2d shootingAimTarget = null;
 
   private SwerveDrivetrain<TalonFX, TalonFX, CANcoder> drivetrain = InstalledHardware.bareDrivetrainInstalled
       ? new BareTunerConstants.TunerSwerveDrivetrain(BareTunerConstants.DrivetrainConstants, 0,
@@ -211,7 +210,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         updatedChassisSpeeds.vyMetersPerSecond,
         getAutoYawVelocityRadiansPerSecond());
     this.chassisSpeeds = newChassisSpeeds;
-    System.out.println("Setting chassis speeds in drivetrain to " + chassisSpeeds + "based on updated " + updatedChassisSpeeds);
   }
 
   /**
@@ -241,11 +239,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @return chassis speeds
    */
   public ChassisSpeeds getChassisSpeedsRobotCentric() {
-    if (swerveDriveMode == SwerveDriveMode.ROBOT_CENTRIC_DRIVING){
-      return drivetrain.getState().Speeds;
-    }
+    if (RobotBase.isSimulation()) {
+      if (swerveDriveMode == SwerveDriveMode.ROBOT_CENTRIC_DRIVING) {
+        return chassisSpeeds;
+      }
+      else {
+        return ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, getGyroscopeRotation());
+      }
+    } 
     else {
-      return ChassisSpeeds.fromFieldRelativeSpeeds(drivetrain.getState().Speeds, getGyroscopeRotation());
+      return drivetrain.getState().Speeds;
     }
   }
 
@@ -255,12 +258,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @return chassis speeds
    */
   public ChassisSpeeds getChassisSpeedsFieldCentric() {
-    if (swerveDriveMode == SwerveDriveMode.ROBOT_CENTRIC_DRIVING){
-      return ChassisSpeeds.fromRobotRelativeSpeeds(drivetrain.getState().Speeds, getGyroscopeRotation());
-    }
-    else {
-      return drivetrain.getState().Speeds;
-    }
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeedsRobotCentric(), getGyroscopeRotation());
   }
 
   /**
@@ -395,6 +393,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
       }
     }
 
+    if (swerveYawMode == SwerveYawMode.AUTO) {
+      this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
+    }
+
     if (swerveDriveMode == SwerveDriveMode.IMMOVABLE_STANCE && chassisSpeedsAreZero()) {
       // only change to ImmovableStance if chassis is not moving.
       // otherwise, we could tip the robot moving to this stance when bot is at high
@@ -428,45 +430,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
           .withVelocityY(chassisSpeeds.vyMetersPerSecond)
           .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
     }
-    if (swerveYawMode == SwerveYawMode.AUTO) {
-      setAutoYawVelocityRadiansPerSecond();
-    }
-
+  
     displayDiagnostics();
-  }
-
-  /**
-   * Set an aiming target (field-relative) for use while in AUTO yaw mode. Use
-   * null to clear.
-   *
-   * @param target field-relative translation for the aim target (meters). If
-   *               null the drivetrain will revert to the default hub position
-   *               behavior.
-   */
-  public void setShootingAimTarget(Translation2d target) {
-    this.shootingAimTarget = target;
-  }
-
-  /**
-   * Clear any manual shooting aim target so the drivetrain uses the default
-   * hub position.
-   */
-  public void clearShootingAimTarget() {
-    this.shootingAimTarget = null;
-  }
-
-  /**
-   * Compute and set the current auto yaw velocity (radians/sec) using the
-   * physical shooter offsets and shooter yaw offset from Constants. This
-   * centralizes the auto-yaw math so callers only need to invoke this method.
-   */
-  private void setAutoYawVelocityRadiansPerSecond() {
-    if (this.shooterAimer != null) {
-      this.autoYawVelocityRadiansPerSecond = shooterAimer.computeAutoYawVelocityRadiansPerSecond(shootingAimTarget);
-    } else {
-      // No aimer - clear auto yaw (drivetrain shouldn't attempt automatic yaw)
-      this.autoYawVelocityRadiansPerSecond = 0.0;
-    }
   }
 
   /**

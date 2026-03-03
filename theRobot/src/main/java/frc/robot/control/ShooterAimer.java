@@ -19,6 +19,7 @@ public class ShooterAimer {
   private final DrivetrainSubsystem drivetrain;
   private final SubsystemCollection subsystemCollection;
 
+  private Translation2d desiredTarget = null;
   private Translation2d targetAdjustment = new Translation2d(0.0, 0.0);
 
   private double autoYawProfileConstraintsMaxVelocity = 540;
@@ -57,8 +58,12 @@ public class ShooterAimer {
     this.subsystemCollection = subsystemCollection;
   }
 
-  public Translation2d computePredictedTarget(Translation2d targetFieldTranslation) {
-    if (targetFieldTranslation == null) {
+  public void clearShootingAimTarget(){
+    this.desiredTarget = null;
+  }
+
+  public Translation2d computePredictedTarget() {
+    if (desiredTarget == null) {
       return null;
     }
 
@@ -68,10 +73,15 @@ public class ShooterAimer {
     double tof = Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS;
 
     Translation2d predicted = new Translation2d(
-        targetFieldTranslation.getX() - (fieldSpeeds.vxMetersPerSecond * tof) + targetAdjustment.getX(),
-        targetFieldTranslation.getY() - (fieldSpeeds.vyMetersPerSecond * tof) + targetAdjustment.getY());
+        desiredTarget.getX() - (fieldSpeeds.vxMetersPerSecond * tof) + targetAdjustment.getX(),
+        desiredTarget.getY() - (fieldSpeeds.vyMetersPerSecond * tof) + targetAdjustment.getY());
 
     return predicted;
+  }
+
+  public double getDistanceToPredictedTarget(){
+    Translation2d predicted = computePredictedTarget();
+    return drivetrain.getRobotPosition().getTranslation().getDistance(predicted);
   }
 
   /**
@@ -83,6 +93,14 @@ public class ShooterAimer {
 
   public void resetTargetAdjustment() {
     targetAdjustment = new Translation2d(0.0, 0.0);
+  }
+
+  public void setDesiredTarget(Translation2d target){
+    this.desiredTarget = target;
+  }
+
+  public Translation2d getDesiredTarget(){
+    return desiredTarget;
   }
 
   /**
@@ -123,20 +141,19 @@ public class ShooterAimer {
         Constants.KICKER_MAX_RPM);
   }
 
+  public Translation2d getHubPositionFromAlliance(){
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    return alliance == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
+  }
+
   /**
    * Computes an auto-yaw velocity to command the drivetrain when aiming at a
    * target.
    * If aimTarget is null, defaults to alliance hub.
    */
-  public double computeAutoYawVelocityRadiansPerSecond(Translation2d aimTarget) {
+  public double computeAutoYawVelocityRadiansPerSecond() {
     double robotYawRadians = drivetrain.getRobotPosition().getRotation().getRadians();
-    if (DriverStation.getAlliance().isEmpty()) {
-      System.out.println("WARNING: DriverStation is reporting no alliance!");
-    }
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    Translation2d hubPosition = (aimTarget != null) ? aimTarget
-        : (alliance == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition);
-    double angleToFace = getYawToFaceTarget(hubPosition).getRadians();
+    double angleToFace = getYawToFaceTarget(computePredictedTarget()).getRadians();
     System.out.println("angleToFace: " + Units.radiansToDegrees(angleToFace));
 
     double error = MathUtil
@@ -147,6 +164,14 @@ public class ShooterAimer {
         ? pidOut + Math.signum(pidOut) * minYawVelocityRadiansPerSecond
         : 0.0;
     return out;
+  }
+
+  public ChassisSpeeds updateChassisSpeedsWithAutoYaw(ChassisSpeeds chassisSpeeds){
+      ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(
+        chassisSpeeds.vxMetersPerSecond,
+        chassisSpeeds.vyMetersPerSecond,
+        computeAutoYawVelocityRadiansPerSecond());
+      return newChassisSpeeds;
   }
 
   /**

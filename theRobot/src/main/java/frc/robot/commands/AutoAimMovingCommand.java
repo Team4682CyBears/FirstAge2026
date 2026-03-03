@@ -35,30 +35,23 @@ public class AutoAimMovingCommand extends Command {
 
   public void initialize() {
     drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.AUTO);
+    aimer.setDesiredTarget(aimer.getHubPositionFromAlliance());
   }
 
   public void execute() {
-    Alliance alliance = DriverStation.getAlliance().get();
-    Translation2d hub = (alliance == Alliance.Blue) ? Constants.blueHubPosition : Constants.redHubPosition;
-
-    Translation2d predicted = aimer.computePredictedTarget(hub);
-    if (predicted != null) {
-      drivetrain.setShootingAimTarget(predicted);
-
-      double distance = drivetrain.getRobotPosition().getTranslation().getDistance(predicted);
-      double ext = aimer.hoodExtensionForDistance(distance);
-      hood.setExtendoPosition(ext);
-      double shooterRpm = aimer.shooterRpmForDistance(distance);
-      shooter.runRPM(shooterRpm);
-      SmartDashboard.putNumber("Calc Shooter Speed", shooterRpm);
-      SmartDashboard.putNumber("Calced Hood Extendo", ext);
-      // double kickerRpm = aimer.kickerRpmForDistance(distance);
-      // kicker.runRPM(kickerRpm);
-    }
+    double distance = aimer.getDistanceToPredictedTarget();
+    double ext = aimer.hoodExtensionForDistance(distance);
+    hood.setExtendoPosition(ext);
+    double shooterRpm = aimer.shooterRpmForDistance(distance);
+    shooter.runRPM(shooterRpm);
+    SmartDashboard.putNumber("Calc Shooter Speed", shooterRpm);
+    SmartDashboard.putNumber("Calced Hood Extendo", ext);
+    // double kickerRpm = aimer.kickerRpmForDistance(distance);
+    // kicker.runRPM(kickerRpm);
   }
 
   public void end(boolean interrupted) {
-    drivetrain.clearShootingAimTarget();
+    aimer.clearShootingAimTarget();
     drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.JOYSTICK);
     shooter.stop();
     hood.retract();
