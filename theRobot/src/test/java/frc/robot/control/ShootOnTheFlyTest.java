@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -137,15 +138,15 @@ class ShootOnTheFlyTest {
     // robot yaw should be 180 when dead on to target
     drivetrain
         .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), new Rotation2d(0.0)));
-    assertEquals(180.0, shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).getDegrees());
+    assertEquals(Rotation2d.fromDegrees(180.0).plus(Constants.shooterYawOffset).getDegrees(), shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).getDegrees());
   }
 
   @Test
   void RobotYawTarget45degrees() {
-    // robot yaw should be -135 (-180+45) degrees when offset equal amounts in x/y
+    // robot yaw should be -135 (-180+45 - shooterYawOffset) degrees when offset equal amounts in x/y
     drivetrain
         .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 1.0)), new Rotation2d(0.0)));
-    assertEquals(-180.0 + 45.0, shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).getDegrees());
+    assertEquals(Rotation2d.fromDegrees(-180.0 + 45.0).plus(Constants.shooterYawOffset).getDegrees(), shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).getDegrees());
   }
 
   @Test
@@ -153,7 +154,7 @@ class ShootOnTheFlyTest {
     // robot yaw should be -90 when to the side of target
     drivetrain
         .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(0.0, 1.0)), new Rotation2d(0.0)));
-    assertEquals(-90.0, shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).getDegrees());
+    assertEquals(Rotation2d.fromDegrees(-90.0).plus(Constants.shooterYawOffset).getDegrees(), shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).getDegrees());
   }
 
   /*
@@ -164,30 +165,33 @@ class ShootOnTheFlyTest {
   void RobotYawTargetDeadOnFadeShot() {
     // robot yaw should be 180 when dead on to target
     // target should move farther when driving away
-    // start 1m from target in x
 
-    // enable driver station
+    // enable driver station and set alliance
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
     DriverStationSim.setEnabled(true);
     DriverStationSim.notifyNewData();
     // delay 100ms to allow enable to take effect
     Timer.delay(0.100);
+
     // set target
     shooterAimer.setDesiredTarget(shooterAimer.getHubPositionFromAlliance());
+    
     // setup drivetrain
+    // start 1m from target in x
+    // have to set the drivetrain x/y first, and then apply the auto yaw (since the PID that would set it doesn't work in sim)
     drivetrain
         .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), new Rotation2d(0.0)));
-    assertEquals(180.0, shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).getDegrees());
+    System.out.println("auto yaw rotational velocity " + shooterAimer.computeAutoYawVelocityRadiansPerSecond());
     drivetrain
         .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), shooterAimer.getYawToFaceTarget(Constants.blueHubPosition)));
+    System.out.println("auto yaw rotational velocity after" + shooterAimer.computeAutoYawVelocityRadiansPerSecond());
+    // drive 1mps away from target in x
     double vx = -1.0;
     double vy = 0.0;
-    // drive 1mps away from target in x
     drivetrain.driveFieldCentricShooting(new ChassisSpeeds(vx, vy, 0.0));
-    // run 1 periodic
-    drivetrain.periodic();
     System.out.println("field centric chassis speeds " + drivetrain.getChassisSpeedsFieldCentric());
 
+    // compute expected target
     Translation2d expectedTarget = Constants.blueHubPosition.plus(
       new Translation2d(-vx * Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS, -vy * Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS));
 

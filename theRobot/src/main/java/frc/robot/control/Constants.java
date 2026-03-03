@@ -57,7 +57,7 @@ public final class Constants {
     public static final double shooterYOffsetFromCenterOfRobot = -.1397; // in meters, positive is to the left
     public static final Translation2d shooterOffsetFromCenterOfRobot = new Translation2d(
             shooterXOffsetFromCenterOfRobot, shooterYOffsetFromCenterOfRobot);
-    public static final double shooterYawOffset = 60.0; // in degrees
+    public static final Rotation2d shooterYawOffset = Rotation2d.fromDegrees(-60.0); 
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
     public static final double DegreesPerRevolution = 360.0;

@@ -107,6 +107,7 @@ public class ShooterAimer {
    * @param targetX meters
    * @param targetY meters
    * @return desired field relative Rotation2d for the robot to face the target
+   * accounts for shooterYawOffset relative to robot
    */
   public Rotation2d getYawToFaceTarget(Translation2d targetTranslation) {
     Pose2d botPos = drivetrain.getRobotPosition();
@@ -114,7 +115,7 @@ public class ShooterAimer {
     double dy = targetTranslation.getY() - botPos.getY();
 
     double angleRad = Math.atan2(dy, dx);
-    return Rotation2d.fromRadians(angleRad);
+    return Rotation2d.fromRadians(angleRad).plus(Constants.shooterYawOffset);
   }
 
   /**
@@ -157,7 +158,7 @@ public class ShooterAimer {
     System.out.println("angleToFace: " + Units.radiansToDegrees(angleToFace));
 
     double error = MathUtil
-        .angleModulus(robotYawRadians - angleToFace + Units.degreesToRadians(Constants.shooterYawOffset));
+        .angleModulus(robotYawRadians - angleToFace);
     System.out.println("error: " + Units.radiansToDegrees(error));
     double pidOut = autoYawPID.calculate(error, 0.0);
     double out = (Math.abs(pidOut) > yawVelocityDeadband)
