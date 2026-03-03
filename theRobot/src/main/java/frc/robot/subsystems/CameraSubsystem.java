@@ -12,13 +12,11 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 import com.ctre.phoenix6.Utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.common.VisionMeasurement;
 import frc.robot.control.Constants;
@@ -31,10 +29,6 @@ import frc.robot.common.DistanceMeasurement;
  * A class to encapsulate the camera subsystem
  */
 public class CameraSubsystem extends SubsystemBase {
-  private final double milisecondsInSeconds = 1000.0;
-  private final double microsecondsInSeconds = 1000000.0;
-  private final int BotposeDoubleArraySize = 8;
-  private final int latencyIndex = 6;
 
   /**
    * Set the internal botPoseSource (NT entry name) based on DriverStation alliance.
@@ -44,26 +38,17 @@ public class CameraSubsystem extends SubsystemBase {
     DriverStation.getAlliance().ifPresent(alliance -> {
       if (alliance == Alliance.Red) {
         botPoseSource = "botpose_wpired";
-        botPoseOrbSource = "botpose_orb_wpired";
       } else if (alliance == Alliance.Blue) {
         botPoseSource = "botpose_wpiblue";
-        botPoseOrbSource = "botpose_orb_wpiblue";
       } else {
         botPoseSource = "botpose";
-        botPoseOrbSource = "botpose_orb";
       }
     });
   }
-  private final int fieldSpaceXIndex = 0;
-  private final int fieldSpaceYIndex = 1;
-  private final int botRotationIndex = 5;
   private final int noTagInSightId = -1;
   // we use this for teleop vision udpates with an origin in the bottom left blue
   // side
   private String botPoseSource = "botpose_wpiblue";
-  // we use this for disabled vision seeding with an origin in the bottom left
-  // blue side
-  private String botPoseOrbSource = "botpose_orb_wpiblue";
   private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
   /**
@@ -82,62 +67,32 @@ public class CameraSubsystem extends SubsystemBase {
   public VisionMeasurement getVisionBotPose() {
     // Use LimelightHelpers to get a PoseEstimate (includes timestamp + latency handling)
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
-    try {
-      LimelightHelpers.PoseEstimate pe;
-      // Select helper based on alliance so we read the correct wpi entry
-      if (false && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-        pe = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
-      } else {
-        pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-      }
-      if (pe != null && pe.pose != null) {
-        // LimelightHelpers timestampSeconds is server-time (seconds since epoch), convert to FPGA time reference
-        double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
-        visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
-      }
-    } catch (Exception e) {
-      // fall back to previous behavior if helper fails
-      double tagId = this.table.getEntry("tid").getDouble(noTagInSightId);
-      NetworkTableEntry botposeEntry = this.table.getEntry(botPoseSource);
-      if (botposeEntry.exists() && tagId != noTagInSightId) {
-        double[] botpose = botposeEntry.getDoubleArray(new double[this.BotposeDoubleArraySize]);
-        Double timestamp = (botposeEntry.getLastChange() / this.microsecondsInSeconds)
-            - (botpose[this.latencyIndex] / this.milisecondsInSeconds);
-        Translation2d botTranslation = new Translation2d(botpose[this.fieldSpaceXIndex], botpose[this.fieldSpaceYIndex]);
-        Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]);
-        Pose2d realRobotPosition = new Pose2d(botTranslation, botYaw);
-        visionMeasurement = new VisionMeasurement(realRobotPosition, Utils.fpgaToCurrentTime(timestamp));
-      }
+    LimelightHelpers.PoseEstimate pe;
+    // Select helper based on alliance so we read the correct wpi entry
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+      pe = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
+    } else {
+      pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+    }
+    if (pe != null && pe.pose != null) {
+      // LimelightHelpers timestampSeconds is server-time (seconds since epoch), convert to FPGA time reference
+      double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
+      visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
     }
     return visionMeasurement;
   }
 
   public VisionMeasurement getVisionBotPoseOrb() {
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
-    try {
-      LimelightHelpers.PoseEstimate pe;
-      if (false && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-        pe = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight");
-      } else {
-        pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-      }
-      if (pe != null && pe.pose != null) {
-        double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
-        visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
-      }
-    } catch (Exception e) {
-      // fallback to manual read
-      double tagId = this.table.getEntry("tid").getDouble(noTagInSightId);
-      NetworkTableEntry botposeEntry = this.table.getEntry(botPoseOrbSource);
-      if (botposeEntry.exists() && tagId != noTagInSightId) {
-        double[] botpose = botposeEntry.getDoubleArray(new double[this.BotposeDoubleArraySize]);
-        Double timestamp = (botposeEntry.getLastChange() / this.microsecondsInSeconds)
-            - (botpose[this.latencyIndex] / this.milisecondsInSeconds);
-        Translation2d botTranslation = new Translation2d(botpose[this.fieldSpaceXIndex], botpose[this.fieldSpaceYIndex]);
-        Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]);
-        Pose2d realRobotPosition = new Pose2d(botTranslation, botYaw);
-        visionMeasurement = new VisionMeasurement(realRobotPosition, Utils.fpgaToCurrentTime(timestamp));
-      }
+    LimelightHelpers.PoseEstimate pe;
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+      pe = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight");
+    } else {
+      pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+    }
+    if (pe != null && pe.pose != null) {
+      double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
+      visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
     }
     return visionMeasurement;
   }
