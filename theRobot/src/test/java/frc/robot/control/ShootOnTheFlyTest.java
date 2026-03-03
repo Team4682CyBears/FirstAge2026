@@ -98,7 +98,7 @@ class ShootOnTheFlyTest {
     System.out.println("auto yaw translation velocity field centric (mps)" + translationalVelocityFieldCentric);
     Translation2d translationalError = translationalVelocityFieldCentric.times(Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS);
     System.out.println("translation error (m) " + translationalError);
-
+    // TODO add actual assert to this test. 
   }
 
 }

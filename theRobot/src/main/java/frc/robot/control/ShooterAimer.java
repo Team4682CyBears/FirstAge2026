@@ -19,7 +19,7 @@ public class ShooterAimer {
   private final DrivetrainSubsystem drivetrain;
   private final SubsystemCollection subsystemCollection;
 
-  private boolean doCompensateForRotation = false;
+  private final boolean doCompensateForRotation = false;
 
   private Translation2d desiredTarget = null;
   private Translation2d targetAdjustment = new Translation2d(0.0, 0.0);
@@ -90,6 +90,7 @@ public class ShooterAimer {
     Translation2d fieldSpeedsTranslation = new Translation2d(fieldSpeeds.vxMetersPerSecond,
         fieldSpeeds.vyMetersPerSecond);
     if (doCompensateForRotation) {
+      // TODO test this on-robot. Not sure about direction of the velocity. Might be -90?
       // velocity due to rotation = angular velocity * shooterOffset rotated by 90
       // degrees (it's orthogonal to the radius).
       Translation2d rotationalVelocityRobotCentric = Constants.shooterOffsetFromCenterOfRobot

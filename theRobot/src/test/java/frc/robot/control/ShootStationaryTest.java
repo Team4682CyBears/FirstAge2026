@@ -139,7 +139,8 @@ class ShootStationaryTest {
     // robot yaw should be 180 when dead on to target
     drivetrain
         .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), new Rotation2d(0.0)));
-    assertEquals(Rotation2d.fromDegrees(180.0).plus(Constants.shooterYawOffset).getDegrees(), shooterAimer.getYawToFaceTarget().getDegrees());
+    assertEquals(Rotation2d.fromDegrees(180.0).plus(Constants.shooterYawOffset).getDegrees(), 
+    shooterAimer.getYawToFaceTarget().getDegrees(), DELTA);
   }
 
   @Test
@@ -147,7 +148,8 @@ class ShootStationaryTest {
     // robot yaw should be -135 (-180+45 - shooterYawOffset) degrees when offset equal amounts in x/y
     drivetrain
         .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 1.0)), new Rotation2d(0.0)));
-    assertEquals(Rotation2d.fromDegrees(-180.0 + 45.0).plus(Constants.shooterYawOffset).getDegrees(), shooterAimer.getYawToFaceTarget().getDegrees());
+    assertEquals(Rotation2d.fromDegrees(-180.0 + 45.0).plus(Constants.shooterYawOffset).getDegrees(), 
+    shooterAimer.getYawToFaceTarget().getDegrees(), DELTA);
   }
 
   @Test
@@ -155,6 +157,8 @@ class ShootStationaryTest {
     // robot yaw should be -90 when to the side of target
     drivetrain
         .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(0.0, 1.0)), new Rotation2d(0.0)));
-    assertEquals(Rotation2d.fromDegrees(-90.0).plus(Constants.shooterYawOffset).getDegrees(), shooterAimer.getYawToFaceTarget().getDegrees());
+    assertEquals(Rotation2d.fromDegrees(-90.0).plus(Constants.shooterYawOffset).getDegrees(), 
+    shooterAimer.getYawToFaceTarget().getDegrees(),
+    DELTA);
   }
 }
