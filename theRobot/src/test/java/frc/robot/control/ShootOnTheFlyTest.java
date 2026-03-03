@@ -61,7 +61,7 @@ class ShootOnTheFlyTest {
     drivetrain
         .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), new Rotation2d(0.0)));
     drivetrain
-        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), shooterAimer.getYawToFaceTarget(Constants.blueHubPosition)));
+        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), shooterAimer.getYawToFaceTarget()));
     // drive 1 mps away from target in x
     double vx = -1.0;
     double vy = 0.0;
@@ -87,11 +87,17 @@ class ShootOnTheFlyTest {
     // make position 5 degrees off and see what the PID speed is
     drivetrain
         .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), 
-        shooterAimer.getYawToFaceTarget(Constants.blueHubPosition).plus(Rotation2d.fromDegrees(5))));
+        shooterAimer.getYawToFaceTarget().plus(Rotation2d.fromDegrees(20))));
     double yawVelocityRadiansPerSecond = shooterAimer.computeAutoYawVelocityRadiansPerSecond();
     System.out.println("auto yaw rotational velocity " + yawVelocityRadiansPerSecond);
     double translationalVelocity = yawVelocityRadiansPerSecond * Constants.shooterOffsetFromCenterOfRobot.getNorm();
     System.out.println("auto yaw translations velocity (mps)" + translationalVelocity);
+    Translation2d translationalVelocityRobotCentric = Constants.shooterOffsetFromCenterOfRobot.times(yawVelocityRadiansPerSecond).rotateBy(Rotation2d.fromDegrees(90));
+    System.out.println("auto yaw translations velocity robot centric (mps)" + translationalVelocityRobotCentric);
+    Translation2d translationalVelocityFieldCentric = translationalVelocityRobotCentric.rotateBy(drivetrain.getGyroscopeRotation());
+    System.out.println("auto yaw translation velocity field centric (mps)" + translationalVelocityFieldCentric);
+    Translation2d translationalError = translationalVelocityFieldCentric.times(Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS);
+    System.out.println("translation error (m) " + translationalError);
 
   }
 
