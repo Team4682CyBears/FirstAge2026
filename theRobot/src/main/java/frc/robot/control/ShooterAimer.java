@@ -50,10 +50,17 @@ public class ShooterAimer {
   private final double[][] kickerRpmLookupTableData = {
       { 1.0, 2000 },
       { 8.2705, 2000 } };
+  private final double[][] tofLookupTableData = {
+      { 1.0000, 0.923 },
+      { 1.3037, 0.923 },
+      { 3.4408, 1.193 },
+      { 4.7448, 1.300 },
+      { 8.2705, 2.315 } };
 
   private final LookupTableDouble hoodExtensionLookupTable = new LookupTableDouble(hoodExtensionLookupTableData);
   private final LookupTableDouble shooterRpmLookupTable = new LookupTableDouble(shooterRpmLookupTableData);
   private final LookupTableDouble kickerRpmLookupTable = new LookupTableDouble(kickerRpmLookupTableData);
+  private final LookupTableDouble tofLookupTable = new LookupTableDouble(tofLookupTableData);
 
   public ShooterAimer(DrivetrainSubsystem drivetrain, SubsystemCollection subsystemCollection) {
     this.drivetrain = drivetrain;
@@ -93,6 +100,7 @@ public class ShooterAimer {
       // TODO test this on-robot. Not sure about direction of the velocity. Might be -90?
       // velocity due to rotation = angular velocity * shooterOffset rotated by 90
       // degrees (it's orthogonal to the radius).
+      System.out.println("field speeds " + fieldSpeeds);
       Translation2d rotationalVelocityRobotCentric = Constants.shooterOffsetFromCenterOfRobot
           .times(fieldSpeeds.omegaRadiansPerSecond).rotateBy(Rotation2d.fromDegrees(90));
       Translation2d rotationalVelocityFieldCentric = rotationalVelocityRobotCentric
@@ -264,6 +272,10 @@ public class ShooterAimer {
   public double shooterRpmForDistance(double distanceMeters) {
     return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), Constants.SHOOTER_MIN_RPM,
         Constants.SHOOTER_MAX_RPM);
+  }
+
+  public double tofForDisatnce(double distanceMeters){
+    return tofLookupTable.queryTable(distanceMeters);
   }
 
   /**

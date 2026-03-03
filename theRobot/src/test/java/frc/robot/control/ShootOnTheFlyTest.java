@@ -3,6 +3,8 @@ package frc.robot.control;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.lang.constant.Constable;
+
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.MathUtil;
@@ -59,9 +61,9 @@ class ShootOnTheFlyTest {
     // start 1m from target in x
     // have to set the drivetrain x/y first, and then apply the auto yaw (since the PID that would set it doesn't work in sim)
     drivetrain
-        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), new Rotation2d(0.0)));
+        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(-1.0, 0.0)), new Rotation2d(0.0)));
     drivetrain
-        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), shooterAimer.getYawToFaceTarget()));
+        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(-1.0, 0.0)), shooterAimer.getYawToFaceTarget()));
     // drive 1 mps away from target in x
     double vx = -1.0;
     double vy = 0.0;
@@ -80,25 +82,81 @@ class ShootOnTheFlyTest {
   @Test
   void RobotYawRotationalVelocityMatters() {
     // setup drivetrain
-    // start 1m from target in x
+    // start to the left of the target and move backwards
     // have to set the drivetrain x/y first, and then apply the auto yaw (since the PID that would set it doesn't work in sim)
     drivetrain
-        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), new Rotation2d(0.0)));
+        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(-1.0, 2.0)), new Rotation2d(0.0)));
     // make position 5 degrees off and see what the PID speed is
+    Rotation2d gyroscopeRotation = shooterAimer.getYawToFaceTarget();
     drivetrain
-        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), 
-        shooterAimer.getYawToFaceTarget().plus(Rotation2d.fromDegrees(20))));
+        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(-1.0, 2.0)), 
+        gyroscopeRotation.plus(Rotation2d.fromDegrees(5.0))));
     double yawVelocityRadiansPerSecond = shooterAimer.computeAutoYawVelocityRadiansPerSecond();
     System.out.println("auto yaw rotational velocity " + yawVelocityRadiansPerSecond);
-    double translationalVelocity = yawVelocityRadiansPerSecond * Constants.shooterOffsetFromCenterOfRobot.getNorm();
-    System.out.println("auto yaw translations velocity (mps)" + translationalVelocity);
-    Translation2d translationalVelocityRobotCentric = Constants.shooterOffsetFromCenterOfRobot.times(yawVelocityRadiansPerSecond).rotateBy(Rotation2d.fromDegrees(90));
-    System.out.println("auto yaw translations velocity robot centric (mps)" + translationalVelocityRobotCentric);
-    Translation2d translationalVelocityFieldCentric = translationalVelocityRobotCentric.rotateBy(drivetrain.getGyroscopeRotation());
-    System.out.println("auto yaw translation velocity field centric (mps)" + translationalVelocityFieldCentric);
-    Translation2d translationalError = translationalVelocityFieldCentric.times(Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS);
-    System.out.println("translation error (m) " + translationalError);
-    // TODO add actual assert to this test. 
+    // drive 1 mps away from target in x
+    double vx = -1.0;
+    double vy = 0.0;
+    drivetrain.driveFieldCentricShooting(new ChassisSpeeds(vx, vy, yawVelocityRadiansPerSecond));
+
+    // compute expected target
+    Translation2d expectedTargetPreRotation = Constants.blueHubPosition.plus(
+      new Translation2d(-vx * Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS, -vy * Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS));
+
+    // construct expected rot vector
+    Translation2d rotVector = new Translation2d(
+      Constants.shooterOffsetFromCenterOfRobot.getNorm(),
+      gyroscopeRotation).times(Math.abs(yawVelocityRadiansPerSecond));
+
+    Translation2d expectedTargetPostRotation = expectedTargetPreRotation.minus(
+      rotVector.times(Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS));
+
+    // compute actual target
+    ChassisSpeeds fieldSpeeds = new ChassisSpeeds(vx, vy, yawVelocityRadiansPerSecond);
+    Translation2d fieldSpeedsTranslation = new Translation2d(fieldSpeeds.vxMetersPerSecond,
+        fieldSpeeds.vyMetersPerSecond);
+      // TODO test this on-robot. Not sure about direction of the velocity. Might be -90?
+      // velocity due to rotation = angular velocity * shooterOffset rotated by 90
+      // degrees (it's orthogonal to the radius).
+      System.out.println("field speeds " + fieldSpeeds);
+      Translation2d rotationalVelocityRobotCentric = Constants.shooterOffsetFromCenterOfRobot
+          .times(fieldSpeeds.omegaRadiansPerSecond).rotateBy(Rotation2d.fromDegrees(90));
+      Translation2d rotationalVelocityFieldCentric = rotationalVelocityRobotCentric
+          .rotateBy(gyroscopeRotation);
+      fieldSpeedsTranslation = fieldSpeedsTranslation.plus(rotationalVelocityFieldCentric);
+      Translation2d rotVecActual = fieldSpeedsTranslation.times(Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS);
+
+    System.out.println("original target " + Constants.blueHubPosition);
+    System.out.println("expected target pre rotation" + expectedTargetPreRotation);
+    System.out.println("rotationVector " + rotVector);
+    System.out.println("expected target post rotation" + expectedTargetPostRotation);
+    System.out.println("Actual rot vec correction" + rotVecActual);
+    //System.out.println("actual target " + shooterAimer.computePredictedTarget());
+    assertTrue(expectedTargetPostRotation.equals(shooterAimer.computePredictedTarget()));
+  }
+
+  @Test
+  void ErrorCalcs() {
+        // setup drivetrain
+    // start 1m from target in x
+    // have to set the drivetrain x/y first, and then apply the auto yaw (since the PID that would set it doesn't work in sim)
+    double xoffset = -3.0;
+    double yoffset = 0.0;
+    drivetrain
+        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(xoffset, yoffset)), new Rotation2d(0.0)));
+    // make position x degrees off and see what the PID speed is
+    double rotOffset = 0.0;
+    drivetrain
+        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(xoffset, yoffset)), 
+        shooterAimer.getYawToFaceTarget().plus(Rotation2d.fromDegrees(rotOffset))));
+    // drive 1 mps away from target in x
+    double vx = 0.0;
+    double vy = 0.0;
+    drivetrain.driveFieldCentricShooting(new ChassisSpeeds(vx, vy, 0.0));
+    double distance = shooterAimer.getDistanceToPredictedTarget();
+    System.out.println("Distance " + distance);
+    System.out.println("Angle " + shooterAimer.hoodExtensionForDistance(distance));
+    System.out.println("V Shooter " + shooterAimer.shooterRpmForDistance(distance));
+    System.out.println("Actual TOF " + shooterAimer.tofForDisatnce(distance));
   }
 
 }
