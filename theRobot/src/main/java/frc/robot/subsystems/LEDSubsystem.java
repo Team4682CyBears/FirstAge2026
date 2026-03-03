@@ -125,6 +125,7 @@ public class LEDSubsystem extends SubsystemBase {
     if (this.currentLEDState != targetLedState) {
       this.currentLEDState = targetLedState;
       if(useBlinkin) {
+        // BLINKIN method
         switch(currentLEDState) {
           case Green:
             setPattern(0.77);
@@ -133,25 +134,13 @@ public class LEDSubsystem extends SubsystemBase {
             setPattern(0.61);
           break;
           case RedBlink:
-            if (this.currentBlinkState) {
-              this.setPattern(0.61);
-            } else {
-              this.setPattern(0.99);
-            }
+            blink(0, 0, 0, 0.61);
           break;
           case GreenBlink:
-            if (this.currentBlinkState) {
-              this.setPattern(0.77);
-            } else {
-              this.setPattern(0.99);
-            }
+            blink(0, 0, 0, 0.77);
           break;
           case OrangeBlink:
-            if (this.currentBlinkState) {
-              this.setPattern(0.65);
-            } else {
-              this.setPattern(0.99);
-            }
+            blink(0, 0, 0, 0.65);
           break;
           case OrangeSolid:
             setPattern(0.65);
@@ -167,7 +156,38 @@ public class LEDSubsystem extends SubsystemBase {
           break;
         }
       } else {
-        if (this.currentLEDState == LEDState.Green) {
+        // Non-BLINKIN method
+        switch(currentLEDState) {
+          case Green:
+            setLedStringColor(0, 200, 0);
+          break;
+          case Yellow:
+            setLedStringColor(150, 150, 0);
+          break;
+          case Red:
+            setLedStringColor(150, 0, 0);
+          break;
+          case OrangeSolid:
+            setLedStringColor(255, 165, 0);
+          break;
+          case OrangeBlink:
+            blink(255, 165, 0, 0);
+          break;
+          case RedBlink:
+            blink(255, 0, 0, 0);
+          break;
+          case GreenBlink:
+            blink(255, 200, 0, 0);
+          break;
+          case Blue:
+            setLedStringColor(0, 0, 225);
+          break;
+          default:
+            setLedStringColor(0, 0, 225);
+          break;
+        }
+        
+        /* if (this.currentLEDState == LEDState.Green) {
           this.greenSolid();
         } else if (this.currentLEDState == LEDState.Yellow) {
           this.yellowSolid();
@@ -187,12 +207,13 @@ public class LEDSubsystem extends SubsystemBase {
         else {
           this.blueSolid();
         }
+      */
       }
 
       System.out.println("**** UPDATING LED STATE TO " + this.currentLEDState.toString());
     } else if (this.lastBlinkState != this.currentBlinkState && this.currentLEDState == LEDState.OrangeBlink) {
       System.out.println("**** BLINKING LED STATE TO " + this.currentLEDState.toString());
-      this.orangeBlink();
+      this.blink(255, 165, 0, 0.65);
     }
   }
   
@@ -202,6 +223,24 @@ public class LEDSubsystem extends SubsystemBase {
     System.out.println("!!!!!!!!!!!!!!!!!SETTING PWM TO " + pwm + " !!!!!!!!!!!!!!!!!!!!!!!!");
   }
 
+  // Method to use a blinking pattern on the LEDs
+  private void blink(int red, int green, int blue, double pwm) {
+    if(useBlinkin) {
+      if (this.currentBlinkState) {
+        setPattern(pwm);
+    } else {
+        setPattern(0.99);
+    }
+    } else {
+      if (this.currentBlinkState) {
+        this.setLedStringColor(red, green, blue);
+    } else {
+        this.setLedStringColor(0, 0, 0);
+    }
+    }
+  }
+
+  /*
   // Sets leds to orange blink
   private void orangeBlink() {
     if (this.currentBlinkState) {
@@ -244,7 +283,7 @@ public class LEDSubsystem extends SubsystemBase {
     this.setLedStringColor(150, 150, 0);
   }
 
-  // Sets leds to yellow solid
+  // Sets leds to red solid
   private void redSolid() {
     this.setLedStringColor(150, 0, 0);
   }
@@ -258,6 +297,7 @@ public class LEDSubsystem extends SubsystemBase {
   private void offState() {
     this.setLedStringColor(0, 0, 0);
   }
+  */
 
   // Sets leds color
   private void setLedStringColor(int red, int green, int blue) {
