@@ -10,8 +10,6 @@
 package frc.robot.subsystems;
 
 import java.lang.Math;
-import java.util.ArrayList;
-import java.util.Collections;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -89,12 +87,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private Matrix<N3, N1> visionStdDev = MatBuilder.fill(Nat.N3(), Nat.N1(), new double[] { 0.7, 0.7, 100 });
   private Matrix<N3, N1> odometryStdDev = MatBuilder.fill(Nat.N3(), Nat.N1(), new double[] { .1, .1, 0.01 });
 
-  private ArrayList<Double> recentVisionYaws = new ArrayList<Double>();
-  private int recentVisionYawsMaxSize = 15;
   private static final int MIN_FIDUCIALS_FOR_VISION = 1;
-  private int lastFiducialCount = 0;
-  private double lastMaxFiducialAmbiguity = 0.0;
-  private double lastHeartbeat = -1.0;
 
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
   private ChassisSpeeds previousChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
@@ -537,28 +530,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * otherwise not moving)
    */
   public void seedRobotPositionFromVision() {
-    if (recentVisionYaws.size() != 0 && cameraSubsystem != null) {
-      // getVisionBotPoseOrb based on that updated orientation being set
-      LimelightHelpers.SetRobotOrientation("limelight", getMedianOfList(recentVisionYaws), 0, 0, 0, 0, 0);
-      Pose2d visonBotPoseOrb = cameraSubsystem.getVisionBotPoseOrb().getRobotPosition();
-      if (visonBotPoseOrb != null) {
-        Pose2d combinedBotPose = new Pose2d(visonBotPoseOrb.getTranslation(),
-            Rotation2d.fromDegrees(getMedianOfList(recentVisionYaws)));
-        this.setRobotPosition(combinedBotPose);
-      }
+    if (cameraSubsystem == null) {
+      return;
     }
-  }
-
-  /**
-   * Calculates the median value of a list of Double values.
-   *
-   * @param list the list of Double values to find the median of
-   * @return the median value of the list
-   */
-  public Double getMedianOfList(ArrayList<Double> list) {
-    ArrayList<Double> modifiedList = new ArrayList<Double>(list);
-    Collections.sort(modifiedList);
-    return modifiedList.get((int) (modifiedList.size() / 2));
+    Pose2d seededPose = cameraSubsystem.getSeedPoseFromVision();
+    if (seededPose != null) {
+      this.setRobotPosition(seededPose);
+    }
   }
 
   /**
@@ -571,8 +549,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // for now ignore all vision measurements that are null or contained robot
     // position is null
     if (visionMeasurement != null && useVision) {
-    if (lastFiducialCount < MIN_FIDUCIALS_FOR_VISION
-      || lastMaxFiducialAmbiguity > Constants.TAG_AMBIGUITY_THRESHOLD) {
+      int fiducialCount = cameraSubsystem != null ? cameraSubsystem.getLastFiducialCount() : 0;
+      double maxAmbiguity = cameraSubsystem != null ? cameraSubsystem.getLastMaxFiducialAmbiguity() : 0.0;
+      if (fiducialCount < MIN_FIDUCIALS_FOR_VISION
+          || maxAmbiguity > Constants.TAG_AMBIGUITY_THRESHOLD) {
         return;
       }
       Pose2d visionComputedMeasurement = visionMeasurement.getRobotPosition();
@@ -593,37 +573,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
       return;
     }
 
-    // heartbeat filtering: only proceed if new frame has arrived
-    double heartbeat = LimelightHelpers.getHeartbeat("limelight");
-    if (heartbeat == lastHeartbeat) {
+    VisionMeasurement visionMeasurement = cameraSubsystem.getLatestVisionMeasurement(getGyroscopeRotation());
+    if (visionMeasurement == null) {
       return;
     }
-    lastHeartbeat = heartbeat;
-
-    LimelightHelpers.SetRobotOrientation("limelight", getGyroscopeRotation().getDegrees(), 0, 0, 0, 0, 0);
-    VisionMeasurement visionMeasurement = cameraSubsystem.getVisionBotPoseOrb();
-    updateFiducialDiagnostics();
-    updateRecentVisionYaws(visionMeasurement);
 
     // Only add the measurement once when enabled. (Avoid double-calling
     // addVisionMeasurement.)
     if (DriverStation.isEnabled()) {
       this.addVisionMeasurement(visionMeasurement);
-    }
-  }
-
-  private void updateFiducialDiagnostics() {
-    LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials("limelight");
-    lastFiducialCount = rawFiducials == null ? 0 : rawFiducials.length;
-    lastMaxFiducialAmbiguity = cameraSubsystem.getMaxRawFiducialAmbiguity();
-  }
-
-  private void updateRecentVisionYaws(VisionMeasurement visionMeasurement) {
-    if (visionMeasurement != null && visionMeasurement.getRobotPosition() != null) {
-      recentVisionYaws.add(visionMeasurement.getRobotPosition().getRotation().getDegrees());
-      while (recentVisionYaws.size() > recentVisionYawsMaxSize) {
-        recentVisionYaws.remove(0);
-      }
     }
   }
 
@@ -723,14 +681,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
           SmartDashboard.putNumber("robot timestamp", Timer.getFPGATimestamp());
           SmartDashboard.putBoolean("VisionWithinAMeter", lessThanAMeter);
         }
+        SmartDashboard.putNumber("VisionFiducialCount", cameraSubsystem.getLastFiducialCount());
+        SmartDashboard.putNumber("VisionMaxFiducialAmbiguity", cameraSubsystem.getLastMaxFiducialAmbiguity());
+        SmartDashboard.putNumber("VisionHeartbeat", cameraSubsystem.getLastHeartbeat());
       }
-      SmartDashboard.putNumber("VisionFiducialCount", lastFiducialCount);
-      SmartDashboard.putNumber("VisionMaxFiducialAmbiguity", lastMaxFiducialAmbiguity);
       SmartDashboard.putNumber("RobotFieldHeadingDegrees", drivetrain.getState().Pose.getRotation().getDegrees());
       SmartDashboard.putNumber("RobotFieldXCoordinateMeters", drivetrain.getState().Pose.getX());
       SmartDashboard.putNumber("RobotFieldYCoordinateMeters", drivetrain.getState().Pose.getY());
-
-  SmartDashboard.putNumber("VisionHeartbeat", lastHeartbeat);
 
       SmartDashboard.putBoolean("UseVision", useVision);
     }
