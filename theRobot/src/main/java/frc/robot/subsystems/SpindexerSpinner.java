@@ -33,50 +33,43 @@ b) a run method that when set to run, if there is no ball in the kicker, the spi
  */
 public class SpindexerSpinner extends SubsystemBase {
 
-    private TalonFX spindexerTalonFX = new TalonFX(Constants.spindexerSensorLaserCanID);
-    //kickerTalonFX
-    private TofSensorLaser spindexerToF = new TofSensorLaser(Constants.spindexerSensorLaserCanID);
+    private TalonFX spindexerTalonFX;
+    private TofSensorLaser spindexerToF;
 
     private final VelocityVoltage motorController = new VelocityVoltage(0.0);
 
-    private double targetRPS = Constants.spindexerSpeed;
-    private boolean staticMode = false;
+    private double targetRPS = 0.0;
+    private boolean continuousMode = false;
     // Found based on experimentation on BearBones kicker V1
     private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.4)
             .withKD(0.0);
 
-    /*
-     * Initialize the kicker and configure the motor
+    /**
+     * Constructor for SpindexerSpinner. Takes in a boolean staticMode which
+     * determines whether the spindexer should run at a constant speed regardless of
+     * the sensor state (true) or if it should stop when the sensor detects a ball
+     * (false).
+     * 
+     * @param staticMode
      */
-    public void initializeKickerSubsystem() {
+    public SpindexerSpinner(int motorCanID, int sensorCanID) {
+        spindexerTalonFX = new TalonFX(motorCanID);
+        spindexerToF = new TofSensorLaser(sensorCanID);
         configureMotor();
     }
 
-    /**
-     * Constructor for SpindexerSpinner. Takes in a boolean staticMode which determines whether the spindexer should run at a constant speed regardless of the sensor state (true) or if it should stop when the sensor detects a ball (false).
-     * @param staticMode
-     */
-    public SpindexerSpinner(boolean staticMode) {
-        this.staticMode = staticMode;
-        initializeKickerSubsystem();
-    }
-  
     /*
      * Sets the target rpm
      */
-    public void runRPMStatic(double rpm) {
-        this.targetRPS = rpmToRPS(rpm);
-    }
-    
-    public void runRPM(double rpm) {
-        if (spindexerToF.tofActivated()){
-            stop();
-        } else {
-            runRPMStatic(rpm);
-        }
-        
+    public void runRPMContinus() {
+        this.targetRPS = rpmToRPS(rpmToRPS(Constants.spindexerSpeedRotationsPerMinute));
+        this.continuousMode = true;
     }
 
+    public void runRPMWtihSensor() {
+        this.targetRPS = rpmToRPS(rpmToRPS(Constants.spindexerSpeedRotationsPerMinute));
+        this.continuousMode = false;
+    }
 
     private double rpmToRPS(double rpm) {
         return rpm / 60.0;
@@ -102,17 +95,18 @@ public class SpindexerSpinner extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        if (staticMode) { 
-          runRPMStatic(targetRPS);
+        if (targetRPS == 0.0) {
+            stop();
+        } else if (!continuousMode && spindexerToF.tofActivated()) {
+            stop();
         } else {
-          runRPM(targetRPS);
+            motorController.withVelocity(targetRPS * Constants.spindexerGearRatio);
+            spindexerTalonFX.setControl(motorController);
         }
-        motorController.withVelocity(targetRPS * Constants.kickerMotorGearRatio);
-        spindexerTalonFX.setControl(motorController);
-        SmartDashboard.putNumber("Kicker Real RPM", getRPM());
+
+        SmartDashboard.putNumber("Spindexer Real RPM", getRPM());
         spindexerToF.publishTelemetery();
     }
-
 
     /*
      * configures motor
@@ -121,7 +115,7 @@ public class SpindexerSpinner extends SubsystemBase {
         // from ElevatorSubsystem.java Reefscape2025
         // Config motor
         TalonFXConfiguration talonMotorConfig = new TalonFXConfiguration();
-        talonMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        talonMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         talonMotorConfig.Slot0 = slot0Configs;
         talonMotorConfig.ClosedLoopRamps.withVoltageClosedLoopRampPeriod(0.02);
         // do not config feedbacksource, since the default is the internal one.

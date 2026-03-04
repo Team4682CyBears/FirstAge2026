@@ -16,6 +16,7 @@ import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.PowerDistributionPanelWatcherSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.ShotLogger;
+import frc.robot.subsystems.SpindexerSpinner;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
@@ -34,6 +35,7 @@ public class SubsystemCollection {
     private KickerSubsystem kickerSubsystem = null;
     private HoodSubsystem hoodSubsystem = null;
     private ShotLogger shotLogger = null;
+    private SpindexerSpinner spindexer = null;
 
     /**
      * Default constructor
@@ -159,5 +161,17 @@ public class SubsystemCollection {
 
     public boolean isManualInputInterfacesAvailable() {
         return manualInput != null;
+    }
+
+    public SpindexerSpinner getSpindexerSpinnerSubsystem(){
+        return spindexer;
+    }
+
+    public void setSpindexerSpinnerSubsystem(SpindexerSpinner spindexer){
+        this.spindexer = spindexer;
+    }
+
+    public boolean isSpinnerSpindexerSubsystemAvaible(){
+        return spindexer != null;
     }
 }

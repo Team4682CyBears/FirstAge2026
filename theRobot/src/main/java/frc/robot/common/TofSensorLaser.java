@@ -9,12 +9,14 @@ package frc.robot.common;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.units.measure.Distance;
 import frc.robot.control.Constants;
 import au.grapplerobotics.LaserCan;
 
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Millimeters;
 
 import com.ctre.phoenix6.StatusSignal;
 
@@ -61,16 +63,15 @@ public class TofSensorLaser {
     public Double getRangeInches() {
         Measurement measurement = laserSensor.getMeasurement();
         if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
-            // TODO change this to use wpilib units conversation
-            Double dInches = measurement.distance_mm * 0.0393701; // convert mm to inches
-            return (dInches);
+            Distance distance = Millimeters.of(measurement.distance_mm);
+            return (distance.in(Inches));
         }
         // if invalid, return the max range as a default
         return Constants.laserInchDetectionRange; 
     }
 
     /**
-     * Gets the distnace in meters and checks if its valid 
+     * Checks if result is valid 
      * @return true if distance is valid and within the max range (MAX_RANGE_METERS)
      * Also checks if its ac
      */
@@ -91,6 +92,5 @@ public class TofSensorLaser {
     public void publishTelemetery(){
         SmartDashboard.putNumber(displayName + " DistanceIn ", getRangeInches());
         SmartDashboard.putBoolean(displayName + "tofActivated ", tofActivated());
-        //martDashboard.putString(displayName, " ToF status " + CANBus.CANBusStatus + rangeSensorCanId)
     }
 }

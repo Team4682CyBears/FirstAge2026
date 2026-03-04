@@ -40,6 +40,9 @@ public class InstalledHardware {
     public static final boolean hoodMotorInstalled = false;
     public static final boolean hoodEncoderInstalled = true;
 
+    // Spindexer
+    public static final boolean spindexerInstalled = true;
+    
     // Kicker
     public static final boolean kickerInstalled = true;
 

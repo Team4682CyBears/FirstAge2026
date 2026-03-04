@@ -238,6 +238,10 @@ public class ManualInputInterfaces {
                             this.subsystemCollection.getHoodSubsystem(),
                             () -> (int) SmartDashboard.getNumber("Hood Extendo", HardwareConstants.HOOD_MIN_EXT)));
                 }
+                if (InstalledHardware.spindexerInstalled) {
+                    this.driverController.b().whileTrue(new SpindexerCommand(
+                            this.subsystemCollection.getSpindexerSpinnerSubsystem(), true));
+                }
                 SmartDashboard.putNumber("Kicker RPM", 0);
                 if (InstalledHardware.kickerInstalled) {
                     this.driverController.rightBumper()
