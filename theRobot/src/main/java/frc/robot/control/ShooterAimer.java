@@ -60,7 +60,6 @@ public class ShooterAimer {
     Rotation2d robotYaw = drivetrain.getGyroscopeRotation();
     ChassisSpeeds fieldSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(chassis, robotYaw);
 
-
     double tof = Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS;
 
     Translation2d predicted = new Translation2d(
@@ -174,5 +173,13 @@ public class ShooterAimer {
     boolean kickerOk = Math.abs(kickerRpm - targetKickerRpm) < kickerRpmTolerance;
 
     return yawOk && hoodOk && shooterOk && kickerOk;
+  }
+
+  public double minShooterSpeed() {
+    return shooterRpmLookupTable.getMinInput();
+  }
+
+  public double minKickerSpeed() {
+    return kickerRpmLookupTable.getMinInput();
   }
 }

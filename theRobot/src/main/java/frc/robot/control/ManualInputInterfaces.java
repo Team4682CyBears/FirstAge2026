@@ -326,6 +326,8 @@ public class ManualInputInterfaces {
                             return SmartDashboard.getNumber("Kicker RPM", 0);
                         }));
             }
+
+            this.coDriverController.y().whileTrue(new ShooterManualCommand(this.subsystemCollection));
         }
     }
 }
