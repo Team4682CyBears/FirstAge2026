@@ -94,6 +94,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private static final int MIN_FIDUCIALS_FOR_VISION = 1;
   private int lastFiducialCount = 0;
   private double lastMaxFiducialAmbiguity = 0.0;
+  // heartbeat from Limelight, increments each frame; used to detect stale data
+  private double lastHeartbeat = -1.0;
 
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
   private ChassisSpeeds previousChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
@@ -567,6 +569,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
       return;
     }
 
+    // heartbeat filtering: only proceed if new frame has arrived
+    double heartbeat = LimelightHelpers.getHeartbeat("limelight");
+    if (heartbeat == lastHeartbeat) {
+      return;
+    }
+    lastHeartbeat = heartbeat;
+
     LimelightHelpers.SetRobotOrientation("limelight", getGyroscopeRotation().getDegrees(), 0, 0, 0, 0, 0);
     VisionMeasurement visionMeasurement = cameraSubsystem.getVisionBotPoseOrb();
     updateFiducialDiagnostics();
@@ -696,6 +705,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("RobotFieldHeadingDegrees", drivetrain.getState().Pose.getRotation().getDegrees());
       SmartDashboard.putNumber("RobotFieldXCoordinateMeters", drivetrain.getState().Pose.getX());
       SmartDashboard.putNumber("RobotFieldYCoordinateMeters", drivetrain.getState().Pose.getY());
+
+  SmartDashboard.putNumber("VisionHeartbeat", lastHeartbeat);
 
       SmartDashboard.putBoolean("UseVision", useVision);
     }
