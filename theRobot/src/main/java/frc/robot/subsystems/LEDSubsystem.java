@@ -185,28 +185,6 @@ public class LEDSubsystem extends SubsystemBase {
             setLedStringColor(0, 0, 225);
           break;
         }
-        
-        /* if (this.currentLEDState == LEDState.Green) {
-          this.greenSolid();
-        } else if (this.currentLEDState == LEDState.Yellow) {
-          this.yellowSolid();
-        } else if (this.currentLEDState == LEDState.Red) {
-          this.redSolid();
-        } else if (this.currentLEDState == LEDState.OrangeSolid) {
-          this.orangeSolid();
-        } else if (this.currentLEDState == LEDState.OrangeBlink) {
-          this.orangeBlink();
-        } else if (this.currentLEDState == LEDState.RedBlink) {
-          this.redBlink();
-        } else if (this.currentLEDState == LEDState.GreenBlink) {
-          this.greenBlink();
-        } else if(this.currentLEDState == LEDState.Blue){
-        this.blueSolid();
-        }
-        else {
-          this.blueSolid();
-        }
-      */
       }
 
       System.out.println("**** UPDATING LED STATE TO " + this.currentLEDState.toString());
@@ -238,65 +216,6 @@ public class LEDSubsystem extends SubsystemBase {
     }
     }
   }
-
-  /*
-  // Sets leds to orange blink
-  private void orangeBlink() {
-    if (this.currentBlinkState) {
-      this.setLedStringColor(255, 165, 0);
-    } else {
-      this.setLedStringColor(0, 0, 0);
-    }
-  }
-
-  // Sets leds to red blink
-  private void redBlink() {
-    if (this.currentBlinkState) {
-      this.setLedStringColor(255, 0, 0);
-    } else {
-      this.setLedStringColor(0, 0, 0);
-    }
-  }
-
-    // Sets leds to green blink
-  private void greenBlink() {
-    if (this.currentBlinkState) {
-      this.setLedStringColor(255, 200, 0);
-    } else {
-      this.setLedStringColor(0, 0, 0);
-    }
-  }
-
-  // Sets leds to blue solid
-  private void blueSolid() {
-    this.setLedStringColor(0, 0, 225);
-  }
-
-  // Sets leds to orange solid
-  private void orangeSolid() {
-    this.setLedStringColor(255, 165, 0);
-  }
-
-  // Sets leds to yellow solid
-  private void yellowSolid() {
-    this.setLedStringColor(150, 150, 0);
-  }
-
-  // Sets leds to red solid
-  private void redSolid() {
-    this.setLedStringColor(150, 0, 0);
-  }
-
-  // Sets leds to green solid
-  private void greenSolid() {
-    this.setLedStringColor(0, 200, 0);
-  }
-
-  // Turns off leds
-  private void offState() {
-    this.setLedStringColor(0, 0, 0);
-  }
-  */
 
   // Sets leds color
   private void setLedStringColor(int red, int green, int blue) {
