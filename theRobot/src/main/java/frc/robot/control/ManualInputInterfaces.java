@@ -231,7 +231,7 @@ public class ManualInputInterfaces {
                     this.driverController.leftBumper()
                             .whileTrue(new ShootCommand(this.subsystemCollection.getShooterSubsystem(), () -> {
                                 return SmartDashboard.getNumber("Shooter RPM", 0);
-}));
+                            }));
                 }
                 if (InstalledHardware.hoodMotorInstalled) {
                     this.driverController.a().onTrue(new HoodAngleCommand(
