@@ -19,7 +19,7 @@ public class ShooterAimer {
   private final DrivetrainSubsystem drivetrain;
   private final SubsystemCollection subsystemCollection;
 
-  private final boolean doCompensateForRotation = false;
+  private final boolean doCompensateForRotation = true;
 
   private Translation2d desiredTarget = null;
   private Translation2d targetAdjustment = new Translation2d(0.0, 0.0);
@@ -81,6 +81,8 @@ public class ShooterAimer {
     this.desiredTarget = null;
   }
 
+  // TODO put these into an update function that gets called once per periodic in
+  // the drivetrainSubsystem
   /**
    * Compute the predicted target accounting for targetAdjustments, velocities,
    * and time of flight
@@ -97,15 +99,19 @@ public class ShooterAimer {
     Translation2d fieldSpeedsTranslation = new Translation2d(fieldSpeeds.vxMetersPerSecond,
         fieldSpeeds.vyMetersPerSecond);
     if (doCompensateForRotation) {
-      // TODO test this on-robot. Not sure about direction of the velocity. Might be -90?
-      // velocity due to rotation = angular velocity * shooterOffset rotated by 90
-      // degrees (it's orthogonal to the radius).
-      System.out.println("field speeds " + fieldSpeeds);
-      Translation2d rotationalVelocityRobotCentric = Constants.shooterOffsetFromCenterOfRobot
-          .times(fieldSpeeds.omegaRadiansPerSecond).rotateBy(Rotation2d.fromDegrees(90));
-      Translation2d rotationalVelocityFieldCentric = rotationalVelocityRobotCentric
-          .rotateBy(drivetrain.getGyroscopeRotation());
-      fieldSpeedsTranslation = fieldSpeedsTranslation.plus(rotationalVelocityFieldCentric);
+      // TODO test this on-robot. Not sure about direction of the velocity.
+      // construct expected rot velocity vector
+      Translation2d rotVelocityVector = new Translation2d(
+          // magnitude is the shooter distance from center of robot * the rotational
+          // velocity
+          Constants.shooterOffsetFromCenterOfRobot.getNorm() * Math.abs(fieldSpeeds.omegaRadiansPerSecond),
+          // angle w.r.t. field is orthogonal (90 degrees) to the vector from shooter to
+          // robot center
+          // direction depends on the rotation direction
+          drivetrain.getGyroscopeRotation()
+              .plus(Constants.shooterYawOffset)
+              .minus(Rotation2d.fromDegrees(Math.copySign(-90, fieldSpeeds.omegaRadiansPerSecond))));
+      fieldSpeedsTranslation = fieldSpeedsTranslation.plus(rotVelocityVector);
     }
 
     double tof = Constants.PROJECTILE_TIME_OF_FLIGHT_SECONDS;
@@ -122,11 +128,9 @@ public class ShooterAimer {
   public double computeAutoYawVelocityRadiansPerSecond() {
     double robotYawRadians = drivetrain.getRobotPosition().getRotation().getRadians();
     double angleToFace = getYawToFaceTarget().getRadians();
-    System.out.println("angleToFace: " + Units.radiansToDegrees(angleToFace));
 
     double error = MathUtil
         .angleModulus(robotYawRadians - angleToFace);
-    System.out.println("error: " + Units.radiansToDegrees(error));
     double pidOut = autoYawPID.calculate(error, 0.0);
     double out = (Math.abs(pidOut) > yawVelocityDeadband)
         ? pidOut + Math.signum(pidOut) * minYawVelocityRadiansPerSecond
@@ -274,7 +278,7 @@ public class ShooterAimer {
         Constants.SHOOTER_MAX_RPM);
   }
 
-  public double tofForDisatnce(double distanceMeters){
+  public double tofForDisatnce(double distanceMeters) {
     return tofLookupTable.queryTable(distanceMeters);
   }
 

@@ -126,7 +126,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
-  private double autoYawVelocityRadiansPerSecond = 0.0;
+  private Pose2d simPosition = new Pose2d();
 
   /**
    * Constructor for this DrivetrainSubsystem
@@ -205,11 +205,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       this.previousChassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(previousChassisSpeeds, getGyroscopeRotation());
     }
     this.swerveDriveMode = SwerveDriveMode.FIELD_CENTRIC_SHOOTING;
-    ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(
-        updatedChassisSpeeds.vxMetersPerSecond,
-        updatedChassisSpeeds.vyMetersPerSecond,
-        getAutoYawVelocityRadiansPerSecond());
-    this.chassisSpeeds = newChassisSpeeds;
+    this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(updatedChassisSpeeds);
   }
 
   /**
@@ -247,9 +243,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         return ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, getGyroscopeRotation());
       }
     } 
-    else {
-      return drivetrain.getState().Speeds;
-    }
+    return drivetrain.getState().Speeds;
   }
 
   /**
@@ -300,6 +294,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @return A Rotation2d that describes the current orentation of the robot.
    */
   public Rotation2d getGyroscopeRotation() {
+    if (RobotBase.isSimulation()) {
+      return simPosition.getRotation();
+    }
     return drivetrain.getState().Pose.getRotation();
   }
 
@@ -309,7 +306,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @return the current auto yaw velocity in radians per second.
    */
   public double getAutoYawVelocityRadiansPerSecond() {
-    return this.autoYawVelocityRadiansPerSecond;
+    return shooterAimer.computeAutoYawVelocityRadiansPerSecond();
   }
 
   /**
@@ -440,6 +437,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @param updatedPosition - the new position of the robot
    */
   public void setRobotPosition(Pose2d updatedPosition) {
+    if (RobotBase.isSimulation()) {
+      this.simPosition = updatedPosition;
+    }
     drivetrain.resetPose(updatedPosition);
   }
 
