@@ -67,7 +67,6 @@ public class KickerSubsystem extends SubsystemBase {
      * Stop both motors and set the targetRPS to 0
      */
     public void stop() {
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!KICKER IS STOPPPING!!!!!!!!!!!!!!!");
         targetRPS = 0.0;
         kickerTalonFX.stopMotor();
     }
