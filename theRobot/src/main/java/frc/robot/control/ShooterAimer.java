@@ -1,3 +1,13 @@
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Rebuilt - 2026
+// File: ShooterAimer.java
+// Intent: Helper class to compute aiming parameters for shooting at a target
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
+
 package frc.robot.control;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -121,7 +131,7 @@ public class ShooterAimer {
     System.out.println("angleToFace: " + Units.radiansToDegrees(angleToFace));
 
     double error = MathUtil
-        .angleModulus(robotYawRadians - angleToFace + Units.degreesToRadians(Constants.shooterYawOffset));
+        .angleModulus(robotYawRadians - angleToFace + Units.degreesToRadians(Constants.shooterYawOffsetDegrees));
     System.out.println("error: " + Units.radiansToDegrees(error));
     double pidOut = autoYawPID.calculate(error, 0.0);
     double out = (Math.abs(pidOut) > yawVelocityDeadband)

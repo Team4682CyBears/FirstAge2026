@@ -1,3 +1,11 @@
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Rebuilt - 2026
+// File: AutoAimMovingCommand.java
+// Intent: Command to automatically aim at a moving target
+// ************************************************************
+
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -19,6 +27,7 @@ public class AutoAimMovingCommand extends Command {
   private final ShooterSubsystem shooter;
   private final KickerSubsystem kicker;
   private final ShooterAimer aimer;
+  private Translation2d hub;
 
   //
   public AutoAimMovingCommand(SubsystemCollection subsystemCollection,
@@ -30,21 +39,25 @@ public class AutoAimMovingCommand extends Command {
     this.aimer = aimer;
     // We are not declaring drivetrain subsystem as a requirement because it is only
     // setting the swerve yaw mode
+    //TODO kicker needs to be added as a requirement once testing is done.
     addRequirements(hood, shooter);
   }
 
   public void initialize() {
     drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.AUTO);
-  }
 
-  public void execute() {
     Alliance alliance = DriverStation.getAlliance().get();
-    Translation2d hub = (alliance == Alliance.Blue) ? Constants.blueHubPosition : Constants.redHubPosition;
+    hub = (alliance == Alliance.Blue) ? Constants.blueHubPosition : Constants.redHubPosition;
 
     Translation2d predicted = aimer.computePredictedTarget(hub);
     if (predicted != null) {
       drivetrain.setShootingAimTarget(predicted);
+    }
+  }
 
+  public void execute() {
+    Translation2d predicted = aimer.computePredictedTarget(hub);
+    if (predicted != null) {
       double distance = drivetrain.getRobotPosition().getTranslation().getDistance(predicted);
       double ext = aimer.hoodExtensionForDistance(distance);
       hood.setExtendoPosition(ext);

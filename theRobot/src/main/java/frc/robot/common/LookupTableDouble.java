@@ -1,3 +1,13 @@
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Rebuilt - 2026
+// File: LookupTableDouble.java
+// Intent: a class to handle lookup tables with double values
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
+
 package frc.robot.common;
 
 // This class assumes that the lookup table is ordered and in the format (Input, Output)

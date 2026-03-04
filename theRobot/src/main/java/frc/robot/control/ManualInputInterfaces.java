@@ -153,19 +153,27 @@ public class ManualInputInterfaces {
         // while the button is held down.  We use onTrue to set the
         // flag when pressed and onFalse to clear it when released.
         this.driverController.start().onTrue(
-            new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
-                this.subsystemCollection.getDriveTrainSubsystem()
-                    .setSeedingCamera(true);
-                }
-            }))
-            .onFalse(
+            new ParallelCommandGroup(
                 new InstantCommand(() -> {
                     if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
-                    this.subsystemCollection.getDriveTrainSubsystem()
-                        .setSeedingCamera(false);
+                        this.subsystemCollection.getDriveTrainSubsystem()
+                            .setSeedingCamera(true);
                     }
-                }));
+                }),
+                new ButtonPressCommand(
+                    "driverController.start()",
+                    "enable camera seeding")))
+            .onFalse(
+                new ParallelCommandGroup(
+                    new InstantCommand(() -> {
+                        if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                            this.subsystemCollection.getDriveTrainSubsystem()
+                                .setSeedingCamera(false);
+                        }
+                    }),
+                    new ButtonPressCommand(
+                        "driverController.start()",
+                        "disable camera seeding")));
 
             }
 

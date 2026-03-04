@@ -416,7 +416,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
           chassisSpeeds.omegaRadiansPerSecond * Math.min(1.0, this.speedReductionFactor * 1.25));
 
       // apply acceleration control
-      // TODO figure this accel decell thing out
+      // TODO should test this at practice feild
       // reducedChassisSpeeds = limitChassisSpeedsAccel(reducedChassisSpeeds);
       previousChassisSpeeds = reducedChassisSpeeds;
 
