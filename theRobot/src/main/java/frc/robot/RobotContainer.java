@@ -178,10 +178,10 @@ public class RobotContainer {
       if (subsystems.isLEDSubsystemAvailable()) {
         // Green if April tag seen
         subsystems.getLedSubsystem().registerStateAction(LEDState.Green, 
-            () -> subsystems.getCameraSubsystem().getTagId() != -1);
+            () -> subsystems.getCameraSubsystem().getTagId() != 0);
          // Red if not seen
         subsystems.getLedSubsystem().registerStateAction(LEDState.Red, 
-            () -> subsystems.getCameraSubsystem().getTagId() == -1);
+            () -> subsystems.getCameraSubsystem().getTagId() == 0);
       }
       DataLogManager.log("!!!!!!!!!!!!!!!!!!!SUCCESS: initializeCamera!!!!!!!!!!!!!!!!!!!!!!!!");
     } else {

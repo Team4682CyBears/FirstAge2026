@@ -61,7 +61,6 @@ public class LEDSubsystem extends SubsystemBase {
     if (useBlinkin == true) {
       System.out.println("LED CONSTRUCTOR ---- BLINKIN --------------------");
       blinkin = new Spark(pwmID); // initialization of the Blinkin
-      setPattern(0.87); // start blue
     }
     else {
       this.leds = new AddressableLED(pwmID); // initialization of the AdressableLED
