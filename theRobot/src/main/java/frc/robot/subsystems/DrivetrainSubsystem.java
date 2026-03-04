@@ -13,7 +13,6 @@ import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
@@ -49,7 +48,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.MatBuilder;
-import edu.wpi.first.math.MathUtil;
 
 public class DrivetrainSubsystem extends SubsystemBase {
   private CameraSubsystem cameraSubsystem;
@@ -93,6 +91,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private ArrayList<Double> recentVisionYaws = new ArrayList<Double>();
   private int recentVisionYawsMaxSize = 15;
+  private static final int MIN_FIDUCIALS_FOR_VISION = 1;
+  private int lastFiducialCount = 0;
+  private double lastMaxFiducialAmbiguity = 0.0;
 
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
   private ChassisSpeeds previousChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
@@ -368,26 +369,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
       this.seedRobotPositionFromVision();
     } else {
       LimelightHelpers.SetIMUMode("limelight", 3); // set limelight IMU to assist mode, where it uses the limelight
-                                                   // botpose to
-      // assist the IMU's yaw angle estimation
+              // botpose to assist the IMU's yaw angle estimation
       LimelightHelpers.SetIMUAssistAlpha("limelight", Constants.IMUassistAlpha);
     }
 
-    if (InstalledHardware.limelightInstalled && cameraSubsystem != null) {
-      VisionMeasurement visionMeasurement = cameraSubsystem.getVisionBotPose();
-
-      if (visionMeasurement.getRobotPosition() != null) {
-        recentVisionYaws.add(visionMeasurement.getRobotPosition().getRotation().getDegrees());
-        while (recentVisionYaws.size() > recentVisionYawsMaxSize) {
-          recentVisionYaws.remove(0);
-        }
-      }
-      // Only add the measurement once when enabled. (Avoid double-calling
-      // addVisionMeasurement.)
-      if (DriverStation.isEnabled()) {
-        this.addVisionMeasurement(visionMeasurement);
-      }
-    }
+    updateVisionMeasurements();
 
     if (swerveDriveMode == SwerveDriveMode.IMMOVABLE_STANCE && chassisSpeedsAreZero()) {
       // only change to ImmovableStance if chassis is not moving.
@@ -559,6 +545,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // for now ignore all vision measurements that are null or contained robot
     // position is null
     if (visionMeasurement != null && useVision) {
+    if (lastFiducialCount < MIN_FIDUCIALS_FOR_VISION
+      || lastMaxFiducialAmbiguity > Constants.TAG_AMBIGUITY_THRESHOLD) {
+        return;
+      }
       Pose2d visionComputedMeasurement = visionMeasurement.getRobotPosition();
       if (visionComputedMeasurement != null) {
         // we want to reject vision measurements that are more than 1 meter away in case
@@ -568,6 +558,38 @@ public class DrivetrainSubsystem extends SubsystemBase {
         if (lessThanAMeter) {
           drivetrain.addVisionMeasurement(visionComputedMeasurement, visionMeasurement.getTimestamp());
         }
+      }
+    }
+  }
+
+  private void updateVisionMeasurements() {
+    if (!InstalledHardware.limelightInstalled || cameraSubsystem == null) {
+      return;
+    }
+
+    LimelightHelpers.SetRobotOrientation("limelight", getGyroscopeRotation().getDegrees(), 0, 0, 0, 0, 0);
+    VisionMeasurement visionMeasurement = cameraSubsystem.getVisionBotPoseOrb();
+    updateFiducialDiagnostics();
+    updateRecentVisionYaws(visionMeasurement);
+
+    // Only add the measurement once when enabled. (Avoid double-calling
+    // addVisionMeasurement.)
+    if (DriverStation.isEnabled()) {
+      this.addVisionMeasurement(visionMeasurement);
+    }
+  }
+
+  private void updateFiducialDiagnostics() {
+    LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials("limelight");
+    lastFiducialCount = rawFiducials == null ? 0 : rawFiducials.length;
+    lastMaxFiducialAmbiguity = cameraSubsystem.getMaxRawFiducialAmbiguity();
+  }
+
+  private void updateRecentVisionYaws(VisionMeasurement visionMeasurement) {
+    if (visionMeasurement != null && visionMeasurement.getRobotPosition() != null) {
+      recentVisionYaws.add(visionMeasurement.getRobotPosition().getRotation().getDegrees());
+      while (recentVisionYaws.size() > recentVisionYawsMaxSize) {
+        recentVisionYaws.remove(0);
       }
     }
   }
@@ -589,6 +611,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @param rotationMax
    * @return clamped chassisSpeeds
    */
+  @SuppressWarnings("unused")
   private ChassisSpeeds clampChassisSpeeds(
       ChassisSpeeds chassisSpeeds,
       double translationMin,
@@ -617,6 +640,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @param speeds
    * @return
    */
+  @SuppressWarnings("unused")
   private ChassisSpeeds limitChassisSpeedsAccel(ChassisSpeeds speeds) {
     // translational acceleration has different accel/decel limits
     double xVelocityLimited = limitAxisSpeed(speeds.vxMetersPerSecond, previousChassisSpeeds.vxMetersPerSecond,
@@ -656,16 +680,19 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private void displayDiagnostics() {
     if (displayOdometryDiagnostics) {
-      VisionMeasurement visionBotPose = cameraSubsystem.getVisionBotPose();
-      if (visionBotPose.getRobotPosition() != null) {
-        SmartDashboard.putNumber("vision x", visionBotPose.getRobotPosition().getX());
-        SmartDashboard.putNumber("vision y", visionBotPose.getRobotPosition().getY());
-        SmartDashboard.putNumber("vision theta", visionBotPose.getRobotPosition().getRotation().getDegrees());
-        SmartDashboard.putNumber("vision timestamp", visionBotPose.getTimestamp());
-        SmartDashboard.putNumber("current timestamp", Utils.fpgaToCurrentTime(visionBotPose.getTimestamp()));
-        SmartDashboard.putNumber("robot timestamp", Timer.getFPGATimestamp());
-        SmartDashboard.putBoolean("VisionWithinAMeter", lessThanAMeter);
+      if (cameraSubsystem != null) {
+        VisionMeasurement visionBotPose = cameraSubsystem.getVisionBotPoseOrb();
+        if (visionBotPose.getRobotPosition() != null) {
+          SmartDashboard.putNumber("vision x", visionBotPose.getRobotPosition().getX());
+          SmartDashboard.putNumber("vision y", visionBotPose.getRobotPosition().getY());
+          SmartDashboard.putNumber("vision theta", visionBotPose.getRobotPosition().getRotation().getDegrees());
+          SmartDashboard.putNumber("vision timestamp", visionBotPose.getTimestamp());
+          SmartDashboard.putNumber("robot timestamp", Timer.getFPGATimestamp());
+          SmartDashboard.putBoolean("VisionWithinAMeter", lessThanAMeter);
+        }
       }
+      SmartDashboard.putNumber("VisionFiducialCount", lastFiducialCount);
+      SmartDashboard.putNumber("VisionMaxFiducialAmbiguity", lastMaxFiducialAmbiguity);
       SmartDashboard.putNumber("RobotFieldHeadingDegrees", drivetrain.getState().Pose.getRotation().getDegrees());
       SmartDashboard.putNumber("RobotFieldXCoordinateMeters", drivetrain.getState().Pose.getX());
       SmartDashboard.putNumber("RobotFieldYCoordinateMeters", drivetrain.getState().Pose.getY());
