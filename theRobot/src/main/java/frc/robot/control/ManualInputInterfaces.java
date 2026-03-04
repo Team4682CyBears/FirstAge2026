@@ -149,6 +149,24 @@ public class ManualInputInterfaces {
                                         "zero gyroscope")));
                 DataLogManager.log("FINISHED registering back button to zero gyroscope ... ");
 
+        // start button used to temporarily enable camera seeding
+        // while the button is held down.  We use onTrue to set the
+        // flag when pressed and onFalse to clear it when released.
+        this.driverController.start().onTrue(
+            new InstantCommand(() -> {
+                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                this.subsystemCollection.getDriveTrainSubsystem()
+                    .setSeedingCamera(true);
+                }
+            }))
+            .onFalse(
+                new InstantCommand(() -> {
+                    if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                    this.subsystemCollection.getDriveTrainSubsystem()
+                        .setSeedingCamera(false);
+                    }
+                }));
+
             }
 
             if (this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()) {

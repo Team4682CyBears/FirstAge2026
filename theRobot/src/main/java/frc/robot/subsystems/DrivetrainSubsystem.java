@@ -94,7 +94,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private static final int MIN_FIDUCIALS_FOR_VISION = 1;
   private int lastFiducialCount = 0;
   private double lastMaxFiducialAmbiguity = 0.0;
-  // heartbeat from Limelight, increments each frame; used to detect stale data
   private double lastHeartbeat = -1.0;
 
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
@@ -129,6 +128,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
+
+  /* Keep track if we are currently seeding the camera */
+  private boolean isSeedingCamera = false;
 
   private double autoYawVelocityRadiansPerSecond = 0.0;
 
@@ -269,6 +271,29 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   /**
+   * Enable or disable the camera seeding mode.  When seeding is active the
+   * drivetrain periodically forces the limelight into its "seeding" IMU mode
+   * and continuously updates the robot position from vision even while the
+   * robot is disabled.  This is useful during testing so that a driver can
+   * hold a button and verify the limelight calibration without driving the
+   * robot.
+   *
+   * @param seeding true to start seeding the camera, false to stop
+   */
+  public void setSeedingCamera(boolean seeding) {
+    this.isSeedingCamera = seeding;
+  }
+
+  /**
+   * Query whether the drivetrain is currently seeding the camera.
+   *
+   * @return true if seeding, false otherwise
+   */
+  public boolean isSeedingCamera() {
+    return this.isSeedingCamera;
+  }
+
+  /**
    * Method to set the current speed reduction factor to a new value
    * 
    * @param value - the new speed reduction factor
@@ -355,7 +380,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * This ensures driving behavior doesn't change until an explicit disable event
      * occurs during testing.
      */
-    if (DriverStation.isDisabled()) {
+    if (DriverStation.isDisabled() || isSeedingCamera) {
       LimelightHelpers.SetIMUMode("limelight", 1); // set limelight IMU to seeding mode
 
       if (!m_hasAppliedOperatorPerspective) {
@@ -370,8 +395,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // When disabled countinually set the botpose to what the vision says
       this.seedRobotPositionFromVision();
     } else {
-      LimelightHelpers.SetIMUMode("limelight", 3); // set limelight IMU to assist mode, where it uses the limelight
-              // botpose to assist the IMU's yaw angle estimation
+      LimelightHelpers.SetIMUMode("limelight", 4);
       LimelightHelpers.SetIMUAssistAlpha("limelight", Constants.IMUassistAlpha);
     }
 
