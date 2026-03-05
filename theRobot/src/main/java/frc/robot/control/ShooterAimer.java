@@ -27,7 +27,10 @@ public class ShooterAimer {
   private final DrivetrainSubsystem drivetrain;
   private final SubsystemCollection subsystemCollection;
 
+  // NOTE protected flags and methods below exposed for unit testing purposes
+  // otherwise, they would have been private
   protected boolean doCompensateForRotation = true;
+  protected boolean displayDiagnostics = false;
 
   private Translation2d desiredTarget = null;
   private Translation2d targetAdjustment = new Translation2d(0.0, 0.0);
@@ -78,6 +81,11 @@ public class ShooterAimer {
   private final LookupTableDouble kickerRpmLookupTable = new LookupTableDouble(kickerRpmLookupTableData);
   private final LookupTableDouble tofLookupTable = new LookupTableDouble(tofLookupTableData);
 
+  /*
+   * A class to handle all the shooter aiming related calculations
+   * shooterRPM, kickerRPM, autoYaw angle, autoYaw velocity, hoodExtension
+   * requires drivetrain to call calculate() method in periodic when in auto-yaw mode. 
+   */
   public ShooterAimer(DrivetrainSubsystem drivetrain, SubsystemCollection subsystemCollection) {
     this.drivetrain = drivetrain;
     this.subsystemCollection = subsystemCollection;
@@ -98,7 +106,6 @@ public class ShooterAimer {
    */
   public void calculate(){
     if (desiredTarget != null){
-      System.out.println("Shooter Aimer updated!");
       predictedTarget = computePredictedTarget();
       autoYaw = computeYawToFaceTarget();
       autoYawVelocity = computeAutoYawVelocityRadiansPerSecond();
@@ -107,9 +114,14 @@ public class ShooterAimer {
       kickerRPM = kickerRpmForDistance(distance);
       hoodExtension = hoodExtensionForDistance(distance);
       predictedTimeOfFlight = tofForDisatnce(distance);
-    }
-    else {
-      System.out.println("Shooter Aimer not updated!: No target set.");
+      if (displayDiagnostics) {
+      System.out.println("Shooter Aimer updated!");
+      System.out.println("Predicted Target " + predictedTarget);
+      System.out.println("AutoYaw " + autoYaw);
+      System.out.println("AutoYawVelocity " + autoYawVelocity);
+      System.out.println("Distance " + distance);
+      System.out.println("PredictedTimeOfFlight " + predictedTimeOfFlight);
+      }
     }
   }
 
@@ -148,42 +160,82 @@ public class ShooterAimer {
     return alliance == Alliance.Blue ? Constants.blueHubPosition : Constants.redHubPosition;
   }
 
+  /**
+   * Get pre-calculated autoYaw
+   * @return autoYaw
+   */
   public Rotation2d getAutoYaw(){
     return autoYaw;
   }
 
+  /**
+   * Get pre-calculated autoYawVelocity
+   * @return autoYawVelocity in radians per second
+   */
   public double getAutoYawVelocityRadiansPerSecond() {
     return autoYawVelocity;
   }
 
+  /**
+   * Get pre-calculated distance from predicted target
+   * @return distance (m)
+   */
   public double getDistanceForPredictedTarget() {
     return distance;
   }
 
+  /**
+   * Get pre-calculated hood extension
+   * @return hood extension
+   */
   public double getHoodExtension() {
     return hoodExtension;
   }
 
+  /**
+   * Get pre-calculated kicker RPM
+   * @return kicker RPM
+   */
   public double getKickerRPM() {
     return kickerRPM;
   }
 
+  /**
+   * Get kicker min speed 
+   * @return kicker min speed in RPM
+   */
   public double getMinKickerSpeedRPM() {
     return kickerRpmForDistance(0.0);
   }
 
+  /**
+   * Get shooter min speed
+   * @return shooter min speed in RPM
+   */
   public double getMinShooterSpeedRPM() {
     return shooterRpmForDistance(0.0);
   }
 
+  /**
+   * Get pre-computed predicted target
+   * @return predicted target
+   */
   public Translation2d getPredictedTarget(){
     return predictedTarget;
   }
 
+  /**
+   * Get pre-computed shooterRPM
+   * @return shooterRPM
+   */
   public double getShooterRPM() {
     return shooterRPM;
   }
 
+  /**
+   * Get pre-computed time of flight
+   * @return time of flight (seconds)
+   */
   public double getTimeOfFlight() {
     return predictedTimeOfFlight;
   }
@@ -314,8 +366,9 @@ public class ShooterAimer {
           // robot center
           // direction depends on the rotation direction
           drivetrain.getGyroscopeRotation()
-              .plus(Constants.shooterYawOffset)
+              .minus(Constants.shooterYawOffset) // take out shooter yaw offset
               .minus(Rotation2d.fromDegrees(Math.copySign(-90, fieldSpeeds.omegaRadiansPerSecond))));
+      System.out.println("ShooterAimer|ComputePredictedTarget->RotVelocityVector " + rotVelocityVector);
       fieldSpeedsTranslation = fieldSpeedsTranslation.plus(rotVelocityVector);
     }
 
