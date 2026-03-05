@@ -146,6 +146,8 @@ public final class Constants {
     // Shooter RPM bounds
     public static final double SHOOTER_MIN_RPM = 0.0;
     public static final double SHOOTER_MAX_RPM = 6500.0;
+    // tolerance used when judging whether the shooter is "at speed" for LEDs
+    public static final double SHOOTER_RPM_TOLERANCE = 100.0;
 
     // ********************************************************************
     // Kicker Constants
