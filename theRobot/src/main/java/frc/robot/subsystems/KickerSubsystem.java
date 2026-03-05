@@ -27,7 +27,7 @@ import frc.robot.control.Constants;
  */
 public class KickerSubsystem extends SubsystemBase {
 
-    private TalonFX kickerTalonFX = new TalonFX(Constants.kickerTalonCanId);
+    private TalonFX kickerTalonFX;
 
     private final VelocityVoltage motorController = new VelocityVoltage(0.0);
 
@@ -40,7 +40,8 @@ public class KickerSubsystem extends SubsystemBase {
     /*
      * Initialize the kicker and configure the motor
      */
-    public KickerSubsystem() {
+    public KickerSubsystem(int kickerTalonCanID) {
+        this.kickerTalonFX = new TalonFX(kickerTalonCanID);
         configureMotor();
     }
 
@@ -49,8 +50,6 @@ public class KickerSubsystem extends SubsystemBase {
      */
     public void runRPM(double rpm) {
         this.targetRPS = rpmToRPS(rpm);
-        motorController.withVelocity(targetRPS * Constants.kickerMotorGearRatio);
-        kickerTalonFX.setControl(motorController);
     }
 
     private double rpmToRPS(double rpm) {
@@ -77,6 +76,8 @@ public class KickerSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
+        motorController.withVelocity(targetRPS * Constants.kickerMotorGearRatio);
+        kickerTalonFX.setControl(motorController);
         SmartDashboard.putNumber("Kicker Real RPM", getRPM());
     }
 
