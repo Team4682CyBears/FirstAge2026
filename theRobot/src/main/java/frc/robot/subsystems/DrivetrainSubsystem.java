@@ -40,6 +40,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -97,8 +98,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private SwerveYawMode swerveYawMode = SwerveYawMode.JOYSTICK;
 
-  private Translation2d shootingAimTarget = null;
-
   private SwerveDrivetrain<TalonFX, TalonFX, CANcoder> drivetrain = InstalledHardware.bareDrivetrainInstalled
       ? new BareTunerConstants.TunerSwerveDrivetrain(BareTunerConstants.DrivetrainConstants, 0,
           odometryStdDev, visionStdDev,
@@ -122,16 +121,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
+  private Pose2d simPosition = new Pose2d();
   /* Keep track if we are currently seeding the camera */
   private boolean isSeedingCamera = false;
-
-  private double autoYawVelocityRadiansPerSecond = 0.0;
 
   /**
    * Constructor for this DrivetrainSubsystem
    */
   public DrivetrainSubsystem(SubsystemCollection subsystems) {
-    if (InstalledHardware.limelightInstalled) {
+    if (subsystems.isCameraSubsystemAvailable()) {
       cameraSubsystem = subsystems.getCameraSubsystem();
     }
 
@@ -204,11 +202,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       this.previousChassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(previousChassisSpeeds, getGyroscopeRotation());
     }
     this.swerveDriveMode = SwerveDriveMode.FIELD_CENTRIC_SHOOTING;
-    ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(
-        updatedChassisSpeeds.vxMetersPerSecond,
-        updatedChassisSpeeds.vyMetersPerSecond,
-        getAutoYawVelocityRadiansPerSecond());
-    this.chassisSpeeds = newChassisSpeeds;
+    this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(updatedChassisSpeeds);
   }
 
   /**
@@ -237,8 +231,25 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * 
    * @return chassis speeds
    */
-  public ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeedsRobotCentric() {
+    if (RobotBase.isSimulation()) {
+      if (swerveDriveMode == SwerveDriveMode.ROBOT_CENTRIC_DRIVING) {
+        return chassisSpeeds;
+      }
+      else {
+        return ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, getGyroscopeRotation());
+      }
+    } 
     return drivetrain.getState().Speeds;
+  }
+
+  /**
+   * returns chassis speeds (field relative)
+   * 
+   * @return chassis speeds
+   */
+  public ChassisSpeeds getChassisSpeedsFieldCentric() {
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeedsRobotCentric(), getGyroscopeRotation());
   }
 
   /**
@@ -303,6 +314,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @return A Rotation2d that describes the current orentation of the robot.
    */
   public Rotation2d getGyroscopeRotation() {
+    if (RobotBase.isSimulation()) {
+      return simPosition.getRotation();
+    }
     return drivetrain.getState().Pose.getRotation();
   }
 
@@ -312,7 +326,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @return the current auto yaw velocity in radians per second.
    */
   public double getAutoYawVelocityRadiansPerSecond() {
-    return this.autoYawVelocityRadiansPerSecond;
+    return shooterAimer.getAutoYawVelocityRadiansPerSecond();
   }
 
   /**
@@ -322,20 +336,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
    */
   public Pose2d getRobotPosition() {
     return drivetrain.getState().Pose;
-  }
-
-  /**
-   * @param targetX meters
-   * @param targetY meters
-   * @return desired field relative Rotation2d for the robot to face the target
-   */
-  public Rotation2d getYawToFaceTarget(Translation2d targetTranslation) {
-    Pose2d botPos = getRobotPosition();
-    double dx = targetTranslation.getX() - botPos.getX();
-    double dy = targetTranslation.getY() - botPos.getY();
-
-    double angleRad = Math.atan2(dy, dx);
-    return Rotation2d.fromRadians(angleRad);
   }
 
   /**
@@ -394,6 +394,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     updateVisionMeasurements();
 
+    if (swerveYawMode == SwerveYawMode.AUTO) {
+      shooterAimer.calculate(); // update all the shooterAimer parameters
+      this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
+    }
+
     if (swerveDriveMode == SwerveDriveMode.IMMOVABLE_STANCE && chassisSpeedsAreZero()) {
       // only change to ImmovableStance if chassis is not moving.
       // otherwise, we could tip the robot moving to this stance when bot is at high
@@ -427,45 +432,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
           .withVelocityY(chassisSpeeds.vyMetersPerSecond)
           .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
     }
-    if (swerveYawMode == SwerveYawMode.AUTO) {
-      setAutoYawVelocityRadiansPerSecond();
-    }
-
+  
     displayDiagnostics();
-  }
-
-  /**
-   * Set an aiming target (field-relative) for use while in AUTO yaw mode. Use
-   * null to clear.
-   *
-   * @param target field-relative translation for the aim target (meters). If
-   *               null the drivetrain will revert to the default hub position
-   *               behavior.
-   */
-  public void setShootingAimTarget(Translation2d target) {
-    this.shootingAimTarget = target;
-  }
-
-  /**
-   * Clear any manual shooting aim target so the drivetrain uses the default
-   * hub position.
-   */
-  public void clearShootingAimTarget() {
-    this.shootingAimTarget = null;
-  }
-
-  /**
-   * Compute and set the current auto yaw velocity (radians/sec) using the
-   * physical shooter offsets and shooter yaw offset from Constants. This
-   * centralizes the auto-yaw math so callers only need to invoke this method.
-   */
-  private void setAutoYawVelocityRadiansPerSecond() {
-    if (this.shooterAimer != null) {
-      this.autoYawVelocityRadiansPerSecond = shooterAimer.computeAutoYawVelocityRadiansPerSecond(shootingAimTarget);
-    } else {
-      // No aimer - clear auto yaw (drivetrain shouldn't attempt automatic yaw)
-      this.autoYawVelocityRadiansPerSecond = 0.0;
-    }
   }
 
   /**
@@ -474,6 +442,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @param updatedPosition - the new position of the robot
    */
   public void setRobotPosition(Pose2d updatedPosition) {
+    if (RobotBase.isSimulation()) {
+      this.simPosition = updatedPosition;
+    }
     drivetrain.resetPose(updatedPosition);
   }
 
@@ -671,16 +642,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private void displayDiagnostics() {
     if (displayOdometryDiagnostics) {
-      if (cameraSubsystem != null) {
-        VisionMeasurement visionBotPose = cameraSubsystem.getVisionBotPoseOrb();
-        if (visionBotPose.getRobotPosition() != null) {
-          SmartDashboard.putNumber("vision x", visionBotPose.getRobotPosition().getX());
-          SmartDashboard.putNumber("vision y", visionBotPose.getRobotPosition().getY());
-          SmartDashboard.putNumber("vision theta", visionBotPose.getRobotPosition().getRotation().getDegrees());
-          SmartDashboard.putNumber("vision timestamp", visionBotPose.getTimestamp());
-          SmartDashboard.putNumber("robot timestamp", Timer.getFPGATimestamp());
-          SmartDashboard.putBoolean("VisionWithinAMeter", lessThanAMeter);
-        }
+      VisionMeasurement visionBotPose = cameraSubsystem != null ? cameraSubsystem.getVisionBotPose() : null;
+      if (visionBotPose != null && visionBotPose.getRobotPosition() != null) {
+        SmartDashboard.putNumber("vision x", visionBotPose.getRobotPosition().getX());
+        SmartDashboard.putNumber("vision y", visionBotPose.getRobotPosition().getY());
+        SmartDashboard.putNumber("vision theta", visionBotPose.getRobotPosition().getRotation().getDegrees());
+        SmartDashboard.putNumber("vision timestamp", visionBotPose.getTimestamp());
+        SmartDashboard.putNumber("robot timestamp", Timer.getFPGATimestamp());
+        SmartDashboard.putBoolean("VisionWithinAMeter", lessThanAMeter);
         SmartDashboard.putNumber("VisionFiducialCount", cameraSubsystem.getLastFiducialCount());
         SmartDashboard.putNumber("VisionMaxFiducialAmbiguity", cameraSubsystem.getLastMaxFiducialAmbiguity());
         SmartDashboard.putNumber("VisionHeartbeat", cameraSubsystem.getLastHeartbeat());
