@@ -1,3 +1,13 @@
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Rebuilt - 2026
+// File: ShooterAimer.java
+// Intent: Helper class to compute aiming parameters for shooting at a target
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
+
 package frc.robot.control;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -156,6 +166,14 @@ public class ShooterAimer {
 
   public double getKickerRPM() {
     return kickerRPM;
+  }
+
+  public double getMinKickerSpeedRPM() {
+    return kickerRpmForDistance(0.0);
+  }
+
+  public double getMinShooterSpeedRPM() {
+    return shooterRpmForDistance(0.0);
   }
 
   public Translation2d getPredictedTarget(){

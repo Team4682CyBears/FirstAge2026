@@ -98,9 +98,6 @@ public class HoodSubsystem extends SubsystemBase {
         
         if (!hoodIsAtDesiredExtension) {
             // use motionMagic voltage control
-            // System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!SETTING HOOD TO MOTION MAGIC !!!!!! " + desiredExtension);
-            // System.out.println("Desired extension " + desiredExtension);
-            // System.out.print("is at desired extension " + hoodIsAtDesiredExtension);
             motor.setControl(
                     voltageController.withPosition(desiredExtension));
             // keep moving until it reaches target extendo

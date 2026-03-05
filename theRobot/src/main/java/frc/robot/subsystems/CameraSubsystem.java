@@ -10,9 +10,11 @@
 
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 import com.ctre.phoenix6.Utils;
@@ -31,10 +33,6 @@ import frc.robot.common.DistanceMeasurement;
  * A class to encapsulate the camera subsystem
  */
 public class CameraSubsystem extends SubsystemBase {
-  private final double milisecondsInSeconds = 1000.0;
-  private final double microsecondsInSeconds = 1000000.0;
-  private final int BotposeDoubleArraySize = 8;
-  private final int latencyIndex = 6;
 
   /**
    * Set the internal botPoseSource (NT entry name) based on DriverStation alliance.
@@ -44,27 +42,24 @@ public class CameraSubsystem extends SubsystemBase {
     DriverStation.getAlliance().ifPresent(alliance -> {
       if (alliance == Alliance.Red) {
         botPoseSource = "botpose_wpired";
-        botPoseOrbSource = "botpose_orb_wpired";
       } else if (alliance == Alliance.Blue) {
         botPoseSource = "botpose_wpiblue";
-        botPoseOrbSource = "botpose_orb_wpiblue";
       } else {
         botPoseSource = "botpose";
-        botPoseOrbSource = "botpose_orb";
       }
     });
   }
-  private final int fieldSpaceXIndex = 0;
-  private final int fieldSpaceYIndex = 1;
-  private final int botRotationIndex = 5;
   private final int noTagInSightId = -1;
   // we use this for teleop vision udpates with an origin in the bottom left blue
   // side
   private String botPoseSource = "botpose_wpiblue";
-  // we use this for disabled vision seeding with an origin in the bottom left
-  // blue side
-  private String botPoseOrbSource = "botpose_orb_wpiblue";
   private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+
+  private final ArrayList<Double> recentVisionYaws = new ArrayList<Double>();
+  private final int recentVisionYawsMaxSize = 15;
+  private int lastFiducialCount = 0;
+  private double lastMaxFiducialAmbiguity = 0.0;
+  private double lastHeartbeat = -1.0;
 
   /**
    * a constructor for the camera subsystem class
@@ -82,64 +77,74 @@ public class CameraSubsystem extends SubsystemBase {
   public VisionMeasurement getVisionBotPose() {
     // Use LimelightHelpers to get a PoseEstimate (includes timestamp + latency handling)
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
-    try {
-      LimelightHelpers.PoseEstimate pe;
-      // Select helper based on alliance so we read the correct wpi entry
-      if (false && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-        pe = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
-      } else {
-        pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-      }
-      if (pe != null && pe.pose != null) {
-        // LimelightHelpers timestampSeconds is server-time (seconds since epoch), convert to FPGA time reference
-        double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
-        visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
-      }
-    } catch (Exception e) {
-      // fall back to previous behavior if helper fails
-      double tagId = this.table.getEntry("tid").getDouble(noTagInSightId);
-      NetworkTableEntry botposeEntry = this.table.getEntry(botPoseSource);
-      if (botposeEntry.exists() && tagId != noTagInSightId) {
-        double[] botpose = botposeEntry.getDoubleArray(new double[this.BotposeDoubleArraySize]);
-        Double timestamp = (botposeEntry.getLastChange() / this.microsecondsInSeconds)
-            - (botpose[this.latencyIndex] / this.milisecondsInSeconds);
-        Translation2d botTranslation = new Translation2d(botpose[this.fieldSpaceXIndex], botpose[this.fieldSpaceYIndex]);
-        Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]);
-        Pose2d realRobotPosition = new Pose2d(botTranslation, botYaw);
-        visionMeasurement = new VisionMeasurement(realRobotPosition, Utils.fpgaToCurrentTime(timestamp));
-      }
+    LimelightHelpers.PoseEstimate pe;
+    // Select helper based on alliance so we read the correct wpi entry
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+      pe = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
+    } else {
+      pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+    }
+    if (pe != null && pe.pose != null) {
+      // LimelightHelpers timestampSeconds is server-time (seconds since epoch), convert to FPGA time reference
+      double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
+      visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
     }
     return visionMeasurement;
   }
 
   public VisionMeasurement getVisionBotPoseOrb() {
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
-    try {
-      LimelightHelpers.PoseEstimate pe;
-      if (false && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-        pe = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight");
-      } else {
-        pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-      }
-      if (pe != null && pe.pose != null) {
-        double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
-        visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
-      }
-    } catch (Exception e) {
-      // fallback to manual read
-      double tagId = this.table.getEntry("tid").getDouble(noTagInSightId);
-      NetworkTableEntry botposeEntry = this.table.getEntry(botPoseOrbSource);
-      if (botposeEntry.exists() && tagId != noTagInSightId) {
-        double[] botpose = botposeEntry.getDoubleArray(new double[this.BotposeDoubleArraySize]);
-        Double timestamp = (botposeEntry.getLastChange() / this.microsecondsInSeconds)
-            - (botpose[this.latencyIndex] / this.milisecondsInSeconds);
-        Translation2d botTranslation = new Translation2d(botpose[this.fieldSpaceXIndex], botpose[this.fieldSpaceYIndex]);
-        Rotation2d botYaw = Rotation2d.fromDegrees(botpose[this.botRotationIndex]);
-        Pose2d realRobotPosition = new Pose2d(botTranslation, botYaw);
-        visionMeasurement = new VisionMeasurement(realRobotPosition, Utils.fpgaToCurrentTime(timestamp));
-      }
+    LimelightHelpers.PoseEstimate pe;
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+      pe = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight");
+    } else {
+      pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+    }
+    if (pe != null && pe.pose != null) {
+      double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
+      visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
     }
     return visionMeasurement;
+  }
+
+  /**
+   * Returns the latest vision measurement only when a new limelight frame is
+   * available. Also refreshes fiducial diagnostics and recent yaw history.
+   *
+   * @param gyroRotation Current robot field rotation for limelight orientation
+   * @return latest VisionMeasurement or null if no new frame was detected
+   */
+  public VisionMeasurement getLatestVisionMeasurement(Rotation2d gyroRotation) {
+    double heartbeat = LimelightHelpers.getHeartbeat("limelight");
+    if (heartbeat == lastHeartbeat) {
+      return null;
+    }
+    lastHeartbeat = heartbeat;
+
+    LimelightHelpers.SetRobotOrientation("limelight", gyroRotation.getDegrees(), 0, 0, 0, 0, 0);
+    VisionMeasurement visionMeasurement = getVisionBotPoseOrb();
+    updateFiducialDiagnostics();
+    updateRecentVisionYaws(visionMeasurement);
+    return visionMeasurement;
+  }
+
+  /**
+   * Compute a seeded pose from the recent vision yaw history.
+   *
+   * @return combined pose with median vision yaw, or null if unavailable
+   */
+  public Pose2d getSeedPoseFromVision() {
+    if (recentVisionYaws.isEmpty()) {
+      return null;
+    }
+
+    double medianYaw = getMedianOfList(recentVisionYaws);
+    LimelightHelpers.SetRobotOrientation("limelight", medianYaw, 0, 0, 0, 0, 0);
+    Pose2d visionPose = getVisionBotPoseOrb().getRobotPosition();
+    if (visionPose == null) {
+      return null;
+    }
+    return new Pose2d(visionPose.getTranslation(), Rotation2d.fromDegrees(medianYaw));
   }
 
   /**
@@ -181,6 +186,18 @@ public class CameraSubsystem extends SubsystemBase {
     return table.getEntry("tid").getDouble(0);
   }
 
+  public int getLastFiducialCount() {
+    return lastFiducialCount;
+  }
+
+  public double getLastMaxFiducialAmbiguity() {
+    return lastMaxFiducialAmbiguity;
+  }
+
+  public double getLastHeartbeat() {
+    return lastHeartbeat;
+  }
+
   /**
    * Returns the maximum ambiguity value from the latest raw fiducials read from
    * the Limelight. If no fiducials are present this returns 0.0.
@@ -205,6 +222,33 @@ public class CameraSubsystem extends SubsystemBase {
     } catch (Exception e) {
       return 0.0;
     }
+  }
+
+  private void updateFiducialDiagnostics() {
+    LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials("limelight");
+    lastFiducialCount = rawFiducials == null ? 0 : rawFiducials.length;
+    lastMaxFiducialAmbiguity = getMaxRawFiducialAmbiguity();
+  }
+
+  private void updateRecentVisionYaws(VisionMeasurement visionMeasurement) {
+    if (visionMeasurement != null && visionMeasurement.getRobotPosition() != null) {
+      recentVisionYaws.add(visionMeasurement.getRobotPosition().getRotation().getDegrees());
+      while (recentVisionYaws.size() > recentVisionYawsMaxSize) {
+        recentVisionYaws.remove(0);
+      }
+    }
+  }
+
+  /**
+   * Calculates the median value of a list of Double values.
+   *
+   * @param list the list of Double values to find the median of
+   * @return the median value of the list
+   */
+  private Double getMedianOfList(ArrayList<Double> list) {
+    ArrayList<Double> modifiedList = new ArrayList<Double>(list);
+    Collections.sort(modifiedList);
+    return modifiedList.get((int) (modifiedList.size() / 2));
   }
 
   /**

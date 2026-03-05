@@ -149,6 +149,32 @@ public class ManualInputInterfaces {
                                         "zero gyroscope")));
                 DataLogManager.log("FINISHED registering back button to zero gyroscope ... ");
 
+        // start button used to temporarily enable camera seeding
+        // while the button is held down.  We use onTrue to set the
+        // flag when pressed and onFalse to clear it when released.
+        this.driverController.start().onTrue(
+            new ParallelCommandGroup(
+                new InstantCommand(() -> {
+                    if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                        this.subsystemCollection.getDriveTrainSubsystem()
+                            .setSeedingCamera(true);
+                    }
+                }),
+                new ButtonPressCommand(
+                    "driverController.start()",
+                    "enable camera seeding")))
+            .onFalse(
+                new ParallelCommandGroup(
+                    new InstantCommand(() -> {
+                        if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                            this.subsystemCollection.getDriveTrainSubsystem()
+                                .setSeedingCamera(false);
+                        }
+                    }),
+                    new ButtonPressCommand(
+                        "driverController.start()",
+                        "disable camera seeding")));
+
             }
 
             if (this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()) {
@@ -308,6 +334,8 @@ public class ManualInputInterfaces {
                             return SmartDashboard.getNumber("Kicker RPM", 0);
                         }));
             }
+
+            this.coDriverController.y().whileTrue(new ShooterManualCommand(this.subsystemCollection));
         }
     }
 }
