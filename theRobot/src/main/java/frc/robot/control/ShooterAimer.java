@@ -205,7 +205,7 @@ public class ShooterAimer {
    * @return kicker min speed in RPM
    */
   public double getMinKickerSpeedRPM() {
-    return kickerRpmForDistance(0.0);
+    return kickerRpmLookupTable.getMinOutput();
   }
 
   /**
@@ -213,7 +213,7 @@ public class ShooterAimer {
    * @return shooter min speed in RPM
    */
   public double getMinShooterSpeedRPM() {
-    return shooterRpmForDistance(0.0);
+    return shooterRpmLookupTable.getMinOutput();
   }
 
   /**
