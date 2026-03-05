@@ -25,6 +25,7 @@ import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import java.util.function.BooleanSupplier;
 
 public class RobotContainer {
 
@@ -66,6 +67,9 @@ public class RobotContainer {
 
     // init the input system
     this.initializeManualInputInterfaces();
+
+    // init this last since it depends on other subsystems
+    this.initializeLEDStateActions();
 
     // do late binding of default commands
     this.lateBindDefaultCommands();
@@ -171,6 +175,98 @@ public class RobotContainer {
     } else {
       System.out.println("FAIL: initializeLEDS");
     }
+  }
+
+  /**
+   * Register LED state actions that reflect shooter/hood status.
+   *
+   * Color indicates shooter speed (green within tolerance, red otherwise).
+   * Blink pattern indicates hood position (solid when hood settled, blink when
+   * moving/not in position).
+   *
+   * We encode the four possible combinations using the built‑in states
+   * Green/Red/GreenBlink/RedBlink.  This method is called after the shooter
+   * and hood subsystems have been initialized; it is safe to assume the LED
+   * subsystem already exists as well.
+   */
+  private void initializeLEDStateActions() {
+    if (!subsystems.isLEDSubsystemAvailable()) {
+      return;
+    }
+
+    var led = subsystems.getLedSubsystem();
+    boolean hasShooter = subsystems.isShooterSubsystemAvailable();
+    boolean hasHood = subsystems.isHoodSubsystemAvailable();
+    final BooleanSupplier cameraGreen = subsystems.isCameraSubsystemAvailable()
+      ? () -> subsystems.getCameraSubsystem().getTagId() != 0
+        && subsystems.getCameraSubsystem().getMaxRawFiducialAmbiguity() <= Constants.TAG_AMBIGUITY_THRESHOLD
+      : () -> false;
+    final BooleanSupplier cameraYellow = subsystems.isCameraSubsystemAvailable()
+      ? () -> subsystems.getCameraSubsystem().getTagId() != 0
+        && subsystems.getCameraSubsystem().getMaxRawFiducialAmbiguity() > Constants.TAG_AMBIGUITY_THRESHOLD
+      : () -> false;
+    final BooleanSupplier cameraRed = subsystems.isCameraSubsystemAvailable()
+      ? () -> subsystems.getCameraSubsystem().getTagId() == 0
+      : () -> false;
+
+
+  double shooterTol = Constants.SHOOTER_RPM_TOLERANCE;
+
+  BooleanSupplier enabled = () -> DriverStation.isEnabled();
+
+  if (hasShooter && hasHood) {
+    led.registerStateAction(LEDState.Green, () ->
+      (enabled.getAsBoolean()
+        && subsystems.getShooterSubsystem().isAtTargetRPM(shooterTol)
+        && subsystems.getHoodSubsystem().isAtDesiredPosition())
+        || (!enabled.getAsBoolean() && cameraGreen.getAsBoolean()));
+
+    led.registerStateAction(LEDState.Red, () ->
+      (enabled.getAsBoolean()
+        && !subsystems.getShooterSubsystem().isAtTargetRPM(shooterTol)
+        && subsystems.getHoodSubsystem().isAtDesiredPosition())
+        || (!enabled.getAsBoolean() && cameraRed.getAsBoolean()));
+
+    led.registerStateAction(LEDState.GreenBlink, () ->
+      enabled.getAsBoolean()
+        && subsystems.getShooterSubsystem().isAtTargetRPM(shooterTol)
+        && !subsystems.getHoodSubsystem().isAtDesiredPosition());
+
+    led.registerStateAction(LEDState.RedBlink, () ->
+      enabled.getAsBoolean()
+        && !subsystems.getShooterSubsystem().isAtTargetRPM(shooterTol)
+        && !subsystems.getHoodSubsystem().isAtDesiredPosition());
+
+    led.registerStateAction(LEDState.Yellow, () ->
+      !enabled.getAsBoolean() && cameraYellow.getAsBoolean());
+  } else if (hasShooter) {
+    led.registerStateAction(LEDState.Green, () ->
+      enabled.getAsBoolean()
+        && subsystems.getShooterSubsystem().isAtTargetRPM(shooterTol)
+        || (!enabled.getAsBoolean() && cameraGreen.getAsBoolean()));
+    led.registerStateAction(LEDState.Red, () ->
+      enabled.getAsBoolean()
+        && !subsystems.getShooterSubsystem().isAtTargetRPM(shooterTol)
+        || (!enabled.getAsBoolean() && cameraRed.getAsBoolean()));
+    led.registerStateAction(LEDState.Yellow, () ->
+      !enabled.getAsBoolean() && cameraYellow.getAsBoolean());
+  } else if (hasHood) {
+    led.registerStateAction(LEDState.Green, () ->
+      enabled.getAsBoolean()
+        && subsystems.getHoodSubsystem().isAtDesiredPosition()
+        || (!enabled.getAsBoolean() && cameraGreen.getAsBoolean()));
+    led.registerStateAction(LEDState.GreenBlink, () ->
+      enabled.getAsBoolean() && !subsystems.getHoodSubsystem().isAtDesiredPosition());
+    led.registerStateAction(LEDState.Yellow, () ->
+      !enabled.getAsBoolean() && cameraYellow.getAsBoolean());
+    led.registerStateAction(LEDState.Red, () ->
+      !enabled.getAsBoolean() && cameraRed.getAsBoolean());
+  } else {
+    // no shooter/hood
+    led.registerStateAction(LEDState.Green, () -> cameraGreen.getAsBoolean());
+    led.registerStateAction(LEDState.Yellow, () -> cameraYellow.getAsBoolean());
+    led.registerStateAction(LEDState.Red, () -> cameraRed.getAsBoolean());
+  }
   }
 
   /**
