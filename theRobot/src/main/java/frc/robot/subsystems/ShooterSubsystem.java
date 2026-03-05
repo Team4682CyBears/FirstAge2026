@@ -33,6 +33,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private final SparkClosedLoopController PIDController;
 
+    private double lastTargetRPM = 0.0;
+
     /*
      * Initialize and configure the shooter motors and PIDs
      */
@@ -54,6 +56,7 @@ public class ShooterSubsystem extends SubsystemBase {
      * Run the motor at the target velocity in rpm
      */
     public void runRPM(double targetRPM) {
+        this.lastTargetRPM = targetRPM;
         PIDController.setSetpoint(targetRPM, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
     }
 
@@ -78,6 +81,17 @@ public class ShooterSubsystem extends SubsystemBase {
     public void periodic() {
         double rpm = getRPM();
         SmartDashboard.putNumber("Real Shooter RPM", rpm);
+    }
+
+    /**
+     * Determine if the shooter is within <code>tolerance</code> RPM of the
+     * last commanded setpoint.
+     *
+     * @param tolerance maximum allowable error in RPM
+     * @return true when current velocity is within tolerance of the target
+     */
+    public boolean isAtTargetRPM(double tolerance) {
+        return Math.abs(getRPM() - lastTargetRPM) <= tolerance;
     }
 
     private void configureMotors() {

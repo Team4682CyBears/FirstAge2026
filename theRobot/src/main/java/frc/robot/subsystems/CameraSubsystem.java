@@ -183,7 +183,9 @@ public class CameraSubsystem extends SubsystemBase {
    * @return double of the current in view tag id
    */
   public double getTagId() {
-    return table.getEntry("tid").getDouble(0);
+    var tagSeen = table.getEntry("tid").getDouble(0);
+    System.out.println("Tag seen ID: " + tagSeen);
+    return tagSeen;
   }
 
   public int getLastFiducialCount() {

@@ -110,6 +110,14 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     /**
+     * @return true if the hood has reached (and is settled at) the most
+     *         recently requested position.
+     */
+    public boolean isAtDesiredPosition() {
+        return hoodIsAtDesiredExtension;
+    }
+
+    /**
      * A method to test whether the extendo is within tolerance of the target
      * extendo
      * 

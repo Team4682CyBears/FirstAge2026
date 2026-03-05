@@ -88,11 +88,22 @@ public final class Constants {
 
     // ******************************************************************
     // led constants
-    public static final int ledPWMID = 0;
+    public static final int ledPWMID = 1;
     public static final int ledLength = 30;
     public static final int ledStartIdx = 0;
     public static final int ledBlinkFrquencyInHertz = 2;
     public static final double ledBrightness = 0.5;
+
+    // ******************************************************************
+    // LED PWM constants. All of these constants are US pulse widths from
+    // 1000 to 2000 represented as a double ranging from -1 to 1
+    public static final double ledPWMDarkGreen = 0.75;
+    public static final double ledPWMYellow = 0.69;
+    public static final double ledPWMGreen = 0.77;
+    public static final double ledPWMRed = 0.61;
+    public static final double ledPWMBlack = 0.99;
+    public static final double ledPWMOrange = 0.65;
+    public static final double ledPWMBlue = 0.87;
 
     // ******************************************************************
     // camera constants
@@ -135,6 +146,8 @@ public final class Constants {
     // Shooter RPM bounds
     public static final double SHOOTER_MIN_RPM = 0.0;
     public static final double SHOOTER_MAX_RPM = 6500.0;
+    // tolerance used when judging whether the shooter is "at speed" for LEDs
+    public static final double SHOOTER_RPM_TOLERANCE = 100.0;
 
     // ********************************************************************
     // Kicker Constants
