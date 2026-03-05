@@ -39,10 +39,9 @@ public class AutoAimMovingCommand extends Command {
   }
 
   public void execute() {
-    double distance = aimer.getDistanceToPredictedTarget();
-    double ext = aimer.hoodExtensionForDistance(distance);
+    double ext = aimer.getHoodExtension();
     hood.setExtendoPosition(ext);
-    double shooterRpm = aimer.shooterRpmForDistance(distance);
+    double shooterRpm = aimer.getShooterRPM();
     shooter.runRPM(shooterRpm);
     SmartDashboard.putNumber("Calc Shooter Speed", shooterRpm);
     SmartDashboard.putNumber("Calced Hood Extendo", ext);

@@ -306,7 +306,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @return the current auto yaw velocity in radians per second.
    */
   public double getAutoYawVelocityRadiansPerSecond() {
-    return shooterAimer.computeAutoYawVelocityRadiansPerSecond();
+    return shooterAimer.getAutoYawVelocityRadiansPerSecond();
   }
 
   /**
@@ -391,6 +391,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
 
     if (swerveYawMode == SwerveYawMode.AUTO) {
+      shooterAimer.calculate(); // update all the shooterAimer parameters
       this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
     }
 
