@@ -86,6 +86,7 @@ public class ShooterSubsystem extends SubsystemBase {
         LeadConfig.idleMode(IdleMode.kCoast);
         LeadConfig.smartCurrentLimit(HardwareConstants.shooterSmartCurrentLimitAmps);
         LeadConfig.voltageCompensation(HardwareConstants.nominalVoltageCompensationVolts);
+        LeadConfig.inverted(true);
 
         // Derived values from testing on tardi
         LeadConfig.closedLoop
@@ -108,7 +109,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         FollowerConfig.idleMode(IdleMode.kCoast);
         FollowerConfig.smartCurrentLimit(HardwareConstants.shooterSmartCurrentLimitAmps);
-        FollowerConfig.follow(LeadMotor, true);
+        FollowerConfig.follow(LeadMotor, true); // invert the follower motors
 
         error = FollowMotor.configure(FollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         if (error != REVLibError.kOk) {

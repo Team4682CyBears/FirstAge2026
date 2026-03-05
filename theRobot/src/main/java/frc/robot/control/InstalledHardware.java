@@ -32,12 +32,13 @@ public class InstalledHardware {
     public static final boolean coDriverXboxControllerInstalled = false;
 
     // DriveTrain Related Hardware
-    public static final boolean drivetrainInstalled = false;
-    public static final boolean tardiDrivetrainInstalled = true;
+    public static final boolean drivetrainInstalled = true;
+    public static final boolean bareDrivetrainInstalled = true;
 
     // Shooter related hardware
-    public static final boolean shooterInstalled = false;
-    public static final boolean hoodInstalled = false;
+    public static final boolean shooterInstalled = true;
+    public static final boolean hoodMotorInstalled = true;
+    public static final boolean hoodEncoderInstalled = true;
 
     // Kicker
     public static final boolean kickerInstalled = false;

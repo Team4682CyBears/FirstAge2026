@@ -22,6 +22,7 @@ import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 import frc.robot.control.AutonomousChooser;
 import frc.robot.control.Constants;
+import frc.robot.control.ShooterAimer;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -56,8 +57,12 @@ public class RobotContainer {
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
 
+    // init the shooter aimer (needs drivetrain, shooter and hood)
+    this.initializeShooterAimer();
+
     // init the shot logger (after drivetrain, shooter and hood are initialized)
-    this.initializeShotLogger();
+    // Disabled for now
+    // this.initializeShotLogger();
 
     // init the input system
     this.initializeManualInputInterfaces();
@@ -156,7 +161,6 @@ public class RobotContainer {
   private void initializeDebugDashboard() {
     SmartDashboard.putData("Debug: CommandScheduler", CommandScheduler.getInstance());
   }
-
   /**
    * A method to init the LEDSubsystem
    */
@@ -176,16 +180,23 @@ public class RobotContainer {
     if (InstalledHardware.limelightInstalled) {
       subsystems.setCameraSubsystem(new CameraSubsystem());
       if (subsystems.isLEDSubsystemAvailable()) {
-        // Green if April tag seen
-        subsystems.getLedSubsystem().registerStateAction(LEDState.Green, 
-            () -> subsystems.getCameraSubsystem().getTagId() != 0);
-         // Red if not seen
-        subsystems.getLedSubsystem().registerStateAction(LEDState.Red, 
+        // Green: tag seen and ambiguity is low
+        subsystems.getLedSubsystem().registerStateAction(LEDState.Green,
+            () -> subsystems.getCameraSubsystem().getTagId() != 0
+                && subsystems.getCameraSubsystem().getMaxRawFiducialAmbiguity() <= Constants.TAG_AMBIGUITY_THRESHOLD);
+
+        // Yellow: tag seen but ambiguity is above threshold
+        subsystems.getLedSubsystem().registerStateAction(LEDState.Yellow,
+            () -> subsystems.getCameraSubsystem().getTagId() != 0
+                && subsystems.getCameraSubsystem().getMaxRawFiducialAmbiguity() > Constants.TAG_AMBIGUITY_THRESHOLD);
+
+        // Red: no tag in sight
+        subsystems.getLedSubsystem().registerStateAction(LEDState.Red,
             () -> subsystems.getCameraSubsystem().getTagId() == 0);
       }
-      DataLogManager.log("!!!!!!!!!!!!!!!!!!!SUCCESS: initializeCamera!!!!!!!!!!!!!!!!!!!!!!!!");
+      DataLogManager.log("SUCCESS: initializeCamera");
     } else {
-      DataLogManager.log("!!!!!!!!!!!!!!!!!!!FAIL: initializeCamera!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      DataLogManager.log("FAIL: initializeCamera");
     }
   }
 
@@ -206,8 +217,8 @@ public class RobotContainer {
    * A method to init the hood subsystem
    */
   private void initializeHoodSubsystem() {
-    if (InstalledHardware.hoodInstalled) {
-      subsystems.setHoodSubsystem(new HoodSubsystem(Constants.servoHubCanID));
+    if (InstalledHardware.hoodEncoderInstalled || InstalledHardware.hoodMotorInstalled) {
+      subsystems.setHoodSubsystem(new HoodSubsystem(Constants.hoodMotorCanID, Constants.hoodEncoderCanID));
       System.out.println("SUCCESS: initializeHood");
     } else {
       System.out.println("FAIL: initializeHood");
@@ -219,7 +230,7 @@ public class RobotContainer {
    */
   private void initializeKickerSubsystem() {
     if (InstalledHardware.kickerInstalled) {
-      subsystems.setKickerSubsystem(new KickerSubsystem());
+      subsystems.setKickerSubsystem(new KickerSubsystem(Constants.kickerTalonCanId));
       System.out.println("SUCCESS: initializeKicker");
     } else {
       System.out.println("FAIL: initializeKicker");
@@ -240,6 +251,21 @@ public class RobotContainer {
       DataLogManager.log("SUCCESS: initializeManualInputInterfaces");
     } else {
       DataLogManager.log("FAIL: initializeManualInputInterfaces");
+    }
+  }
+
+  /**
+   * Initialize and wire the ShooterAimer helper (used for auto yaw calculations
+   * and aiming)
+   */
+  private void initializeShooterAimer() {
+    if (subsystems.isDriveTrainSubsystemAvailable() && subsystems.isHoodSubsystemAvailable()
+        && subsystems.isShooterSubsystemAvailable()) {
+      ShooterAimer aimer = new ShooterAimer(subsystems.getDriveTrainSubsystem(), subsystems);
+      subsystems.getDriveTrainSubsystem().setShooterAimer(aimer);
+      DataLogManager.log("SUCCESS: initializeShooterAimer");
+    } else {
+      DataLogManager.log("FAIL: initializeShooterAimer");
     }
   }
 
