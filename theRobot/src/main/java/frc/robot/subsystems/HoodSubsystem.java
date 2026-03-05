@@ -3,133 +3,166 @@
 // Home of the Cybears
 // FRC - Rebuilt - 2026
 // File: HoodSubsystem.java
-// Intent: Changes of the shooter angle
+// Intent: runs the talonfxs motor to extend the hood
 // ************************************************************
 
 // ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
 
-// Quick Citation Links
-// https://docs.revrobotics.com/revlib/servo-hub/configuring-a-servo-hub
-
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
+import com.ctre.phoenix6.configs.TalonFXSConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFXS;
+import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorArrangementValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+
 import edu.wpi.first.math.MathUtil;
-
-import com.revrobotics.servohub.config.ServoChannelConfig;
-import com.revrobotics.servohub.config.ServoHubConfig;
-import com.revrobotics.servohub.ServoHub;
-import com.revrobotics.ResetMode;
-import com.revrobotics.servohub.ServoChannel;
-import com.revrobotics.servohub.ServoChannel.ChannelId;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
-import frc.robot.control.HardwareConstants;
+import frc.robot.control.InstalledHardware;
 
-/**
- * Subsystem for controlling the shooter hood angle and extendo using REV
- * ServoHub.
- */
 public class HoodSubsystem extends SubsystemBase {
-    private final ServoHubConfig config;
-    private final ServoHub servoHub;
-    private ServoChannel rightAngleServoChannel;
-    private ServoChannel leftAngleServoChannel;
-    private ServoChannel extendoServoChannel;
-    private int anglePosition;
-    private int extendoPosition;
 
-    /**
-     * Constructs a new HoodSubsystem.
-     *
-     * @param canID the CAN ID of the ServoHub
-     */
-    public HoodSubsystem(int canID) {
-        this.config = new ServoHubConfig();
-        this.servoHub = new ServoHub(canID);
-        this.rightAngleServoChannel = servoHub.getServoChannel(ChannelId.kChannelId0);
-        this.leftAngleServoChannel = servoHub.getServoChannel(ChannelId.kChannelId1);
-        this.extendoServoChannel = servoHub.getServoChannel(ChannelId.kChannelId2);
+    // Hood gearing
+    private static final double hoodMotorToMechanismGearRatio = (12.0 / 29.0) * (14.0 / 27.0);
+    private static final double hoodExtendoLowVelocityTol = 10; // TODO test this on device with motion magic profile
 
-        anglePosition = HardwareConstants.HOOD_MIN_EXT;
-        extendoPosition = HardwareConstants.HOOD_MIN_EXT;
+    private TalonFXS motor;
+    private CANcoder encoder;
+    private MotionMagicVoltage voltageController = new MotionMagicVoltage(0.0);
 
-        configureServos();
+    private boolean hoodIsAtDesiredExtension = true;
+    private double desiredExtension;
+
+    private Slot0Configs hoodMotorGainsForAbsoluteEncoder = new Slot0Configs().withKP(0.4).withKI(0.01).withKD(0.0)
+            .withKV(0.495).withKS(0.1).withKG(0.02); 
+
+    public HoodSubsystem(int hoodMotorCanID, int hoodEncoderID) {
+        if (InstalledHardware.hoodEncoderInstalled) {
+            this.encoder = new CANcoder(hoodEncoderID);
+            configureEncoder();
+        }
+
+        if (InstalledHardware.hoodMotorInstalled) {
+            this.motor = new TalonFXS(hoodMotorCanID);
+            configureMotor();
+        }
+    }
+
+    public void setExtendoPosition(double position) {
+        desiredExtension = MathUtil.clamp(position, Constants.hoodMinPositionRotations,
+                Constants.hoodMaxPositionRotations);
+        hoodIsAtDesiredExtension = false;
+    }
+
+    private void configureEncoder() {
+        CANcoderConfiguration ccConfig = new CANcoderConfiguration();
+        ccConfig.MagnetSensor.MagnetOffset = Constants.hoodEncoderAbsoluteOffset;
+        // sensor range is (0 .. 0.635) so setting this to 0.9 to be outside the viable range
+        ccConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.9;
+    
+        ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        // apply configs
+        StatusCode response = encoder.getConfigurator().apply(ccConfig);
+        if (!response.isOK()) {
+            DataLogManager.log(
+                    "CANcoder ID " + encoder.getDeviceID() + " failed config with error " + response.toString());
+        }
     }
 
     /**
-     * Configures all servo channels with pulse ranges and default positions.
+     * A method to get the hood extendo
+     * 
+     * @return hood extendo in rotations
      */
-    private void configureServos() {
-        configureServoChannel(rightAngleServoChannel, config.channel0, HardwareConstants.HOOD_MIN_EXT,
-                (HardwareConstants.HOOD_MIN_EXT + HardwareConstants.HOOD_MAX_EXT) / 2, HardwareConstants.HOOD_MAX_EXT);
-        configureServoChannel(leftAngleServoChannel, config.channel1, HardwareConstants.HOOD_MIN_EXT,
-                (HardwareConstants.HOOD_MIN_EXT + HardwareConstants.HOOD_MAX_EXT) / 2, HardwareConstants.HOOD_MAX_EXT);
-        configureServoChannel(extendoServoChannel, config.channel2, HardwareConstants.HOOD_MIN_EXT,
-                (HardwareConstants.HOOD_MIN_EXT + HardwareConstants.HOOD_MAX_EXT) / 2, HardwareConstants.HOOD_MAX_EXT);
-
-        servoHub.setBankPulsePeriod(ServoHub.Bank.kBank0_2, 20000);
-
-        servoHub.configure(config, ResetMode.kResetSafeParameters);
+    public double getHoodPosition() {
+        return InstalledHardware.hoodEncoderInstalled ? encoder.getAbsolutePosition().getValueAsDouble()
+                : motor.getPosition().getValueAsDouble();
     }
 
     /**
-     * Configures a single servo channel with the given pulse range.
-     *
-     * @param channel     the servo channel to configure
-     * @param servoConfig the servo channel configuration
-     * @param minPulse    the minimum pulse width
-     * @param midPulse    the middle pulse width
-     * @param maxPulse    the maximum pulse width
+     * this method will be called once per scheduler run
      */
-    public void configureServoChannel(ServoChannel channel, ServoChannelConfig servoConfig, int minPulse, int midPulse,
-            int maxPulse) {
-        servoConfig.pulseRange(minPulse, midPulse, maxPulse);
-        channel.setPowered(true);
-        channel.setEnabled(true);
-        channel.setPulseWidth(Constants.servoDefaultPosition);
-    }
-
-    /**
-     * Sets the angle position for the hood servos.
-     *
-     * @param position pulse width between 1000 and 2000
-     */
-    public void setAnglePosition(int position) {
-        anglePosition = MathUtil.clamp(position, HardwareConstants.HOOD_MIN_EXT, HardwareConstants.HOOD_MAX_EXT);
-    };
-
-    /**
-     * Sets the extendo position for the hood extendo servo.
-     *
-     * @param position pulse width between 1000 and 2000
-     */
-    public void setExtendoPosition(int position) {
-        extendoPosition = MathUtil.clamp(position, HardwareConstants.HOOD_MIN_EXT, HardwareConstants.HOOD_MAX_EXT);
-    }
-
-    /**
-     * Returns the current angle position pulse width for the hood servos.
-     * Useful for logging/testing.
-     *
-     * @return pulse width (1000-2000)
-     */
-    public int getAnglePosition() {
-        return anglePosition;
-    }
-
-    /**
-     * Returns the current extendo position pulse width for the hood extendo servo.
-     *
-     * @return pulse width (1000-2000)
-     */
-    public int getExtendoPosition() {
-        return extendoPosition;
-    }
-
     @Override
     public void periodic() {
-        rightAngleServoChannel.setPulseWidth(anglePosition);
-        leftAngleServoChannel.setPulseWidth(anglePosition);
-        extendoServoChannel.setPulseWidth(extendoPosition);
+        
+        if (!hoodIsAtDesiredExtension) {
+            // use motionMagic voltage control
+            motor.setControl(
+                    voltageController.withPosition(desiredExtension));
+            // keep moving until it reaches target extendo
+            hoodIsAtDesiredExtension = isExtendoWithinTolerance(desiredExtension);
+        }
+        SmartDashboard.putBoolean("Hood Within Tolerance", hoodIsAtDesiredExtension);
+        SmartDashboard.putNumber("Hood Absolute Position",
+                encoder.getAbsolutePosition().getValueAsDouble());
+        SmartDashboard.putNumber("Hood Motor Encoder Extendo", motor.getPosition().getValueAsDouble());
+    }
+
+    /**
+     * A method to test whether the extendo is within tolerance of the target
+     * extendo
+     * 
+     * @param targetExtendoTolerance
+     * @return true if the extendo is within tolerance
+     */
+    public boolean isExtendoWithinTolerance(double targetExtendoTolerance) {
+        // check both the position and velocity. To allow PID to not stop before
+        // settling.
+        boolean positionTargetReached = Math
+                .abs(getHoodPosition() - desiredExtension) < Constants.hoodExtendoTolerance;
+        boolean velocityIsSmall = Math.abs(motor.getVelocity().getValueAsDouble()) < hoodExtendoLowVelocityTol;
+        return positionTargetReached && velocityIsSmall;
+    }
+
+    private void configureMotor() {
+        TalonFXSConfiguration config = new TalonFXSConfiguration();
+        config.ExternalFeedback.FeedbackRemoteSensorID = Constants.hoodEncoderCanID;
+        config.ExternalFeedback.ExternalFeedbackSensorSource = ExternalFeedbackSensorSourceValue.SyncCANcoder;
+        config.Slot0 = hoodMotorGainsForAbsoluteEncoder;
+        config.ExternalFeedback.SensorToMechanismRatio = 1.0;
+        config.ExternalFeedback.RotorToSensorRatio = 1.0 / hoodMotorToMechanismGearRatio;
+
+        config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+        config.Voltage.PeakForwardVoltage = Constants.falconMaxVoltage;
+        config.Voltage.PeakReverseVoltage = -Constants.falconMaxVoltage;
+        config.Voltage.SupplyVoltageTimeConstant = Constants.motorSupplyVoltageTimeConstant;
+
+        config.CurrentLimits.StatorCurrentLimit = Constants.motorStatorCurrentMaximumAmps;
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
+        config.CurrentLimits.SupplyCurrentLimitEnable = true;
+
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.Commutation.MotorArrangement = MotorArrangementValue.Minion_JST;
+
+        // TODO: Verify values
+        config.MotionMagic.MotionMagicCruiseVelocity = 800.0;
+        config.MotionMagic.MotionMagicAcceleration = 160.0;
+        config.MotionMagic.MotionMagicJerk = 800.0;
+
+        // Software limit switches
+        config.SoftwareLimitSwitch = new SoftwareLimitSwitchConfigs()
+                .withForwardSoftLimitEnable(true)
+                .withForwardSoftLimitThreshold(Constants.hoodMaxPositionRotations)
+                .withReverseSoftLimitEnable(true)
+                .withReverseSoftLimitThreshold(Constants.hoodMinPositionRotations);
+
+        StatusCode response = motor.getConfigurator().apply(config);
+        if (!response.isOK()) {
+            System.out.println(
+                    "TalonFX ID " + motor.getDeviceID() + " failed config with error " + response.toString());
+        }
     }
 }
