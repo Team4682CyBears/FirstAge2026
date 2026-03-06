@@ -19,5 +19,5 @@ public final class Constants {
   }
   public static final double limelightToWPIBlueXOffest = 8.75;
   public static final double limelightToWPIBlueYOffset = 4.0;
-  public static final String cameraName = "limelight";
+  public static final int ballDetectionPipeline = 0;
 }

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.LimelightHelpers;
+import frc.robot.Constants;
 
 public class BallDetectionSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
@@ -44,11 +45,19 @@ public class BallDetectionSubsystem extends SubsystemBase {
   }
 
 
+  /*
+  public static int HowManyBallsDetected(String cameraName){
+
+  }
+
+  */
+
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Ball detected", BallDetectionSubsystem.ballDetected("limelight"));
-    System.out.println(BallDetectionSubsystem.ballDetected("limelight"));
+    System.out.println("Ball detected " + BallDetectionSubsystem.ballDetected("limelight"));
   }
 
   @Override
@@ -56,8 +65,8 @@ public class BallDetectionSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
   }
 
+  //Method to check if ball in the center
   public static boolean isBallInCenterZone(String cameraName) {
-      // 1. Check if the Limelight actually sees a target
       boolean hasTarget = LimelightHelpers.getTV(cameraName);
 
       if (hasTarget) {
@@ -70,6 +79,8 @@ public class BallDetectionSubsystem extends SubsystemBase {
       }
     return false;
   }
+
+  //returns if a ball is detected on camera
   public static boolean ballDetected(String name){
     if(LimelightHelpers.getTV(name) == true){
       return true;

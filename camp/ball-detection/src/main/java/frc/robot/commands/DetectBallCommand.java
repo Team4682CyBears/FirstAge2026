@@ -13,6 +13,7 @@ package frc.robot.commands;
 import frc.robot.subsystems.BallDetectionSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.LimelightHelpers;
+import frc.robot.Constants;
 
 /** An example command that uses an example subsystem. */
 public class DetectBallCommand extends Command {
@@ -33,7 +34,7 @@ public class DetectBallCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    LimelightHelpers.setPipelineIndex("limelight", 0);
+    LimelightHelpers.setPipelineIndex("limelight", Constants.ballDetectionPipeline);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
