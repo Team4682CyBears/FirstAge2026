@@ -45,13 +45,6 @@ public class BallDetectionSubsystem extends SubsystemBase {
   }
 
 
-  /*
-  public static int HowManyBallsDetected(String cameraName){
-
-  }
-
-  */
-
 
   @Override
   public void periodic() {
@@ -82,6 +75,7 @@ public class BallDetectionSubsystem extends SubsystemBase {
 
   //returns if a ball is detected on camera
   public static boolean ballDetected(String name){
+    System.out.println("Target Count: " + LimelightHelpers.getTargetCount(name));
     if(LimelightHelpers.getTV(name) == true){
       return true;
     }
