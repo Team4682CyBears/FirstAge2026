@@ -10,12 +10,6 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.control.HardwareConstants;
-
 import com.revrobotics.PersistMode;
 import com.revrobotics.REVLibError;
 import com.revrobotics.ResetMode;
@@ -27,9 +21,11 @@ import com.revrobotics.spark.config.FeedForwardConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
-
-
-
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.control.HardwareConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
     private final SparkFlex LeadMotor;
@@ -38,19 +34,21 @@ public class ClimberSubsystem extends SubsystemBase {
     private boolean lastHallEffectState = false;
 
     private final SparkClosedLoopController PIDController;
-    /*
-     * TODO: Get mech to get precise values
-     */
+
     private static final double ROTATIONS_PER_INCH = 2.0; // Placeholder
     private static final double SENSOR_POSITION_ABOVE_FLOOR_INCHES = 1.0; // Mostly Placeholder
     private static final double MIN_HEIGHT_ABOVE_FLOOR_INCHES = 0.0; // Placeholder
     private static final double MAX_HEIGHT_INCHES = 25.0; // Placeholder
-    private static final double POSITION_TOLERANCE_INCHES = 0.25; // unsure of what exactly tolerance should be, couldn't find anything on tolerance in KickerSubsystem
-    private static final double VELOCITY_TOLERANCE = 0.1; // that goes for method too, both values placeholders
+    private static final double POSITION_TOLERANCE_INCHES = 0.25; 
+    private static final double VELOCITY_TOLERANCE = 0.1; 
 
-    private double targetPositionInches = 0.0; // TODO: Set to default height
-    /*
-     * Initialize and configure the shooter motors and PIDs
+    private double targetPositionInches = 0.0; 
+
+    /**
+     * Initializes the climber hardware and configuration.
+     * @param LeadCanID   The CAN ID for the leader Spark Flex.
+     * @param FollowCanID The CAN ID for the follower Spark Flex.
+     * @param DIOPortID   The RoboRIO DIO port for the Hall Effect sensor.
      */
     public ClimberSubsystem(int LeadCanID, int FollowCanID, int DIOPortID) {
         this.LeadMotor = new SparkFlex(LeadCanID, MotorType.kBrushless);
@@ -63,92 +61,104 @@ public class ClimberSubsystem extends SubsystemBase {
         configureMotors();
     }
 
+    /**
+     * Returns the current height of the climber.
+     * @return Current position in inches (calculated via conversion factor).
+     */
+    public double getPosition() {
+        return LeadMotor.getEncoder().getPosition();
+    }
 
     /**
-     * Checks if the climber is at the target and moving slowly enough to be considered "set".
+     * Gets the currently set target height of the climber.
+     * @return The target position in inches.
      */
-    public boolean isClimberWithinTolerance(double targetInches) {
-        return (Math.abs(getPosition() - targetInches) < POSITION_TOLERANCE_INCHES) 
-            && (Math.abs(getVelocity()) < VELOCITY_TOLERANCE); // Position is coverted to inches by the encoder's position conversion factor, so we can directly compare it to targetInches
-    }
-
-    public void goToPosition(double targetInches) {
-        targetPositionInches = targetInches;
-        double clampedPosition = MathUtil.clamp(targetInches, MIN_HEIGHT_ABOVE_FLOOR_INCHES, MAX_HEIGHT_INCHES);
-        PIDController.setSetpoint(clampedPosition, com.revrobotics.spark.SparkBase.ControlType.kPosition); // Position is in inches due to the position conversion factor set in configureMotors(), so we can directly use targetInches as the setpoint
-    }
-
     public double getTargetPosition() {
         return targetPositionInches;
     }
 
-     /*
-      * Run the climber at the target voltage
-      */
-    public void runVoltage(double Volts) {
-        LeadMotor.setVoltage(Volts);
-    }
-    public void stop() {
-        LeadMotor.stopMotor();
-    }
-
-    public double getPosition() {
-        return LeadMotor.getEncoder().getPosition(); // Position is in inches due to the position conversion factor set in configureMotors()
-    }
-
+    /**
+     * Returns the current speed of the climber.
+     * @return Current velocity in inches per second.
+     */
     public double getVelocity() {
-        return LeadMotor.getEncoder().getVelocity(); // Velocity is in inches per second due to the velocity conversion factor set in configureMotors()
+        return LeadMotor.getEncoder().getVelocity();
     }
 
-    /*
-     * determines if the climber should reset its encoder based on the hall effect sensor
-     * logic: if the climber is moving up and the sensor was previously triggered but is now not triggered,
-     * or if the climber is moving down and the sensor was previously not triggered but is now triggered, then we should reset the encoder
+    /**
+     * Commands the climber to move to a specific height. The input is clamped 
+     * between the minimum and maximum physical limits.
+     * @param targetInches The target height in inches relative to the floor.
+     */
+    public void goToPosition(double targetInches) {
+        targetPositionInches = targetInches;
+        double clampedPosition = MathUtil.clamp(targetInches, MIN_HEIGHT_ABOVE_FLOOR_INCHES, MAX_HEIGHT_INCHES);
+        PIDController.setSetpoint(clampedPosition, com.revrobotics.spark.SparkBase.ControlType.kPosition);
+    }
+
+    /**
+     * Determines if the climber is near its target height and has stopped moving.
+     * @param targetInches The desired height in inches.
+     * @return True if within both position and velocity tolerances.
+     */
+    public boolean isClimberWithinTolerance(double targetInches) {
+        return (Math.abs(getPosition() - targetInches) < POSITION_TOLERANCE_INCHES) 
+            && (Math.abs(getVelocity()) < VELOCITY_TOLERANCE);
+    }
+
+    /**
+     * Standard subsystem periodic loop. Handles telemetry and automatic 
+     * encoder recalibration when the Hall Effect sensor transition is detected.
      */
     @Override
     public void periodic() {
         boolean currentDetected = isDetected();
-        double velocity = getVelocity(); // Assumption: positive velocity means moving up, negative velocity means moving down
+        double velocity = getVelocity();
 
-        // Check for Reset Conditions
-        // Upwards: Detected -> Not Detected
         if (velocity > 0.1 && (lastHallEffectState && !currentDetected)) {
             LeadMotor.getEncoder().setPosition(SENSOR_POSITION_ABOVE_FLOOR_INCHES);
         } 
-        // Downwards: Not Detected -> Detected
         else if (velocity < -0.1 && (!lastHallEffectState && currentDetected)) {
             LeadMotor.getEncoder().setPosition(SENSOR_POSITION_ABOVE_FLOOR_INCHES);
         }
         lastHallEffectState = currentDetected;
     }
-    
+
+    /**
+     * Drives the lead climber motor using a raw voltage.
+     * @param Volts The voltage to apply (-12.0 to 12.0).
+     */
+    public void runVoltage(double Volts) {
+        LeadMotor.setVoltage(Volts);
+    }
+
+    /**
+     * Immediately stops motor movement and sets voltage to 0.
+     */ 
+    public void stop() {
+        LeadMotor.stopMotor();
+    }
+
     private void checkError(REVLibError error, int id) {
         if (error != REVLibError.kOk) {
             System.out.println("SparkFlex ID " + id + " failed config: " + error);
         }
     }
-    
-    private boolean isDetected() {
-        return !hallEffectSensor.get();
-    }
-    
+
     private void configureMotors() {
         SparkFlexConfig leadConfig = new SparkFlexConfig();
-
-        // Conversion factor: 1 / rotationsPerInch converts rotations to inches
-        double positionConversion = 1.0 / ROTATIONS_PER_INCH; // this works trust i think
+        double positionConversion = 1.0 / ROTATIONS_PER_INCH;
         
         leadConfig.idleMode(IdleMode.kBrake); 
         leadConfig.smartCurrentLimit(HardwareConstants.shooterSmartCurrentLimitAmps);
         leadConfig.voltageCompensation(HardwareConstants.nominalVoltageCompensationVolts);
 
-        // Configure Encoder units
         leadConfig.encoder
             .positionConversionFactor(positionConversion)
-            .velocityConversionFactor(positionConversion / 60.0); // inches per second
+            .velocityConversionFactor(positionConversion / 60.0);
 
         leadConfig.closedLoop
-            .p(0.1) // Start small for position control
+            .p(0.1)
             .i(0.0)
             .d(0.0)
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -164,5 +174,9 @@ public class ClimberSubsystem extends SubsystemBase {
 
         error = FollowMotor.configure(followConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         checkError(error, FollowMotor.getDeviceId());
+    }
+
+    private boolean isDetected() {
+        return !hallEffectSensor.get();
     }
 }

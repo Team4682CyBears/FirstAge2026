@@ -11,27 +11,38 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.ClimberSubsystem;
-
 import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class ClimberPositionCommand extends Command {
+    private final ClimberSubsystem climberSubsystem;
+    private final DoubleSupplier targetHeightSupplier;
 
-    ClimberSubsystem climberSubsystem;
-    DoubleSupplier targetHeightSupplier;
-
+    /**
+     * Creates a new ClimberPositionCommand.
+     * @param climberSubsystem     The subsystem used by this command.
+     * @param targetHeightSupplier A supplier that provides the target height in inches.
+     */
     public ClimberPositionCommand(ClimberSubsystem climberSubsystem, DoubleSupplier targetHeightSupplier) {
         this.climberSubsystem = climberSubsystem;
         this.targetHeightSupplier = targetHeightSupplier;
+
         addRequirements(climberSubsystem);
     }
 
+    /**
+     * Continuously updates the climber's setpoint to the value provided by the supplier.
+     */
     @Override
     public void execute() {
         this.climberSubsystem.goToPosition(targetHeightSupplier.getAsDouble());
     }
 
+    /**
+     * Returns true when the climber's current position and velocity are within 
+     * the defined tolerances of the target.
+     * @return True if the climber has reached the target position.
+     */
     @Override
     public boolean isFinished() {
         return this.climberSubsystem.isClimberWithinTolerance(this.climberSubsystem.getTargetPosition());
