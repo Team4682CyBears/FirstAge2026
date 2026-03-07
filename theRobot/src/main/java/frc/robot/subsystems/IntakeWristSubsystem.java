@@ -22,7 +22,7 @@ import frc.robot.control.Constants;
 public class IntakeWristSubsystem extends SubsystemBase {
 
     // wrist gearing
-    private static final double intakeWristEncoderGearRatio = 1.0;
+    private static final double intakeWristEncoderGearRatio = 1.0/5.0 * 1.0/5.0 * 22.0/32.0;
     private static final double intakeWristLowVelocityTol = 10; // TODO test this on device with motion magic profile
 
     private TalonFX motor;
