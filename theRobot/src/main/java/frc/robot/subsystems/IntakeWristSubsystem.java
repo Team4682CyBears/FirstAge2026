@@ -63,14 +63,8 @@ public class IntakeWristSubsystem extends SubsystemBase {
      * @return wrist position in rotations
      */
     public double getWristPosition() {
-        // the CANcoder returns the absolute position by default; the hood
-        // subsystem uses getAbsolutePosition() which is more intuitive when
-        // comparing against the constants defined in rotations.  mirror that
-        // behaviour here so the sign conventions stay consistent between
-        // subsystems.  fall back to the motor's internal sensor if we don't
-        // actually have an encoder installed (e.g. during early bench testing).
         if (encoder != null) {
-            return encoder.getAbsolutePosition().getValueAsDouble();
+        return encoder.getPosition().getValueAsDouble();
         }
         return motor.getPosition().getValueAsDouble();
     }
@@ -94,8 +88,6 @@ public class IntakeWristSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("IntakeWrist Absolute Position", Double.NaN);
         }
         SmartDashboard.putNumber("IntakeWrist Motor Encoder Extendo", getWristPosition());
-        SmartDashboard.putNumber("IntakeWrist Desired Extendo", desiredExtension);
-        SmartDashboard.putBoolean("IntakeWrist At Desired", intakeWristIsAtDesiredExtension);
     }
 
     /**
@@ -117,10 +109,6 @@ public class IntakeWristSubsystem extends SubsystemBase {
         CANcoderConfiguration ccConfig = new CANcoderConfiguration();
     ccConfig.MagnetSensor.MagnetOffset = Constants.intakeWristEncoderAbsoluteOffset;
     ccConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
-    // The encoder direction should match the sign used by the motor so that
-    // positive position errors drive the motor in the expected direction.  If
-    // you find that the wrist still moves the wrong way when you set a target
-    // that is less than the current position, invert this value.
     ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         // apply configs
         StatusCode response = encoder.getConfigurator().apply(ccConfig);
@@ -149,15 +137,7 @@ public class IntakeWristSubsystem extends SubsystemBase {
         config.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    // the wrist motor is mounted such that a counter‑clockwise rotation
-    // (looking at the gearbox output) corresponds to increasing encoder
-    // counts when the extendo is moving toward the deployed position.  we
-    // originally had the inversion flipped which caused every position
-    // command below the current reading to drive the mechanism the wrong
-    // direction (i.e. always toward the deployed limit).  match the
-    // convention used in HoodSubsystem so the sign on the motor and
-    // encoder agree.
-    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         // Borrowed from Crescendo2024 ShooterAngleSubsystem.java
         // TODO: Verify values
