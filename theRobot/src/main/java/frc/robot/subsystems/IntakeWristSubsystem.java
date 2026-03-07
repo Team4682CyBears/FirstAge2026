@@ -31,9 +31,9 @@ public class IntakeWristSubsystem extends SubsystemBase {
     private MotionMagicVoltage voltageController = new MotionMagicVoltage(0.0);
 
     private boolean intakeWristIsAtDesiredExtension = true;
-    private double desiredExtension;
+    private double desiredExtension = 0.0;
 
-    private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.4).withKI(0.0).withKD(0.0)
+    private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.4).withKI(0.0).withKD(0.0).withKG(0.2)
             .withKV(0.45045).withKS(0.09009); // TODO: Find real values. DO NOT SET KD!!
 
     public IntakeWristSubsystem(int motorCanID, int encoderCanID) {
@@ -58,15 +58,25 @@ public class IntakeWristSubsystem extends SubsystemBase {
     }
 
     /**
-     * A method to get the hood extendo
+     * A method to get the wrist position
      * 
-     * @return hood extendo in rotations
+     * @return wrist position in rotations
      */
-    public double getHoodPosition() {
+    public double getWristPosition() {
+        // the CANcoder returns the absolute position by default; the hood
+        // subsystem uses getAbsolutePosition() which is more intuitive when
+        // comparing against the constants defined in rotations.  mirror that
+        // behaviour here so the sign conventions stay consistent between
+        // subsystems.  fall back to the motor's internal sensor if we don't
+        // actually have an encoder installed (e.g. during early bench testing).
         if (encoder != null) {
-        return encoder.getPosition().getValueAsDouble();
+            return encoder.getAbsolutePosition().getValueAsDouble();
         }
         return motor.getPosition().getValueAsDouble();
+    }
+
+    public double getDesiredExtension() {
+        return desiredExtension;
     }
 
     /**
@@ -74,29 +84,31 @@ public class IntakeWristSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
+        intakeWristIsAtDesiredExtension = isExtendoWithinTolerance();
+        if (!intakeWristIsAtDesiredExtension){
         motor.setControl(voltageController.withPosition(desiredExtension));
-        intakeWristIsAtDesiredExtension = isExtendoWithinTolerance(desiredExtension);
-        
+        }
         if (encoder != null) {
             SmartDashboard.putNumber("IntakeWrist Absolute Position", encoder.getPosition().getValueAsDouble());
         } else {
             SmartDashboard.putNumber("IntakeWrist Absolute Position", Double.NaN);
         }
-        SmartDashboard.putNumber("IntakeWrist Motor Encoder Extendo", getHoodPosition());
+        SmartDashboard.putNumber("IntakeWrist Motor Encoder Extendo", getWristPosition());
+        SmartDashboard.putNumber("IntakeWrist Desired Extendo", desiredExtension);
+        SmartDashboard.putBoolean("IntakeWrist At Desired", intakeWristIsAtDesiredExtension);
     }
 
     /**
      * A method to test whether the extendo is within tolerance of the target
      * extendo
      * 
-     * @param targetExtendoTolerance
      * @return true if the extendo is within tolerance
      */
-    public boolean isExtendoWithinTolerance(double targetExtendoTolerance) {
+    public boolean isExtendoWithinTolerance() {
         // check both the position and velocity. To allow PID to not stop before
         // settling.
         boolean positionTargetReached = Math
-                .abs(getHoodPosition() - desiredExtension) < Constants.intakeWristTolerance;
+                .abs(getWristPosition() - desiredExtension) < Constants.intakeWristTolerance;
         boolean velocityIsSmall = Math.abs(motor.getVelocity().getValueAsDouble()) < intakeWristLowVelocityTol;
         return positionTargetReached && velocityIsSmall;
     }
@@ -105,6 +117,10 @@ public class IntakeWristSubsystem extends SubsystemBase {
         CANcoderConfiguration ccConfig = new CANcoderConfiguration();
     ccConfig.MagnetSensor.MagnetOffset = Constants.intakeWristEncoderAbsoluteOffset;
     ccConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
+    // The encoder direction should match the sign used by the motor so that
+    // positive position errors drive the motor in the expected direction.  If
+    // you find that the wrist still moves the wrong way when you set a target
+    // that is less than the current position, invert this value.
     ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         // apply configs
         StatusCode response = encoder.getConfigurator().apply(ccConfig);
@@ -116,7 +132,6 @@ public class IntakeWristSubsystem extends SubsystemBase {
 
     private void configureMotor() {
         //TODO when we have an encoder, we will need to put the motor config back
-        // use hood subsystem config for reference.
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
@@ -134,7 +149,15 @@ public class IntakeWristSubsystem extends SubsystemBase {
         config.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    // the wrist motor is mounted such that a counter‑clockwise rotation
+    // (looking at the gearbox output) corresponds to increasing encoder
+    // counts when the extendo is moving toward the deployed position.  we
+    // originally had the inversion flipped which caused every position
+    // command below the current reading to drive the mechanism the wrong
+    // direction (i.e. always toward the deployed limit).  match the
+    // convention used in HoodSubsystem so the sign on the motor and
+    // encoder agree.
+    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         // Borrowed from Crescendo2024 ShooterAngleSubsystem.java
         // TODO: Verify values
@@ -143,11 +166,18 @@ public class IntakeWristSubsystem extends SubsystemBase {
         config.MotionMagic.MotionMagicJerk = 800;
 
         // Software limit switches
-    config.SoftwareLimitSwitch = new SoftwareLimitSwitchConfigs()
-        .withForwardSoftLimitEnable(true)
-        .withForwardSoftLimitThreshold(Constants.intakeWristDeployedPositionRotations)
-        .withReverseSoftLimitEnable(true)
-        .withReverseSoftLimitThreshold(Constants.intakeWristRetractedPositionRotations);
+        // forward = maximum allowed extension, reverse = minimum.  the
+        // previous configuration had these swapped which meant the controller
+        // would immediately hit a soft limit as soon as it tried to move
+        // toward the retracted position and then hold against the "wrong"
+        // limit; that combined with the inverted motor produced the behaviour
+        // described by the driver.  swap them so the limits reflect the
+        // physical positions in Constants.
+        config.SoftwareLimitSwitch = new SoftwareLimitSwitchConfigs()
+            .withForwardSoftLimitEnable(true)
+            .withForwardSoftLimitThreshold(Constants.intakeWristDeployedPositionRotations)
+            .withReverseSoftLimitEnable(true)
+            .withReverseSoftLimitThreshold(Constants.intakeWristRetractedPositionRotations);
 
         StatusCode response = motor.getConfigurator().apply(config);
         if (!response.isOK()) {

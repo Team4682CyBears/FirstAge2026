@@ -24,17 +24,21 @@ public class ToggleIntakeDeployCommand extends InstantCommand {
 
     @Override
     public void initialize() {
-        double currentPos = wrist.getHoodPosition();
-        double mid = (Constants.intakeWristDeployedPositionRotations + Constants.intakeWristRetractedPositionRotations) / 2.0;
-        if (currentPos < mid) {
+        double desiredExtension = wrist.getDesiredExtension();
+        if (desiredExtension == Constants.intakeWristRetractedPositionRotations) {
             // currently retracted -> deploy + start roller
             wrist.setExtendoPosition(Constants.intakeWristDeployedPositionRotations);
-            double rpm = SmartDashboard.getNumber("Intake RPM", 3000);
+            double rpm = SmartDashboard.getNumber("Intake RPM", 5000);
             roller.runRPM(rpm);
         } else {
             // currently deployed -> retract + stop roller
             wrist.setExtendoPosition(Constants.intakeWristRetractedPositionRotations);
             roller.stop();
         }
+    }
+
+    @Override
+    public boolean isFinished(){
+        return true;
     }
 }

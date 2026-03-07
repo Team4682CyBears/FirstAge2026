@@ -266,17 +266,18 @@ public class ManualInputInterfaces {
                             }));
                 }
 
-                // // Driver B toggles intake deploy/retract and runs/stops roller while deployed
-                // if (this.subsystemCollection.isIntakeWristSubsystemAvailable() && this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
-                //     this.driverController.b().onTrue(new ToggleIntakeDeployCommand(
-                //             this.subsystemCollection.getIntakeWristSubsystem(),
-                //             this.subsystemCollection.getIntakeRollerSubsystem()));
-                // }
-
-                 this.driverController.b()
-                 .whileTrue(new InstantCommand(() -> this.subsystemCollection.getIntakeRollerSubsystem().runRPM(1500)));
-                 this.driverController.b()
-                 .onFalse(new InstantCommand(() -> this.subsystemCollection.getIntakeRollerSubsystem().stop()));
+                // Driver B toggles intake deploy/retract and runs/stops roller while deployed
+                if (this.subsystemCollection.isIntakeWristSubsystemAvailable() && this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
+                    this.driverController.b().onTrue(new ToggleIntakeDeployCommand(
+                            this.subsystemCollection.getIntakeWristSubsystem(),
+                            this.subsystemCollection.getIntakeRollerSubsystem()));
+                }
+                // SmartDashboard.putNumber("Intake RPM", 0);
+                //  this.driverController.b()
+                //  .whileTrue(new InstantCommand(() -> this.subsystemCollection.
+                //  getIntakeRollerSubsystem().runRPM(SmartDashboard.getNumber("Intake RPM", 0))));
+                //  this.driverController.b()
+                //  .onFalse(new InstantCommand(() -> this.subsystemCollection.getIntakeRollerSubsystem().stop()));
             }
         }
     }
