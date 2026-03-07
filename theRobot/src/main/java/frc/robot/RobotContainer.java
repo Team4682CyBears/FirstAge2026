@@ -59,8 +59,8 @@ public class RobotContainer {
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
 
-  // init the shooter aimer (needs drivetrain, shooter and hood)
-  this.initializeShooterAimer();
+    // init the shooter aimer (needs drivetrain, shooter and hood)
+    this.initializeShooterAimer();
 
     // init the shot logger (after drivetrain, shooter and hood are initialized)
     // Disabled for now
@@ -224,7 +224,7 @@ public class RobotContainer {
    */
   private void initializeHoodSubsystem() {
     if (InstalledHardware.hoodEncoderInstalled || InstalledHardware.hoodMotorInstalled) {
-      subsystems.setHoodSubsystem(new HoodSubsystem());
+      subsystems.setHoodSubsystem(new HoodSubsystem(Constants.hoodMotorCanID, Constants.hoodEncoderCanID));
       System.out.println("SUCCESS: initializeHood");
     } else {
       System.out.println("FAIL: initializeHood");
@@ -236,7 +236,7 @@ public class RobotContainer {
    */
   private void initializeKickerSubsystem() {
     if (InstalledHardware.kickerInstalled) {
-      subsystems.setKickerSubsystem(new KickerSubsystem());
+      subsystems.setKickerSubsystem(new KickerSubsystem(Constants.kickerTalonCanId));
       System.out.println("SUCCESS: initializeKicker");
     } else {
       System.out.println("FAIL: initializeKicker");
@@ -274,12 +274,13 @@ public class RobotContainer {
   }
 
   /**
-   * Initialize and wire the ShooterAimer helper (used for auto yaw calculations and aiming)
+   * Initialize and wire the ShooterAimer helper (used for auto yaw calculations
+   * and aiming)
    */
   private void initializeShooterAimer() {
     if (subsystems.isDriveTrainSubsystemAvailable() && subsystems.isHoodSubsystemAvailable()
         && subsystems.isShooterSubsystemAvailable()) {
-      ShooterAimer aimer = new ShooterAimer(subsystems.getDriveTrainSubsystem(), subsystems.getHoodSubsystem(), subsystems.getShooterSubsystem());
+      ShooterAimer aimer = new ShooterAimer(subsystems.getDriveTrainSubsystem(), subsystems);
       subsystems.getDriveTrainSubsystem().setShooterAimer(aimer);
       DataLogManager.log("SUCCESS: initializeShooterAimer");
     } else {
