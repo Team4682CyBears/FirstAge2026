@@ -243,8 +243,6 @@ public class ManualInputInterfaces {
                 //  getIntakeRollerSubsystem().runRPM(SmartDashboard.getNumber("Intake RPM", 0))));
                 //  this.driverController.b()
                 //  .onFalse(new InstantCommand(() -> this.subsystemCollection.getIntakeRollerSubsystem().stop()));
-            }
-        }
     }
 
     /**
