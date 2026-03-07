@@ -18,11 +18,15 @@ import frc.robot.control.HardwareConstants;
 import com.revrobotics.PersistMode;
 import com.revrobotics.REVLibError;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.FeedForwardConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+
+
 
 
 
@@ -37,20 +41,21 @@ public class ClimberSubsystem extends SubsystemBase {
      * TODO: Get mech to get precise values
      */
     private static final double ROTATIONS_PER_INCH = 2.0; // Placeholder
-    private static final double SENSOR_POSITION_INCHES = 1.0; // Mostly Placeholder
-    private static final double MIN_HEIGHT_INCHES = 0.0; // Placeholder
+    private static final double SENSOR_POSITION_ABOVE_FLOOR_INCHES = 1.0; // Mostly Placeholder
+    private static final double MIN_HEIGHT_ABOVE_FLOOR_INCHES = 0.0; // Placeholder
     private static final double MAX_HEIGHT_INCHES = 25.0; // Placeholder
-    private static final double POSITION_TOLERANCE = 0.5; // unsure of what exactly tolerance should be, couldn't find anything on tolerance in KickerSubsystem
+    private static final double POSITION_TOLERANCE_INCHES = 0.25; // unsure of what exactly tolerance should be, couldn't find anything on tolerance in KickerSubsystem
     private static final double VELOCITY_TOLERANCE = 0.1; // that goes for method too, both values placeholders
 
+    private double targetPositionInches = 0.0; // TODO: Set to default height
     /*
      * Initialize and configure the shooter motors and PIDs
      */
-    public ClimberSubsystem(int LeadCanID, int FollowCanID) {
+    public ClimberSubsystem(int LeadCanID, int FollowCanID, int DIOPortID) {
         this.LeadMotor = new SparkFlex(LeadCanID, MotorType.kBrushless);
         this.FollowMotor = new SparkFlex(FollowCanID, MotorType.kBrushless);
         this.PIDController = this.LeadMotor.getClosedLoopController();
-        this.hallEffectSensor = new DigitalInput(0);
+        this.hallEffectSensor = new DigitalInput(DIOPortID);
 
         configureMotors();
     }
@@ -60,13 +65,18 @@ public class ClimberSubsystem extends SubsystemBase {
      * Checks if the climber is at the target and moving slowly enough to be considered "set".
      */
     public boolean isClimberWithinTolerance(double targetInches) {
-        return (Math.abs(getPosition() - targetInches) < POSITION_TOLERANCE) 
+        return (Math.abs(getPosition() - targetInches) < POSITION_TOLERANCE_INCHES) 
             && (Math.abs(getVelocity()) < VELOCITY_TOLERANCE); // Position is coverted to inches by the encoder's position conversion factor, so we can directly compare it to targetInches
     }
 
     public void goToPosition(double targetInches) {
-        double clampedPosition = MathUtil.clamp(targetInches, MIN_HEIGHT_INCHES, MAX_HEIGHT_INCHES);
+        targetPositionInches = targetInches;
+        double clampedPosition = MathUtil.clamp(targetInches, MIN_HEIGHT_ABOVE_FLOOR_INCHES, MAX_HEIGHT_INCHES);
         PIDController.setSetpoint(clampedPosition, com.revrobotics.spark.SparkBase.ControlType.kPosition); // Position is in inches due to the position conversion factor set in configureMotors(), so we can directly use targetInches as the setpoint
+    }
+
+    public double getTargetPosition() {
+        return targetPositionInches;
     }
 
      /*
@@ -100,11 +110,11 @@ public class ClimberSubsystem extends SubsystemBase {
         // Check for Reset Conditions
         // Upwards: Detected -> Not Detected
         if (velocity > 0.1 && (lastHallEffectState && !currentDetected)) {
-            LeadMotor.getEncoder().setPosition(SENSOR_POSITION_INCHES);
+            LeadMotor.getEncoder().setPosition(SENSOR_POSITION_ABOVE_FLOOR_INCHES);
         } 
         // Downwards: Not Detected -> Detected
         else if (velocity < -0.1 && (!lastHallEffectState && currentDetected)) {
-            LeadMotor.getEncoder().setPosition(SENSOR_POSITION_INCHES);
+            LeadMotor.getEncoder().setPosition(SENSOR_POSITION_ABOVE_FLOOR_INCHES);
         }
         lastHallEffectState = currentDetected;
     }
@@ -137,7 +147,9 @@ public class ClimberSubsystem extends SubsystemBase {
         leadConfig.closedLoop
             .p(0.1) // Start small for position control
             .i(0.0)
-            .d(0.0);
+            .d(0.0)
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .apply(new FeedForwardConfig().kS(.15).kV(.002));
 
         REVLibError error = LeadMotor.configure(leadConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         checkError(error, LeadMotor.getDeviceId());
@@ -145,6 +157,7 @@ public class ClimberSubsystem extends SubsystemBase {
         SparkFlexConfig followConfig = new SparkFlexConfig();
         followConfig.idleMode(IdleMode.kBrake);
         followConfig.follow(LeadMotor); 
+        followConfig.inverted(true);
 
         error = FollowMotor.configure(followConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         checkError(error, FollowMotor.getDeviceId());
