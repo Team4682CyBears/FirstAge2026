@@ -40,9 +40,12 @@ public class ShooterSubsystem extends SubsystemBase {
         this.LeadMotor = new SparkFlex(LeadCanID, MotorType.kBrushless);
         this.FollowMotor = new SparkFlex(FollowCanID, MotorType.kBrushless);
         this.PIDController = this.LeadMotor.getClosedLoopController();
+        
         configureMotors();
     }
 
+
+        
     /*
      * Run the shooter at the target voltage
      */
