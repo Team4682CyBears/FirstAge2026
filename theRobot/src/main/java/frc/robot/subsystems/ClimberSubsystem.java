@@ -12,19 +12,16 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.HardwareConstants;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.REVLibError;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.FeedForwardConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 
@@ -100,7 +97,7 @@ public class ClimberSubsystem extends SubsystemBase {
         boolean currentDetected = isDetected();
         double velocity = getVelocity(); // Assumption: positive velocity means moving up, negative velocity means moving down
 
-        // 1. Check for Reset Conditions
+        // Check for Reset Conditions
         // Upwards: Detected -> Not Detected
         if (velocity > 0.1 && (lastHallEffectState && !currentDetected)) {
             LeadMotor.getEncoder().setPosition(SENSOR_POSITION_INCHES);
