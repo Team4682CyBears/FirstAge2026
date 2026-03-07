@@ -158,4 +158,10 @@ public final class Constants {
     // Distances corresponding to min and max hood positions
     public static final double HOOD_MIN_DISTANCE_METERS = 1.0;
     public static final double HOOD_MAX_DISTANCE_METERS = 8.27;
+
+    /// ******************************
+    /// Climber Constants
+    
+    public static final int climberLeadMotorCanID = 25;
+    public static final int climberFollowMotorCanID = 26;
 }

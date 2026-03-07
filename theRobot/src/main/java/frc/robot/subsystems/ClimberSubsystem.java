@@ -61,12 +61,12 @@ public class ClimberSubsystem extends SubsystemBase {
      */
     public boolean isClimberWithinTolerance(double targetInches) {
         return (Math.abs(getPosition() - targetInches) < POSITION_TOLERANCE) 
-            && (Math.abs(getVelocity()) < VELOCITY_TOLERANCE);
+            && (Math.abs(getVelocity()) < VELOCITY_TOLERANCE); // Position is coverted to inches by the encoder's position conversion factor, so we can directly compare it to targetInches
     }
 
     public void goToPosition(double targetInches) {
         double clampedPosition = MathUtil.clamp(targetInches, MIN_HEIGHT_INCHES, MAX_HEIGHT_INCHES);
-        PIDController.setSetpoint(clampedPosition, com.revrobotics.spark.SparkBase.ControlType.kPosition);
+        PIDController.setSetpoint(clampedPosition, com.revrobotics.spark.SparkBase.ControlType.kPosition); // Position is in inches due to the position conversion factor set in configureMotors(), so we can directly use targetInches as the setpoint
     }
 
      /*
@@ -80,11 +80,11 @@ public class ClimberSubsystem extends SubsystemBase {
     }
 
     public double getPosition() {
-        return LeadMotor.getEncoder().getPosition();
+        return LeadMotor.getEncoder().getPosition(); // Position is in inches due to the position conversion factor set in configureMotors()
     }
 
     public double getVelocity() {
-        return LeadMotor.getEncoder().getVelocity();
+        return LeadMotor.getEncoder().getVelocity(); // Velocity is in inches per second due to the velocity conversion factor set in configureMotors()
     }
 
     /*
@@ -108,6 +108,7 @@ public class ClimberSubsystem extends SubsystemBase {
         }
         lastHallEffectState = currentDetected;
     }
+    
     private void checkError(REVLibError error, int id) {
         if (error != REVLibError.kOk) {
             System.out.println("SparkFlex ID " + id + " failed config: " + error);
@@ -122,7 +123,7 @@ public class ClimberSubsystem extends SubsystemBase {
         SparkFlexConfig leadConfig = new SparkFlexConfig();
 
         // Conversion factor: 1 / rotationsPerInch converts rotations to inches
-        double positionConversion = 1.0 / ROTATIONS_PER_INCH;
+        double positionConversion = 1.0 / ROTATIONS_PER_INCH; // this works trust i think
         
         leadConfig.idleMode(IdleMode.kBrake); 
         leadConfig.smartCurrentLimit(HardwareConstants.shooterSmartCurrentLimitAmps);
