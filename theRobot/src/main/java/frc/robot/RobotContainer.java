@@ -20,6 +20,8 @@ import frc.robot.control.ManualInputInterfaces;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
+import frc.robot.subsystems.IntakeRollerSubsystem;
+import frc.robot.subsystems.IntakeWristSubsystem;
 import frc.robot.control.AutonomousChooser;
 import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
@@ -66,6 +68,9 @@ public class RobotContainer {
     // init the shot logger (after drivetrain, shooter and hood are initialized)
     // Disabled for now
     // this.initializeShotLogger();
+
+    // init the intake subsystems (wrist + roller)
+    this.initializeIntakeSubsystems();
 
     // init the input system
     this.initializeManualInputInterfaces();
@@ -251,6 +256,19 @@ public class RobotContainer {
       System.out.println("SUCCESS: initializeSpindexer");
     } else {
       System.out.println("FAIL: initializeSpindexer");
+    }
+  }
+
+  /**
+   * A method to init the intake subsystems (wrist + roller)
+   */
+  private void initializeIntakeSubsystems() {
+    try {
+      subsystems.setIntakeWristSubsystem(new IntakeWristSubsystem(Constants.intakeWristMotorCanID, Constants.intakeWristEncoderCanID));
+      subsystems.setIntakeRollerSubsystem(new IntakeRollerSubsystem(Constants.intakeRollerCanId));
+      DataLogManager.log("SUCCESS: initializeIntakeSubsystems");
+    } catch (Exception ex) {
+      DataLogManager.log("FAIL: initializeIntakeSubsystems - " + ex.toString());
     }
   }
 
