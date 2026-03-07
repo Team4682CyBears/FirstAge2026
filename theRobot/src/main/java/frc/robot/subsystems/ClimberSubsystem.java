@@ -12,6 +12,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.HardwareConstants;
 
@@ -56,6 +57,8 @@ public class ClimberSubsystem extends SubsystemBase {
         this.FollowMotor = new SparkFlex(FollowCanID, MotorType.kBrushless);
         this.PIDController = this.LeadMotor.getClosedLoopController();
         this.hallEffectSensor = new DigitalInput(DIOPortID);
+
+        SmartDashboard.putNumber("Go to climber position", 1.0);
 
         configureMotors();
     }
