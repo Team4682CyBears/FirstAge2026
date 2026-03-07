@@ -154,7 +154,24 @@ public final class Constants {
     public static final double hoodEncoderAbsoluteOffset = 0.7220;
     public static final double hoodExtendoTolerance = 0.01;
     public static final double hoodMinPositionRotations = 0.0;
-    public static final double hoodMaxPositionRotations = 0.635;
+    public static final double hoodMaxPositionRotations = 0.635; // TODO measure this on device
+
+    public static final int servoDefaultPosition = 1000; // fully retracted position
+
+    /// Intake Constants
+    public static final int intakeWristMotorCanID = 17;
+    public static final int intakeWristEncoderCanID = 32;
+
+    public static final double intakeWristEncoderAbsoluteOffset = -0.417; // TODO zero on-device
+    public static final double intakeWristTolerance = 0.01;
+    public static final double intakeWristRetractedPositionRotations = 0.0;
+    public static final double intakeWristDeployedPositionRotations = 0.25; // TODO measure this on device
+
+    public static final int intakeRollerCanId = 16;
+
+    // Hood servo pulse widths
+    public static final int HOOD_MIN_PULSE = 1000;
+    public static final int HOOD_MAX_PULSE = 2000;
     // Distances corresponding to min and max hood positions
     public static final double HOOD_MIN_DISTANCE_METERS = 1.0;
     public static final double HOOD_MAX_DISTANCE_METERS = 8.27;
