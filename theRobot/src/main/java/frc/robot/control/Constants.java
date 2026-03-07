@@ -26,7 +26,7 @@ public final class Constants {
     public static final double laserInchDetectionRange = 2.0; 
     public static final int spindexerSensorLaserCanID = 27;
     public static final int spindexerTalonFXCanID = 18;
-    public static final double spindexerGearRatio = 1.0; //TODO get the actual number
+    public static final double spindexerGearRatio = 25.0; //TODO get the actual number
 
     public final static double DriveVoltageScalar = 1.0;
 

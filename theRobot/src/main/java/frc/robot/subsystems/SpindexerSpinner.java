@@ -62,12 +62,12 @@ public class SpindexerSpinner extends SubsystemBase {
      * Sets the target rpm
      */
     public void runRPMContinus() {
-        this.targetRPS = rpmToRPS(rpmToRPS(Constants.spindexerSpeedRotationsPerMinute));
+        this.targetRPS = rpmToRPS(Constants.spindexerSpeedRotationsPerMinute);
         this.continuousMode = true;
     }
 
     public void runRPMWtihSensor() {
-        this.targetRPS = rpmToRPS(rpmToRPS(Constants.spindexerSpeedRotationsPerMinute));
+        this.targetRPS = rpmToRPS(Constants.spindexerSpeedRotationsPerMinute);
         this.continuousMode = false;
     }
 
@@ -79,7 +79,7 @@ public class SpindexerSpinner extends SubsystemBase {
      * Get the rpm from the lead motor
      */
     public double getRPM() {
-        return spindexerTalonFX.getVelocity().getValueAsDouble() * 60 / Constants.kickerMotorGearRatio;
+        return spindexerTalonFX.getVelocity().getValueAsDouble() * 60 / Constants.spindexerGearRatio;
     }
 
     /*
@@ -130,7 +130,7 @@ public class SpindexerSpinner extends SubsystemBase {
         talonMotorConfig.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
         talonMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         // motor direction
-        talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        talonMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         StatusCode response = spindexerTalonFX.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {

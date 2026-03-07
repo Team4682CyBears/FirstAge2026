@@ -67,8 +67,8 @@ public class KickerSubsystem extends SubsystemBase {
      * Stop both motors and set the targetRPS to 0
      */
     public void stop() {
-        targetRPS = 0.0;
         kickerTalonFX.stopMotor();
+        targetRPS = 0.0;
     }
 
     /*
@@ -76,6 +76,9 @@ public class KickerSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
+        if (targetRPS == 0.0) {
+            return;
+        }
         motorController.withVelocity(targetRPS * Constants.kickerMotorGearRatio);
         kickerTalonFX.setControl(motorController);
         SmartDashboard.putNumber("Kicker Real RPM", getRPM());
