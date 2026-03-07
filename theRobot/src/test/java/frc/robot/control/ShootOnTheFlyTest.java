@@ -1,7 +1,15 @@
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Rebuilt - 2026
+// File: ShootOnTheFlyTest.java
+// Intent: a class to test ShooterAimer.java
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
+
 package frc.robot.control;
 
-import static edu.wpi.first.units.Units.Rotation;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.wpi.first.hal.AllianceStationID;
@@ -83,7 +91,7 @@ class ShootOnTheFlyTest {
     System.out.println("drivetrain position " + drivetrain.getRobotPosition());
     System.out.println("drivetrain speeds " + drivetrain.getChassisSpeedsFieldCentric());
     System.out.println("actual target " + actualTarget);
-    assertTrue(expectedTarget.equals(actualTarget));
+    assertTrue(expectedTarget.getDistance(actualTarget) <= DELTA);
   }
 
   @Test

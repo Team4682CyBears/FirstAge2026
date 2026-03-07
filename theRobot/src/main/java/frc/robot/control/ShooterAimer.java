@@ -113,7 +113,7 @@ public class ShooterAimer {
       shooterRPM = shooterRpmForDistance(distance);
       kickerRPM = kickerRpmForDistance(distance);
       hoodExtension = hoodExtensionForDistance(distance);
-      predictedTimeOfFlight = tofForDisatnce(distance);
+      predictedTimeOfFlight = tofForDistance(distance);
       if (displayDiagnostics) {
       System.out.println("Shooter Aimer updated!");
       System.out.println("Predicted Target " + predictedTarget);
@@ -245,26 +245,25 @@ public class ShooterAimer {
    * velocity are at
    * the target values
    */
-  public boolean isAtPosition(double targetYawRadians, double targetHoodExtension, double targetShooterRpm,
-      double targetKickerRpm) {
-    double currentYaw = drivetrain.getGyroscopeRotation().getRadians();
-    double yawErr = Math.abs(MathUtil.angleModulus(currentYaw - targetYawRadians));
+  public boolean isAtPosition() {
+    Rotation2d currentYaw = drivetrain.getGyroscopeRotation();
+    double yawErr = Math.abs(MathUtil.angleModulus(currentYaw.minus(autoYaw).getRadians()));
     boolean yawOk = yawErr < Math.toRadians(yawToleranceDegrees); // 3 deg tolerance
 
     double hoodPos = subsystemCollection.isHoodSubsystemAvailable()
         ? subsystemCollection.getHoodSubsystem().getHoodPosition()
         : Constants.hoodMinPositionRotations;
-    boolean hoodOk = Math.abs(hoodPos - targetHoodExtension) < Constants.hoodExtendoTolerance;
+    boolean hoodOk = Math.abs(hoodPos - hoodExtension) < Constants.hoodExtendoTolerance;
 
-    double shooterRpm = subsystemCollection.isShooterSubsystemAvailable()
+    double currentShooterRPM = subsystemCollection.isShooterSubsystemAvailable()
         ? subsystemCollection.getShooterSubsystem().getRPM()
         : 0.0;
-    boolean shooterOk = Math.abs(shooterRpm - targetShooterRpm) < shooterRpmTolerance;
+    boolean shooterOk = Math.abs(currentShooterRPM - shooterRPM) < shooterRpmTolerance;
 
-    double kickerRpm = subsystemCollection.isKickerSubsystemAvailable()
+    double currentKickerRpm = subsystemCollection.isKickerSubsystemAvailable()
         ? subsystemCollection.getKickerSubsystem().getRPM()
         : 0.0;
-    boolean kickerOk = Math.abs(kickerRpm - targetKickerRpm) < kickerRpmTolerance;
+    boolean kickerOk = Math.abs(currentKickerRpm - kickerRPM) < kickerRpmTolerance;
 
     return yawOk && hoodOk && shooterOk && kickerOk;
   }
@@ -272,8 +271,8 @@ public class ShooterAimer {
   /**
    * Helper to determine if a shot is feasible given ranges/lookup tables.
    */
-  public boolean isShotFeasible(Translation2d target) {
-    if (target == null)
+  public boolean isShotFeasible() {
+    if (predictedTarget == null)
       return false;
     // check hood lookup bounds (using Constants distances) and shooter rpm bounds
     // assume hood, shooter, and kicker are all defined over the same min and max
@@ -430,7 +429,7 @@ public class ShooterAimer {
         Constants.SHOOTER_MAX_RPM);
   }
 
-  private double tofForDisatnce(double distanceMeters) { //USED
+  private double tofForDistance(double distanceMeters) { //USED
     return tofLookupTable.queryTable(distanceMeters);
   }
 }

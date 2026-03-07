@@ -10,8 +10,6 @@
 
 package frc.robot.common;
 
-import edu.wpi.first.math.MathUtil;
-
 // This class assumes that the lookup table is ordered and in the format (Input, Output)
 // There must be at least 1 entry in the table. 
 // if no default value is specified, result will be clamped to min/max values.
