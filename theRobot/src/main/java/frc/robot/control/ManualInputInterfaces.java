@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.*;
 
@@ -212,51 +211,9 @@ public class ManualInputInterfaces {
                                     "driverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
 
-            // this.driverController.y().onTrue(
-            // new ParallelCommandGroup(
-            // new InstantCommand(() -> this.subsystemCollection.getDriveTrainSubsystem()
-            // .setSwerveYawMode(SwerveYawMode.AUTO)),
-            // new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode
-            // AUTO")));
-
-            // this.driverController.y().onFalse(
-            // new ParallelCommandGroup(
-            // new InstantCommand(() -> this.subsystemCollection.getDriveTrainSubsystem()
-            // .setSwerveYawMode(SwerveYawMode.JOYSTICK)),
-            // new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode
-            // JOYSTICK")));
-
             this.driverController.y().whileTrue(new AutoAimMovingCommand(subsystemCollection,
                     subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
 
-            // Single Controller Binds (REMOVE FOR FINAL ROBOT)
-            final boolean useSingleControllerBinds = true;
-            if (useSingleControllerBinds) {
-                this.driverController.povUp().onTrue(new InstantCommand(() -> {
-                    double currentRPM = SmartDashboard.getNumber("Shooter RPM", 0);
-                    double newRPM = MathUtil.clamp(currentRPM + 50, Constants.SHOOTER_MIN_RPM,
-                            Constants.SHOOTER_MAX_RPM);
-                    SmartDashboard.putNumber("Shooter RPM", newRPM);
-                }));
-                this.driverController.povDown().onTrue(new InstantCommand(() -> {
-                    double currentRPM = SmartDashboard.getNumber("Shooter RPM", 0);
-                    double newRPM = MathUtil.clamp(currentRPM - 50, Constants.SHOOTER_MIN_RPM,
-                            Constants.SHOOTER_MAX_RPM);
-                    SmartDashboard.putNumber("Shooter RPM", newRPM);
-                }));
-
-                SmartDashboard.putNumber("Shooter RPM", 0);
-                if (InstalledHardware.shooterInstalled) {
-                    this.driverController.leftBumper()
-                            .whileTrue(new ShootCommand(this.subsystemCollection.getShooterSubsystem(), () -> {
-                                return SmartDashboard.getNumber("Shooter RPM", 0);
-                            }));
-                }
-                SmartDashboard.putNumber("Hood Extendo", 0.0);
-                if (InstalledHardware.hoodMotorInstalled) {
-                    this.driverController.a().onTrue(new HoodAngleCommand(
-                            this.subsystemCollection.getHoodSubsystem(),
-                            () -> SmartDashboard.getNumber("Hood Extendo", 0.0)));
                 }
                 if (InstalledHardware.spindexerInstalled) {
                     this.driverController.b().whileTrue(new SpindexerCommand(
@@ -273,7 +230,6 @@ public class ManualInputInterfaces {
                                 return SmartDashboard.getNumber("Kicker RPM", Constants.KICKER_RPM);
                             }));
                 }
-
             }
         }
     }
@@ -291,43 +247,21 @@ public class ManualInputInterfaces {
                             new ButtonPressCommand(
                                     "coDriverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
+        // POV up/down now only adjust the shooter aimer offset; RPM control
+        // has been removed from the co-driver controller.
+        this.coDriverController.povUp().onTrue(new InstantCommand(() -> {
+        if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+            this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
+                .applyTargetAdjustment(0.10, 0.0);
+        }
+        }));
+        this.coDriverController.povDown().onTrue(new InstantCommand(() -> {
+        if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+            this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
+                .applyTargetAdjustment(-0.10, 0.0);
+        }
+        }));
 
-            this.coDriverController.povUp().onTrue(new InstantCommand(() -> {
-                double currentRPM = SmartDashboard.getNumber("Shooter RPM", 0);
-                double newRPM = MathUtil.clamp(currentRPM + 50, Constants.SHOOTER_MIN_RPM,
-                        Constants.SHOOTER_MAX_RPM);
-                SmartDashboard.putNumber("Shooter RPM", newRPM);
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
-                        && this.coDriverController.leftBumper().getAsBoolean()) {
-                    this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer().applyTargetAdjustment(0.10,
-                            0.0);
-                }
-            }));
-            this.coDriverController.povDown().onTrue(new InstantCommand(() -> {
-                double currentRPM = SmartDashboard.getNumber("Shooter RPM", 0);
-                double newRPM = MathUtil.clamp(currentRPM - 50, Constants.SHOOTER_MIN_RPM,
-                        Constants.SHOOTER_MAX_RPM);
-                SmartDashboard.putNumber("Shooter RPM", newRPM);
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
-                        && this.coDriverController.leftBumper().getAsBoolean()) {
-                    this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer().applyTargetAdjustment(-0.10,
-                            0.0);
-                }
-            }));
-            SmartDashboard.putNumber("Shooter RPM", 0);
-
-            if (InstalledHardware.shooterInstalled) {
-                this.coDriverController.leftTrigger()
-                        .whileTrue(new ShootCommand(this.subsystemCollection.getShooterSubsystem(), () -> {
-                            return SmartDashboard.getNumber("Shooter RPM", 0);
-                        }));
-            }
-
-            if (InstalledHardware.hoodMotorInstalled) {
-                this.driverController.a().onTrue(new HoodAngleCommand(
-                        this.subsystemCollection.getHoodSubsystem(),
-                        () -> SmartDashboard.getNumber("Hood Extendo", 0.0)));
-            }
 
             this.coDriverController.start().onTrue(new InstantCommand(() -> {
                 if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
@@ -335,6 +269,7 @@ public class ManualInputInterfaces {
                 }
             }));
 
+            // shooter controls removed from co-driver
             SmartDashboard.putNumber("Kicker RPM", 0);
             if (InstalledHardware.kickerInstalled) {
                 this.coDriverController.rightTrigger()
@@ -342,8 +277,6 @@ public class ManualInputInterfaces {
                             return SmartDashboard.getNumber("Kicker RPM", 0);
                         }));
             }
-
-            this.coDriverController.y().whileTrue(new ShooterManualCommand(this.subsystemCollection));
         }
     }
 }
