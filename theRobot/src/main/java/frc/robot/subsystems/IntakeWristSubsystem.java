@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
+import frc.robot.control.InstalledHardware;
 
 public class IntakeWristSubsystem extends SubsystemBase {
 
@@ -27,28 +28,27 @@ public class IntakeWristSubsystem extends SubsystemBase {
 
     private TalonFX motor;
     private CANcoder encoder;
-    private int encodeCanID;
     private MotionMagicVoltage voltageController = new MotionMagicVoltage(0.0);
 
     private boolean intakeWristIsAtDesiredExtension = true;
     private double desiredExtension;
 
-    private Slot0Configs slot0Configs = new Slot0Configs().withKP(150).withKI(0.125).withKD(0.0)
-            .withKV(0.1).withKS(0.1); // TODO: Find real values. DO NOT SET KD!!
+    private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.4).withKI(0.0).withKD(0.0)
+            .withKV(0.45045).withKS(0.09009); // TODO: Find real values. DO NOT SET KD!!
 
     public IntakeWristSubsystem(int motorCanID, int encoderCanID) {
-        this.motor = new TalonFX(motorCanID);
-        this.encodeCanID = encoderCanID;
-
         // Only create/configure encoder if hardware is present
-        if (frc.robot.control.InstalledHardware.intakeWristEncoderInstalled) {
+        if (InstalledHardware.intakeWristEncoderInstalled) {
             this.encoder = new CANcoder(encoderCanID);
             configureEncoder();
         } else {
             this.encoder = null;
         }
 
-        configureMotor();
+        if (InstalledHardware.intakeWristMotorInstalled) {
+            this.motor = new TalonFX(motorCanID);
+            configureMotor();
+        }
     }
 
     public void setExtendoPosition(double position) {
@@ -115,13 +115,13 @@ public class IntakeWristSubsystem extends SubsystemBase {
     }
 
     private void configureMotor() {
+        //TODO when we have an encoder, we will need to put the motor config back
+        // use hood subsystem config for reference.
         TalonFXConfiguration config = new TalonFXConfiguration();
-        if (encoder != null) {
-            config.Feedback.FeedbackRemoteSensorID = encodeCanID;
-            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        }
+
+        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         config.Slot0 = slot0Configs;
-        config.Feedback.SensorToMechanismRatio = intakeWristEncoderGearRatio;
+        config.Feedback.SensorToMechanismRatio = 1.0/intakeWristEncoderGearRatio;
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
