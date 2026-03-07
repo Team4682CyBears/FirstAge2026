@@ -20,6 +20,14 @@ import com.pathplanner.lib.path.PathConstraints;
 
 public final class Constants {
 
+    //////// SPINDEXER CONSTANTS ///////////
+    // 10 balls per second / 4 balls per rotation 
+    public static final double spindexerSpeedRotationsPerMinute  = 150;
+    public static final double laserInchDetectionRange = 2.0; 
+    public static final int spindexerSensorLaserCanID = 27;
+    public static final int spindexerTalonFXCanID = 18;
+    public static final double spindexerGearRatio = 25.0; //TODO get the actual number
+
     public final static double DriveVoltageScalar = 1.0;
 
     //////// SWERVE MODULE CONFIGS ///////////

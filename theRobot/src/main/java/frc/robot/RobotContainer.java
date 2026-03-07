@@ -54,6 +54,9 @@ public class RobotContainer {
     // init the kicker subsystem
     this.initializeKickerSubsystem();
 
+    // init the spindexer subsystem
+    this.initializeSpindexerSubsystem();
+    
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
 
@@ -235,6 +238,19 @@ public class RobotContainer {
       System.out.println("SUCCESS: initializeKicker");
     } else {
       System.out.println("FAIL: initializeKicker");
+    }
+  }
+
+    /**
+   * A method to init the spindexer subsystem
+   */
+  private void initializeSpindexerSubsystem() {
+    if (InstalledHardware.spindexerInstalled) {
+      subsystems.setSpindexerSpinnerSubsystem(
+          new SpindexerSpinner(Constants.spindexerTalonFXCanID, Constants.spindexerSensorLaserCanID));
+      System.out.println("SUCCESS: initializeSpindexer");
+    } else {
+      System.out.println("FAIL: initializeSpindexer");
     }
   }
 

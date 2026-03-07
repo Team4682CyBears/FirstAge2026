@@ -21,35 +21,54 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
+import frc.robot.common.TofSensorLaser;
 
 /* 
  * Runs the kicker which kicks the ball into the shooter consistiently
  */
-public class KickerSubsystem extends SubsystemBase {
+/*
+ * 
+ * a) a run method that runs the spindexer at a constant rate indepedent of the sensor state. 
+b) a run method that when set to run, if there is no ball in the kicker, the spindexer should run at the constant speed. If there is a ball in the kicker, the spindexer should stop. 
+ */
+public class SpindexerSpinner extends SubsystemBase {
 
-    private TalonFX kickerTalonFX;
+    private TalonFX spindexerTalonFX;
+    private TofSensorLaser spindexerToF;
 
     private final VelocityVoltage motorController = new VelocityVoltage(0.0);
 
     private double targetRPS = 0.0;
-
+    private boolean continuousMode = false;
     // Found based on experimentation on BearBones kicker V1
-    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.52)
+    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.4)
             .withKD(0.0);
 
-    /*
-     * Initialize the kicker and configure the motor
+    /**
+     * Constructor for SpindexerSpinner. Takes in a boolean staticMode which
+     * determines whether the spindexer should run at a constant speed regardless of
+     * the sensor state (true) or if it should stop when the sensor detects a ball
+     * (false).
+     * 
+     * @param staticMode
      */
-    public KickerSubsystem(int kickerTalonCanID) {
-        this.kickerTalonFX = new TalonFX(kickerTalonCanID);
+    public SpindexerSpinner(int motorCanID, int sensorCanID) {
+        spindexerTalonFX = new TalonFX(motorCanID);
+        spindexerToF = new TofSensorLaser(sensorCanID);
         configureMotor();
     }
 
     /*
      * Sets the target rpm
      */
-    public void runRPM(double rpm) {
-        this.targetRPS = rpmToRPS(rpm);
+    public void runRPMContinus() {
+        this.targetRPS = rpmToRPS(Constants.spindexerSpeedRotationsPerMinute);
+        this.continuousMode = true;
+    }
+
+    public void runRPMWtihSensor() {
+        this.targetRPS = rpmToRPS(Constants.spindexerSpeedRotationsPerMinute);
+        this.continuousMode = false;
     }
 
     private double rpmToRPS(double rpm) {
@@ -60,15 +79,15 @@ public class KickerSubsystem extends SubsystemBase {
      * Get the rpm from the lead motor
      */
     public double getRPM() {
-        return kickerTalonFX.getVelocity().getValueAsDouble() * 60 / Constants.kickerMotorGearRatio;
+        return spindexerTalonFX.getVelocity().getValueAsDouble() * 60 / Constants.spindexerGearRatio;
     }
 
     /*
      * Stop both motors and set the targetRPS to 0
      */
     public void stop() {
-        kickerTalonFX.stopMotor();
         targetRPS = 0.0;
+        spindexerTalonFX.stopMotor();
     }
 
     /*
@@ -77,11 +96,16 @@ public class KickerSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         if (targetRPS == 0.0) {
-            return;
+            stop();
+        } else if (!continuousMode && spindexerToF.tofActivated()) {
+            stop();
+        } else {
+            motorController.withVelocity(targetRPS * Constants.spindexerGearRatio);
+            spindexerTalonFX.setControl(motorController);
         }
-        motorController.withVelocity(targetRPS * Constants.kickerMotorGearRatio);
-        kickerTalonFX.setControl(motorController);
-        SmartDashboard.putNumber("Kicker Real RPM", getRPM());
+
+        SmartDashboard.putNumber("Spindexer Real RPM", getRPM());
+        spindexerToF.publishTelemetery();
     }
 
     /*
@@ -91,7 +115,7 @@ public class KickerSubsystem extends SubsystemBase {
         // from ElevatorSubsystem.java Reefscape2025
         // Config motor
         TalonFXConfiguration talonMotorConfig = new TalonFXConfiguration();
-        talonMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        talonMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         talonMotorConfig.Slot0 = slot0Configs;
         talonMotorConfig.ClosedLoopRamps.withVoltageClosedLoopRampPeriod(0.02);
         // do not config feedbacksource, since the default is the internal one.
@@ -106,12 +130,12 @@ public class KickerSubsystem extends SubsystemBase {
         talonMotorConfig.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
         talonMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
         // motor direction
-        talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        talonMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-        StatusCode response = kickerTalonFX.getConfigurator().apply(talonMotorConfig);
+        StatusCode response = spindexerTalonFX.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {
             System.out.println(
-                    "TalonFX ID " + kickerTalonFX.getDeviceID() + " failed config with error "
+                    "TalonFX ID " + spindexerTalonFX.getDeviceID() + " failed config with error "
                             + response.toString());
         }
 
