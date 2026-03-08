@@ -98,7 +98,8 @@ public class SpindexerSpinner extends SubsystemBase {
         if (targetRPS == 0.0) {
             stop();
         } else if (!continuousMode && spindexerToF.tofActivated()) {
-            stop();
+            // stop the motor, but don't set target RPM to 0
+            spindexerTalonFX.stopMotor();
         } else {
             motorController.withVelocity(targetRPS * Constants.spindexerGearRatio);
             spindexerTalonFX.setControl(motorController);

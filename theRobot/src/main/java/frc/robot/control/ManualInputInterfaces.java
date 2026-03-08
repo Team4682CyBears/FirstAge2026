@@ -217,7 +217,7 @@ public class ManualInputInterfaces {
                 }
                 if (InstalledHardware.spindexerInstalled) {
                     this.driverController.b().whileTrue(new SpindexerCommand(
-                            this.subsystemCollection.getSpindexerSpinnerSubsystem(), true));
+                            this.subsystemCollection.getSpindexerSpinnerSubsystem(), false));
                 }
                 // initialize the dashboard value using the defined constant so it
                 // matches what the commands read when running.  Previous versions
@@ -230,20 +230,35 @@ public class ManualInputInterfaces {
                                 return SmartDashboard.getNumber("Kicker RPM", Constants.KICKER_RPM);
                             }));
                 }
+                SmartDashboard.putNumber("Shooter RPM", 0);
+                if (InstalledHardware.shooterInstalled) {
+                    this.driverController.leftBumper()
+                            .whileTrue(new ShootCommand(this.subsystemCollection.getShooterSubsystem(), () -> {
+                                return SmartDashboard.getNumber("Shooter RPM", 0);
+                            }));
+                }
+                // SmartDashboard.putNumber("Shooter Voltage", 0);
+                // if (InstalledHardware.shooterInstalled) {
+                //     this.driverController.leftBumper()
+                //             .whileTrue(new InstantCommand(() -> subsystemCollection.getShooterSubsystem()
+                //             .runVoltage(SmartDashboard.getNumber("Shooter Voltage", 0))
+                //         ));
+                // }
+                SmartDashboard.putNumber("Hood Extendo", 0.0);
+                if (InstalledHardware.hoodMotorInstalled) {
+                    this.driverController.a().onTrue(new HoodAngleCommand(
+                        this.subsystemCollection.getHoodSubsystem(),
+                        () -> SmartDashboard.getNumber("Hood Extendo", 0.0)));
+                }
+
 
                 // Driver B toggles intake deploy/retract and runs/stops roller while deployed
-                if (this.subsystemCollection.isIntakeWristSubsystemAvailable() && this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
-                    this.driverController.b().onTrue(new ToggleIntakeDeployCommand(
-                            this.subsystemCollection.getIntakeWristSubsystem(),
-                            this.subsystemCollection.getIntakeRollerSubsystem()));
-                }
-                // SmartDashboard.putNumber("Intake RPM", 0);
-                //  this.driverController.b()
-                //  .whileTrue(new InstantCommand(() -> this.subsystemCollection.
-                //  getIntakeRollerSubsystem().runRPM(SmartDashboard.getNumber("Intake RPM", 0))));
-                //  this.driverController.b()
-                //  .onFalse(new InstantCommand(() -> this.subsystemCollection.getIntakeRollerSubsystem().stop()));
-    }
+                // if (this.subsystemCollection.isIntakeWristSubsystemAvailable() && this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
+                //     this.driverController.b().onTrue(new ToggleIntakeDeployCommand(
+                //             this.subsystemCollection.getIntakeWristSubsystem(),
+                //             this.subsystemCollection.getIntakeRollerSubsystem()));
+                // }
+            }
 
     /**
      * Will attach commands to the Co Driver XBox buttons
