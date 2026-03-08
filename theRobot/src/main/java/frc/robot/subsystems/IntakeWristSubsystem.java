@@ -137,7 +137,7 @@ public class IntakeWristSubsystem extends SubsystemBase {
         config.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
         config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
         // Borrowed from Crescendo2024 ShooterAngleSubsystem.java
         // TODO: Verify values
@@ -146,18 +146,11 @@ public class IntakeWristSubsystem extends SubsystemBase {
         config.MotionMagic.MotionMagicJerk = 800;
 
         // Software limit switches
-        // forward = maximum allowed extension, reverse = minimum.  the
-        // previous configuration had these swapped which meant the controller
-        // would immediately hit a soft limit as soon as it tried to move
-        // toward the retracted position and then hold against the "wrong"
-        // limit; that combined with the inverted motor produced the behaviour
-        // described by the driver.  swap them so the limits reflect the
-        // physical positions in Constants.
-        config.SoftwareLimitSwitch = new SoftwareLimitSwitchConfigs()
-            .withForwardSoftLimitEnable(true)
-            .withForwardSoftLimitThreshold(Constants.intakeWristDeployedPositionRotations)
-            .withReverseSoftLimitEnable(true)
-            .withReverseSoftLimitThreshold(Constants.intakeWristRetractedPositionRotations);
+    config.SoftwareLimitSwitch = new SoftwareLimitSwitchConfigs()
+        .withForwardSoftLimitEnable(true)
+        .withForwardSoftLimitThreshold(Constants.intakeWristRetractedPositionRotations)
+        .withReverseSoftLimitEnable(true)
+        .withReverseSoftLimitThreshold(Constants.intakeWristDeployedPositionRotations);
 
         StatusCode response = motor.getConfigurator().apply(config);
         if (!response.isOK()) {
