@@ -172,8 +172,8 @@ public final class Constants {
 
     public static final double intakeWristEncoderAbsoluteOffset = -0.417; // TODO zero on-device
     public static final double intakeWristTolerance = 0.01;
-    public static final double intakeWristRetractedPositionRotations = 0.0;
-    public static final double intakeWristDeployedPositionRotations = 0.25; // TODO measure this on device
+    public static final double intakeWristRetractedPositionRotations = 0.25;
+    public static final double intakeWristDeployedPositionRotations = 0.0; // TODO measure this on device
 
     public static final int intakeRollerCanId = 16;
 

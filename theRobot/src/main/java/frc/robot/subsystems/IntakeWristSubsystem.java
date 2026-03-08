@@ -31,10 +31,10 @@ public class IntakeWristSubsystem extends SubsystemBase {
     private MotionMagicVoltage voltageController = new MotionMagicVoltage(0.0);
 
     private boolean intakeWristIsAtDesiredExtension = true;
-    private double desiredExtension = 0.0;
+    private double desiredExtension = Constants.intakeWristRetractedPositionRotations;
 
-    private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.4).withKI(0.0).withKD(0.0).withKG(0.2)
-            .withKV(0.45045).withKS(0.09009); // TODO: Find real values. DO NOT SET KD!!
+    private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.5).withKI(0.003).withKD(0.0).withKG(0.22)
+            .withKV(3.85).withKS(0.5); // TODO: Find real values. DO NOT SET KD!!
 
     public IntakeWristSubsystem(int motorCanID, int encoderCanID) {
         // Only create/configure encoder if hardware is present
@@ -49,11 +49,12 @@ public class IntakeWristSubsystem extends SubsystemBase {
             this.motor = new TalonFX(motorCanID);
             configureMotor();
         }
+        this.motor.setPosition(Constants.intakeWristRetractedPositionRotations);
     }
 
     public void setExtendoPosition(double position) {
-        desiredExtension = MathUtil.clamp(position, Constants.intakeWristRetractedPositionRotations,
-                Constants.intakeWristDeployedPositionRotations);
+        desiredExtension = MathUtil.clamp(position, Constants.intakeWristDeployedPositionRotations,
+                Constants.intakeWristRetractedPositionRotations);
         intakeWristIsAtDesiredExtension = false;
     }
 
@@ -80,7 +81,7 @@ public class IntakeWristSubsystem extends SubsystemBase {
     public void periodic() {
         intakeWristIsAtDesiredExtension = isExtendoWithinTolerance();
         if (!intakeWristIsAtDesiredExtension){
-        motor.setControl(voltageController.withPosition(desiredExtension));
+            motor.setControl(voltageController.withPosition(desiredExtension));
         }
         if (encoder != null) {
             SmartDashboard.putNumber("IntakeWrist Absolute Position", encoder.getPosition().getValueAsDouble());
@@ -124,6 +125,8 @@ public class IntakeWristSubsystem extends SubsystemBase {
 
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         config.Slot0 = slot0Configs;
+        config.ClosedLoopRamps.withVoltageClosedLoopRampPeriod(0.02);
+
         config.Feedback.SensorToMechanismRatio = 1.0/intakeWristEncoderGearRatio;
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -146,18 +149,11 @@ public class IntakeWristSubsystem extends SubsystemBase {
         config.MotionMagic.MotionMagicJerk = 800;
 
         // Software limit switches
-        // forward = maximum allowed extension, reverse = minimum.  the
-        // previous configuration had these swapped which meant the controller
-        // would immediately hit a soft limit as soon as it tried to move
-        // toward the retracted position and then hold against the "wrong"
-        // limit; that combined with the inverted motor produced the behaviour
-        // described by the driver.  swap them so the limits reflect the
-        // physical positions in Constants.
-        config.SoftwareLimitSwitch = new SoftwareLimitSwitchConfigs()
-            .withForwardSoftLimitEnable(true)
-            .withForwardSoftLimitThreshold(Constants.intakeWristDeployedPositionRotations)
-            .withReverseSoftLimitEnable(true)
-            .withReverseSoftLimitThreshold(Constants.intakeWristRetractedPositionRotations);
+    //config.SoftwareLimitSwitch = new SoftwareLimitSwitchConfigs()
+     //   .withForwardSoftLimitEnable(true)
+      //  .withForwardSoftLimitThreshold(Constants.intakeWristRetractedPositionRotations)
+      //  .withReverseSoftLimitEnable(true)
+      //  .withReverseSoftLimitThreshold(Constants.intakeWristDeployedPositionRotations);
 
         StatusCode response = motor.getConfigurator().apply(config);
         if (!response.isOK()) {
