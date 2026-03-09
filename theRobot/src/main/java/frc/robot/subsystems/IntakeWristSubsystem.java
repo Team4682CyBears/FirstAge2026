@@ -1,50 +1,38 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
 import frc.robot.control.InstalledHardware;
+import frc.robot.control.IntakeWristMode;
 
 public class IntakeWristSubsystem extends SubsystemBase {
 
     // wrist gearing
-    private static final double intakeWristEncoderGearRatio = 1.0/5.0 * 1.0/5.0 * 22.0/32.0;
+    private static final double intakeWristGearRatio = 1.0/5.0 * 1.0/5.0 * 22.0/32.0;
     private static final double intakeWristLowVelocityTol = 10; // TODO test this on device with motion magic profile
 
     private TalonFX motor;
-    private CANcoder encoder;
     private MotionMagicVoltage voltageController = new MotionMagicVoltage(0.0);
 
     private boolean intakeWristIsAtDesiredExtension = true;
+    private IntakeWristMode intakeWristMode = IntakeWristMode.RETRACTED;
     private double desiredExtension = Constants.intakeWristRetractedPositionRotations;
 
     private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.5).withKI(0.003).withKD(0.0).withKG(0.22)
             .withKV(3.85).withKS(0.5); // TODO: Find real values. DO NOT SET KD!!
 
-    public IntakeWristSubsystem(int motorCanID, int encoderCanID) {
-        // Only create/configure encoder if hardware is present
-        if (InstalledHardware.intakeWristEncoderInstalled) {
-            this.encoder = new CANcoder(encoderCanID);
-            configureEncoder();
-        } else {
-            this.encoder = null;
-        }
-
+    public IntakeWristSubsystem(int motorCanID) {
         if (InstalledHardware.intakeWristMotorInstalled) {
             this.motor = new TalonFX(motorCanID);
             configureMotor();
@@ -52,10 +40,12 @@ public class IntakeWristSubsystem extends SubsystemBase {
         this.motor.setPosition(Constants.intakeWristRetractedPositionRotations);
     }
 
-    public void setExtendoPosition(double position) {
-        desiredExtension = MathUtil.clamp(position, Constants.intakeWristDeployedPositionRotations,
-                Constants.intakeWristRetractedPositionRotations);
-        intakeWristIsAtDesiredExtension = false;
+    /**
+     * A method to get the wrist mode
+     * @return wrist mode
+     */
+    public IntakeWristMode getMode(){
+        return intakeWristMode;
     }
 
     /**
@@ -63,15 +53,8 @@ public class IntakeWristSubsystem extends SubsystemBase {
      * 
      * @return wrist position in rotations
      */
-    public double getWristPosition() {
-        if (encoder != null) {
-        return encoder.getPosition().getValueAsDouble();
-        }
+    public double getPosition() {
         return motor.getPosition().getValueAsDouble();
-    }
-
-    public double getDesiredExtension() {
-        return desiredExtension;
     }
 
     /**
@@ -83,55 +66,47 @@ public class IntakeWristSubsystem extends SubsystemBase {
         if (!intakeWristIsAtDesiredExtension){
             motor.setControl(voltageController.withPosition(desiredExtension));
         }
-        if (encoder != null) {
-            SmartDashboard.putNumber("IntakeWrist Absolute Position", encoder.getPosition().getValueAsDouble());
-        } else {
-            SmartDashboard.putNumber("IntakeWrist Absolute Position", Double.NaN);
-        }
-        SmartDashboard.putNumber("IntakeWrist Motor Encoder Extendo", getWristPosition());
+        SmartDashboard.putNumber("IntakeWrist Motor Encoder Extendo", getPosition());
     }
 
     /**
-     * A method to test whether the extendo is within tolerance of the target
-     * extendo
-     * 
-     * @return true if the extendo is within tolerance
+     * A method to set the wrist position
+     * @param position
      */
-    public boolean isExtendoWithinTolerance() {
-        //if deployed never asume within tolerance to keep driving
-        if (desiredExtension != Constants.intakeWristRetractedPositionRotations){
-            return false;
-        }
-        // check both the position and velocity. To allow PID to not stop before
-        // settling.
-        boolean positionTargetReached = Math
-                .abs(getWristPosition() - desiredExtension) < Constants.intakeWristTolerance;
-        boolean velocityIsSmall = Math.abs(motor.getVelocity().getValueAsDouble()) < intakeWristLowVelocityTol;
-        return positionTargetReached && velocityIsSmall;
+    public void setPosition(double position) {
+        desiredExtension = MathUtil.clamp(position, Constants.intakeWristDeployedPositionRotations,
+                Constants.intakeWristRetractedPositionRotations);
+        intakeWristIsAtDesiredExtension = false;
     }
 
-    private void configureEncoder() {
-        CANcoderConfiguration ccConfig = new CANcoderConfiguration();
-    ccConfig.MagnetSensor.MagnetOffset = Constants.intakeWristEncoderAbsoluteOffset;
-    ccConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
-    ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        // apply configs
-        StatusCode response = encoder.getConfigurator().apply(ccConfig);
-        if (!response.isOK()) {
-            DataLogManager.log(
-                    "CANcoder ID " + encoder.getDeviceID() + " failed config with error " + response.toString());
+    public void setMode(IntakeWristMode mode){
+        if (mode == intakeWristMode){
+            // already in this mode
+            return;
+        } 
+        else {
+            intakeWristMode = mode;
+            switch (mode) {
+                case DEPLOYED:
+                    setPosition(Constants.intakeWristDeployedPositionRotations);
+                    break;
+                case RETRACTED:
+                    setPosition(Constants.intakeWristRetractedPositionRotations);
+                    break;
+                default:
+                    setPosition(Constants.intakeWristRetractedPositionRotations);
+            }
         }
     }
 
     private void configureMotor() {
-        //TODO when we have an encoder, we will need to put the motor config back
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         config.Slot0 = slot0Configs;
         config.ClosedLoopRamps.withVoltageClosedLoopRampPeriod(0.02);
 
-        config.Feedback.SensorToMechanismRatio = 1.0/intakeWristEncoderGearRatio;
+        config.Feedback.SensorToMechanismRatio = 1.0/intakeWristGearRatio;
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -147,17 +122,9 @@ public class IntakeWristSubsystem extends SubsystemBase {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         // Borrowed from Crescendo2024 ShooterAngleSubsystem.java
-        // TODO: Verify values
         config.MotionMagic.MotionMagicCruiseVelocity = 800.0;
         config.MotionMagic.MotionMagicAcceleration = 160;
         config.MotionMagic.MotionMagicJerk = 800;
-
-        // Software limit switches
-    //config.SoftwareLimitSwitch = new SoftwareLimitSwitchConfigs()
-     //   .withForwardSoftLimitEnable(true)
-      //  .withForwardSoftLimitThreshold(Constants.intakeWristRetractedPositionRotations)
-      //  .withReverseSoftLimitEnable(true)
-      //  .withReverseSoftLimitThreshold(Constants.intakeWristDeployedPositionRotations);
 
         StatusCode response = motor.getConfigurator().apply(config);
         if (!response.isOK()) {
@@ -165,4 +132,24 @@ public class IntakeWristSubsystem extends SubsystemBase {
                     "TalonFX ID " + motor.getDeviceID() + " failed config with error " + response.toString());
         }
     }
+
+    /**
+     * A method to test whether the extendo is within tolerance of the target
+     * extendo
+     * 
+     * @return true if the extendo is within tolerance
+     */
+    private boolean isExtendoWithinTolerance() {
+        //if deployed never asume within tolerance to keep driving
+        if (intakeWristMode == IntakeWristMode.DEPLOYED){
+            return false;
+        }
+        // check both the position and velocity. To allow PID to not stop before
+        // settling.
+        boolean positionTargetReached = Math
+                .abs(getPosition() - desiredExtension) < Constants.intakeWristTolerance;
+        boolean velocityIsSmall = Math.abs(motor.getVelocity().getValueAsDouble()) < intakeWristLowVelocityTol;
+        return positionTargetReached && velocityIsSmall;
+    }
+
 }

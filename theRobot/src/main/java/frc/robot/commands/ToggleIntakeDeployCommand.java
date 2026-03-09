@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.IntakeRollerSubsystem;
 import frc.robot.subsystems.IntakeWristSubsystem;
 import frc.robot.control.Constants;
+import frc.robot.control.IntakeWristMode;
 
 /**
  * Toggle the intake wrist between deployed and retracted.
@@ -24,15 +25,16 @@ public class ToggleIntakeDeployCommand extends InstantCommand {
 
     @Override
     public void initialize() {
-        double desiredExtension = wrist.getDesiredExtension();
-        if (desiredExtension == Constants.intakeWristRetractedPositionRotations) {
+        IntakeWristMode intakeWristMode = wrist.getMode();
+        if (intakeWristMode == IntakeWristMode.RETRACTED) {
             // currently retracted -> deploy + start roller
-            wrist.setExtendoPosition(Constants.intakeWristDeployedPositionRotations);
+            wrist.setMode(IntakeWristMode.DEPLOYED);
+            // TODO make this a constant after testing complete
             double rpm = SmartDashboard.getNumber("Intake RPM", 5000);
             roller.runRPM(rpm);
         } else {
             // currently deployed -> retract + stop roller
-            wrist.setExtendoPosition(Constants.intakeWristRetractedPositionRotations);
+            wrist.setMode(IntakeWristMode.RETRACTED);
             roller.stop();
         }
     }
