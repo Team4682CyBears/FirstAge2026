@@ -98,6 +98,10 @@ public class IntakeWristSubsystem extends SubsystemBase {
      * @return true if the extendo is within tolerance
      */
     public boolean isExtendoWithinTolerance() {
+        //if deployed never asume within tolerance to keep driving
+        if (desiredExtension != Constants.intakeWristRetractedPositionRotations){
+            return false;
+        }
         // check both the position and velocity. To allow PID to not stop before
         // settling.
         boolean positionTargetReached = Math

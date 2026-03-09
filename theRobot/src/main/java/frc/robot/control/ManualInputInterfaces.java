@@ -216,7 +216,7 @@ public class ManualInputInterfaces {
 
                 }
                 if (InstalledHardware.spindexerInstalled) {
-                    this.driverController.b().whileTrue(new SpindexerCommand(
+                    this.driverController.rightTrigger().whileTrue(new SpindexerCommand(
                             this.subsystemCollection.getSpindexerSpinnerSubsystem(), false));
                 }
                 // initialize the dashboard value using the defined constant so it
@@ -253,11 +253,11 @@ public class ManualInputInterfaces {
 
 
                 // Driver B toggles intake deploy/retract and runs/stops roller while deployed
-                // if (this.subsystemCollection.isIntakeWristSubsystemAvailable() && this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
-                //     this.driverController.b().onTrue(new ToggleIntakeDeployCommand(
-                //             this.subsystemCollection.getIntakeWristSubsystem(),
-                //             this.subsystemCollection.getIntakeRollerSubsystem()));
-                // }
+                 if (this.subsystemCollection.isIntakeWristSubsystemAvailable() && this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
+                     this.driverController.b().onTrue(new ToggleIntakeDeployCommand(
+                             this.subsystemCollection.getIntakeWristSubsystem(),
+                             this.subsystemCollection.getIntakeRollerSubsystem()));
+                 }
             }
 
     /**

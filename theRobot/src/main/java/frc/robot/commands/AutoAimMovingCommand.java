@@ -56,7 +56,7 @@ public class AutoAimMovingCommand extends Command {
       drivetrain.setShootingAimTarget(predicted);
     }
 
-    subsystems.getDriveTrainPowerSubsystem().setReducedPowerReductionFactor();
+    //subsystems.getDriveTrainPowerSubsystem().setReducedPowerReductionFactor();
   }
 
   public void execute() {
@@ -79,6 +79,7 @@ public class AutoAimMovingCommand extends Command {
     drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.JOYSTICK);
     subsystems.getDriveTrainPowerSubsystem().resetPowerReductionFactor();
     shooter.stop();
+    hood.setExtendoPosition(0.0);
   }
 
   public boolean isFinished() {
