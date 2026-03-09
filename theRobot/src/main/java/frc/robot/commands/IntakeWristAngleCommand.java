@@ -21,7 +21,7 @@ public class IntakeWristAngleCommand extends Command{
      }
 
      public void initialize(){
-        this.intakeWristSubsystem.setExtendoPosition(extendoSupplier.getAsInt());
+        this.intakeWristSubsystem.setPosition(extendoSupplier.getAsInt());
      }
 
      @Override
