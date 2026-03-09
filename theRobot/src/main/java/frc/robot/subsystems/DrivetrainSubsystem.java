@@ -122,6 +122,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
+  private boolean isTick0 = true;
+
   /* Keep track if we are currently seeding the camera */
   private boolean isSeedingCamera = false;
 
@@ -388,11 +390,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // When disabled countinually set the botpose to what the vision says
       this.seedRobotPositionFromVision();
     } else {
-      LimelightHelpers.SetIMUMode("limelight", 4);
+      LimelightHelpers.SetIMUMode("limelight", 3);
       LimelightHelpers.SetIMUAssistAlpha("limelight", Constants.IMUassistAlpha);
     }
 
-    updateVisionMeasurements();
+    if (isTick0){
+      isTick0 = false;
+    } else {
+      updateVisionMeasurements();
+    }
 
     if (swerveDriveMode == SwerveDriveMode.IMMOVABLE_STANCE && chassisSpeedsAreZero()) {
       // only change to ImmovableStance if chassis is not moving.

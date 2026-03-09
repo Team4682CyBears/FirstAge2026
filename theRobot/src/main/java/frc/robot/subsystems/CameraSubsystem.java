@@ -79,7 +79,7 @@ public class CameraSubsystem extends SubsystemBase {
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
     LimelightHelpers.PoseEstimate pe;
     // Select helper based on alliance so we read the correct wpi entry
-    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+    if (false && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
       pe = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
     } else {
       pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
@@ -95,7 +95,7 @@ public class CameraSubsystem extends SubsystemBase {
   public VisionMeasurement getVisionBotPoseOrb() {
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
     LimelightHelpers.PoseEstimate pe;
-    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
+    if (false && DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
       pe = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight");
     } else {
       pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
@@ -155,28 +155,6 @@ public class CameraSubsystem extends SubsystemBase {
   public String getBotPoseSource() {
     return botPoseSource;
   }
-
-  /**
-   * a method that sets which limelight data table we should be using
-   * based on the alliance spit out from driver station
-   * https://docs.limelightvision.io/docs/docs-limelight/apis/complete-networktables-api#apriltag-and-3d-data
-   */
-  /*
-   * public void setBotPoseSource(){
-   * var alliance = DriverStation.getAlliance();
-   * if(alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red){
-   * botPoseSource = "botpose_wpired";
-   * }
-   * else if(alliance.isPresent() && alliance.get() ==
-   * DriverStation.Alliance.Blue){
-   * botPoseSource = "botpose_wpiblue";
-   * }
-   * else{
-   * botPoseSource = "botpose";
-   * }
-   * }
-   */
-
   /**
    * a method that returns the tag id of the current viewed tag
    * 
@@ -237,6 +215,10 @@ public class CameraSubsystem extends SubsystemBase {
         recentVisionYaws.remove(0);
       }
     }
+  }
+
+  public void clearRecentVisionYaws(){
+    recentVisionYaws.clear();
   }
 
   /**
