@@ -50,7 +50,7 @@ public class LookupTableDouble {
 
         if (!rangeFound) {
             System.out.println("ERROR: Value '" + input + "' does not exist in the range of lookup table with min of '"
-                    + lookupTable[0][0] + "' and a max of '" + lookupTable[lookupTable.length][0] + "'");
+                    + lookupTable[0][0] + "' and a max of '" + lookupTable[lookupTable.length-1][0] + "'");
             return defaultValue;
         } else {
             // do interpolation on input to get output

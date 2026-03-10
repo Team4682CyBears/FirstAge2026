@@ -90,11 +90,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
         // Derived values from testing on tardi
         LeadConfig.closedLoop
-                .p(.00027)
+                .p(.00025)
                 .i(0.0)
                 .d(0.001)
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .apply(new FeedForwardConfig().kS(.15).kV(.002)); // TODO: Calculate values for kS and kV
+                .apply(new FeedForwardConfig().kS(0.065).kV(.00172));
 
         REVLibError error = LeadMotor.configure(LeadConfig, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);

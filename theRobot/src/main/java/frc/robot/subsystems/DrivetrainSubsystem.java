@@ -392,8 +392,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
       LimelightHelpers.SetIMUAssistAlpha("limelight", Constants.IMUassistAlpha);
     }
 
-    updateVisionMeasurements();
-
     if (swerveDriveMode == SwerveDriveMode.IMMOVABLE_STANCE && chassisSpeedsAreZero()) {
       // only change to ImmovableStance if chassis is not moving.
       // otherwise, we could tip the robot moving to this stance when bot is at high
