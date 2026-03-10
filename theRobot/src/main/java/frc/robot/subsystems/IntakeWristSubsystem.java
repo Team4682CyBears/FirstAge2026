@@ -46,9 +46,9 @@ public class IntakeWristSubsystem extends SubsystemBase {
         if (InstalledHardware.intakeWristMotorInstalled) {
             this.motor = new TalonFX(motorCanID);
             configureMotor();
-        }
         // wrist starts retracted
         this.motor.setPosition(Constants.intakeWristRetractedPositionRotations);
+        }
     }
 
     /**
