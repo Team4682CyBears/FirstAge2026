@@ -18,7 +18,7 @@ import frc.robot.subsystems.IntakeRollerSubsystem;
 /**
  * Command to set the roller speed.
  */
-public class intakeRollerCommand extends Command {
+public class IntakeRollerCommand extends Command {
     private final IntakeRollerSubsystem intakeRollerSubsystem;
     private final DoubleSupplier intakeSpeedSupplier;
 
@@ -27,7 +27,7 @@ public class intakeRollerCommand extends Command {
      * @param intakeRollerSubsystem
      * @param intakeSpeedSupplier
      */
-    public intakeRollerCommand(IntakeRollerSubsystem intakeRollerSubsystem, DoubleSupplier intakeSpeedSupplier) {
+    public IntakeRollerCommand(IntakeRollerSubsystem intakeRollerSubsystem, DoubleSupplier intakeSpeedSupplier) {
         this.intakeRollerSubsystem = intakeRollerSubsystem;
         this.intakeSpeedSupplier = intakeSpeedSupplier;
         addRequirements(intakeRollerSubsystem);
