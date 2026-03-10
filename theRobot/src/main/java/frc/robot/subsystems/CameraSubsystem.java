@@ -284,14 +284,17 @@ public class CameraSubsystem extends SubsystemBase {
   }
 
   public void setMode(CameraMode newMode) {
-    CameraMode previousMode = cameraMode;
-    // going to SEEDING from TRACKING
-    if (newMode == CameraMode.SEEDING && previousMode == CameraMode.TRACKING) {
+    if (cameraMode == newMode){
+            // already in this mode
+            return;
+    } 
+    // going to SEEDING 
+    if (newMode == CameraMode.SEEDING) {
       LimelightHelpers.SetIMUMode("limelight", 1); // set limelight IMU to seeding mode
       clearRecentVisionYaws();
     } 
-    // going to TRACKING from SEEDING
-    else if (newMode == CameraMode.TRACKING && previousMode == CameraMode.SEEDING) {
+    // going to TRACKING
+    else if (newMode == CameraMode.TRACKING) {
       LimelightHelpers.SetIMUMode("limelight", 4);
       LimelightHelpers.SetIMUAssistAlpha("limelight", Constants.IMUassistAlpha);
     } 
