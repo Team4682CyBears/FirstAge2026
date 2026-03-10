@@ -20,6 +20,14 @@ import com.pathplanner.lib.path.PathConstraints;
 
 public final class Constants {
 
+    //////// SPINDEXER CONSTANTS ///////////
+    // 10 balls per second / 4 balls per rotation 
+    public static final double spindexerSpeedRotationsPerMinute  = 1200;
+    public static final double kickerBallDetectionRangeInches = 4.0; 
+    public static final int spindexerSensorLaserCanID = 27;
+    public static final int spindexerTalonFXCanID = 18;
+    public static final double spindexerGearRatio = 25.0; //TODO get the actual number
+
     public final static double DriveVoltageScalar = 1.0;
 
     //////// SWERVE MODULE CONFIGS ///////////
@@ -154,8 +162,16 @@ public final class Constants {
     public static final double hoodEncoderAbsoluteOffset = 0.7220;
     public static final double hoodExtendoTolerance = 0.01;
     public static final double hoodMinPositionRotations = 0.0;
-    public static final double hoodMaxPositionRotations = 0.635;
-    // Distances corresponding to min and max hood positions
-    public static final double HOOD_MIN_DISTANCE_METERS = 1.0;
-    public static final double HOOD_MAX_DISTANCE_METERS = 8.27;
+    public static final double hoodMaxPositionRotations = 0.635; // TODO measure this on device
+
+    /// Intake Constants
+    public static final int intakeWristMotorCanID = 17;
+    public static final int intakeWristEncoderCanID = 32;
+
+    public static final double intakeWristEncoderAbsoluteOffset = -0.417; // TODO zero on-device
+    public static final double intakeWristTolerance = 0.01;
+    public static final double intakeWristRetractedPositionRotations = 0.25;
+    public static final double intakeWristDeployedPositionRotations = 0.0; // TODO measure this on device
+
+    public static final int intakeRollerCanId = 16;
 }

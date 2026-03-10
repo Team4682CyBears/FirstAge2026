@@ -40,8 +40,15 @@ public class InstalledHardware {
     public static final boolean hoodMotorInstalled = true;
     public static final boolean hoodEncoderInstalled = true;
 
+    // Spindexer
+    public static final boolean spindexerInstalled = true;
+    
     // Kicker
     public static final boolean kickerInstalled = true;
+
+    // Intake wrist encoder
+    public static final boolean intakeWristEncoderInstalled = false;
+    public static final boolean intakeWristMotorInstalled = true;
 
     // TOF Sensor Hardware
     // Important! You must disable any TOF sensor that is not installed!!

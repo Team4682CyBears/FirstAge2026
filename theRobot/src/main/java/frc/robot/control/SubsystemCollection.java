@@ -16,9 +16,12 @@ import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.PowerDistributionPanelWatcherSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.ShotLogger;
+import frc.robot.subsystems.SpindexerSpinner;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
+import frc.robot.subsystems.IntakeRollerSubsystem;
+import frc.robot.subsystems.IntakeWristSubsystem;
 
 public class SubsystemCollection {
     // declaring input classes
@@ -33,7 +36,10 @@ public class SubsystemCollection {
     private ShooterSubsystem shooterSubsystem = null;
     private KickerSubsystem kickerSubsystem = null;
     private HoodSubsystem hoodSubsystem = null;
+    private IntakeRollerSubsystem intakeRollerSubsystem = null;
+    private IntakeWristSubsystem intakeWristSubsystem = null;
     private ShotLogger shotLogger = null;
+    private SpindexerSpinner spindexer = null;
 
     /**
      * Default constructor
@@ -113,6 +119,30 @@ public class SubsystemCollection {
         return kickerSubsystem != null;
     }
 
+    public IntakeRollerSubsystem getIntakeRollerSubsystem() {
+        return intakeRollerSubsystem;
+    }
+
+    public void setIntakeRollerSubsystem(IntakeRollerSubsystem value) {
+        intakeRollerSubsystem = value;
+    }
+
+    public boolean isIntakeRollerSubsystemAvailable() {
+        return intakeRollerSubsystem != null;
+    }
+
+    public IntakeWristSubsystem getIntakeWristSubsystem() {
+        return intakeWristSubsystem;
+    }
+
+    public void setIntakeWristSubsystem(IntakeWristSubsystem value) {
+        intakeWristSubsystem = value;
+    }
+
+    public boolean isIntakeWristSubsystemAvailable() {
+        return intakeWristSubsystem != null;
+    }
+
     public ShotLogger getShotLogger() {
         return shotLogger;
     }
@@ -159,5 +189,17 @@ public class SubsystemCollection {
 
     public boolean isManualInputInterfacesAvailable() {
         return manualInput != null;
+    }
+
+    public SpindexerSpinner getSpindexerSpinnerSubsystem(){
+        return spindexer;
+    }
+
+    public void setSpindexerSpinnerSubsystem(SpindexerSpinner spindexer){
+        this.spindexer = spindexer;
+    }
+
+    public boolean isSpinnerSpindexerSubsystemAvaible(){
+        return spindexer != null;
     }
 }

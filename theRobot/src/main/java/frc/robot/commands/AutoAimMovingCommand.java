@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class AutoAimMovingCommand extends Command {
+  private final SubsystemCollection subsystems;
   private final DrivetrainSubsystem drivetrain;
   private final HoodSubsystem hood;
   private final ShooterSubsystem shooter;
@@ -32,6 +33,7 @@ public class AutoAimMovingCommand extends Command {
   //
   public AutoAimMovingCommand(SubsystemCollection subsystemCollection,
       ShooterAimer aimer) {
+    this.subsystems = subsystemCollection;
     this.drivetrain = subsystemCollection.getDriveTrainSubsystem();
     this.hood = subsystemCollection.getHoodSubsystem();
     this.shooter = subsystemCollection.getShooterSubsystem();
@@ -62,6 +64,7 @@ public class AutoAimMovingCommand extends Command {
   public void end(boolean interrupted) {
     aimer.clearShootingAimTarget();
     drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.JOYSTICK);
+    subsystems.getDriveTrainPowerSubsystem().resetPowerReductionFactor();
     shooter.stop();
     hood.retract();
   }
