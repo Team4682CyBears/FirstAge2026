@@ -117,15 +117,16 @@ public class CameraSubsystem extends SubsystemBase {
       updateRecentVisionYaws(getVisionBotPoseMT1());
       // seed measurement uses MT2 position and recent Yaws (averaged from MT1)
       VisionMeasurement seedMeasurement = getSeedPoseFromVision();
-      updateCameraIMU(seedMeasurement.getRobotPosition().getRotation());
+      if (seedMeasurement != null && seedMeasurement.getRobotPosition() != null) {
+        updateCameraIMU(seedMeasurement.getRobotPosition().getRotation());
+      }
       return seedMeasurement;
     } 
     else { // TRACKING MODE
+      // use pigeon yaw for camera IMU
+      updateCameraIMU(gyroRotation);
       // use MT2
       VisionMeasurement visionMeasurement = getVisionBotPoseMT2();
-      updateRecentVisionYaws(visionMeasurement);
-      // use robot yaw for camera IMU
-      updateCameraIMU(gyroRotation);
       return visionMeasurement;
     }
   }

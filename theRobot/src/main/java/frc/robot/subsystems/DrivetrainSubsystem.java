@@ -554,7 +554,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       cameraSubsystem.setMode(CameraMode.TRACKING);
       // When enabled, fuse the vision measurement with the odometry
       VisionMeasurement visionMeasurement = cameraSubsystem.getLatestVisionMeasurement(getGyroscopeRotation());
-      if (visionMeasurement != null & visionMeasurement.getRobotPosition() != null) {
+      if (visionMeasurement != null && visionMeasurement.getRobotPosition() != null) {
         this.addVisionMeasurement(visionMeasurement);
       }
     }
