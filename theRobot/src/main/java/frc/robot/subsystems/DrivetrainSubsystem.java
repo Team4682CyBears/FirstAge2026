@@ -17,9 +17,9 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.config.RobotConfig;
 
+import frc.robot.control.CameraMode;
 import frc.robot.control.Constants;
 import frc.robot.control.InstalledHardware;
-import frc.robot.generated.LimelightHelpers;
 import frc.robot.generated.TardiTunerConstants;
 import frc.robot.generated.Telemetry;
 import frc.robot.control.SwerveDriveMode;
@@ -87,8 +87,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private Matrix<N3, N1> visionStdDev = MatBuilder.fill(Nat.N3(), Nat.N1(), new double[] { 0.7, 0.7, 100 });
   private Matrix<N3, N1> odometryStdDev = MatBuilder.fill(Nat.N3(), Nat.N1(), new double[] { .1, .1, 0.01 });
 
-  private static final int MIN_FIDUCIALS_FOR_VISION = 1;
-
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
   private ChassisSpeeds previousChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
   private double speedReductionFactor = 1.0;
@@ -121,8 +119,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
-
-  private boolean isTick0 = true;
 
   /* Keep track if we are currently seeding the camera */
   private boolean isSeedingCamera = false;
@@ -376,7 +372,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * occurs during testing.
      */
     if (DriverStation.isDisabled() || isSeedingCamera) {
-      LimelightHelpers.SetIMUMode("limelight", 1); // set limelight IMU to seeding mode
+      updateVisionMeasurements(CameraMode.SEEDING);
 
       if (!m_hasAppliedOperatorPerspective) {
         DriverStation.getAlliance().ifPresent(allianceColor -> {
@@ -387,17 +383,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
           m_hasAppliedOperatorPerspective = true;
         });
       }
-      // When disabled countinually set the botpose to what the vision says
-      this.seedRobotPositionFromVision();
     } else {
-      LimelightHelpers.SetIMUMode("limelight", 3);
-      LimelightHelpers.SetIMUAssistAlpha("limelight", Constants.IMUassistAlpha);
-    }
-
-    if (isTick0){
-      isTick0 = false;
-    } else {
-      updateVisionMeasurements();
+      updateVisionMeasurements(CameraMode.TRACKING);
     }
 
     if (swerveDriveMode == SwerveDriveMode.IMMOVABLE_STANCE && chassisSpeedsAreZero()) {
@@ -526,26 +513,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   /**
-   * Updates the robot's position based on vision data from the camera subsystem.
-   * Take the median of multiple vision-based yaws from botPose
-   * Seed that yaw into the camera.
-   * Read the botPoseOrb
-   * Use the combination of botPoseOrb translation with median rotation to set
-   * robot position
-   * this should only be called when robot is stationary (i.e. when disabled or
-   * otherwise not moving)
-   */
-  public void seedRobotPositionFromVision() {
-    if (cameraSubsystem == null) {
-      return;
-    }
-    Pose2d seededPose = cameraSubsystem.getSeedPoseFromVision();
-    if (seededPose != null) {
-      this.setRobotPosition(seededPose);
-    }
-  }
-
-  /**
    * A method that updates the robot position with a vision measurement
    * 
    * @param visionMeasurement the most recent vision measurement provided by
@@ -555,10 +522,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // for now ignore all vision measurements that are null or contained robot
     // position is null
     if (visionMeasurement != null && useVision) {
-      int fiducialCount = cameraSubsystem != null ? cameraSubsystem.getLastFiducialCount() : 0;
-      double maxAmbiguity = cameraSubsystem != null ? cameraSubsystem.getLastMaxFiducialAmbiguity() : 0.0;
-      if (fiducialCount < MIN_FIDUCIALS_FOR_VISION
-          || maxAmbiguity > Constants.TAG_AMBIGUITY_THRESHOLD) {
+      if (!cameraSubsystem.isVisionQualityGood()) {
         return;
       }
       Pose2d visionComputedMeasurement = visionMeasurement.getRobotPosition();
@@ -574,20 +538,25 @@ public class DrivetrainSubsystem extends SubsystemBase {
     }
   }
 
-  private void updateVisionMeasurements() {
+  private void updateVisionMeasurements(CameraMode cameraMode) {
     if (!InstalledHardware.limelightInstalled || cameraSubsystem == null) {
       return;
     }
-
-    VisionMeasurement visionMeasurement = cameraSubsystem.getLatestVisionMeasurement(getGyroscopeRotation());
-    if (visionMeasurement == null) {
-      return;
-    }
-
-    // Only add the measurement once when enabled. (Avoid double-calling
-    // addVisionMeasurement.)
-    if (DriverStation.isEnabled()) {
-      this.addVisionMeasurement(visionMeasurement);
+    if (cameraMode == CameraMode.SEEDING) {
+      cameraSubsystem.setMode(CameraMode.SEEDING);
+      // When disabled countinually set the botpose to what the vision says
+      VisionMeasurement seedMeasurement = cameraSubsystem.getLatestVisionMeasurement(getGyroscopeRotation());
+      if (seedMeasurement != null && seedMeasurement.getRobotPosition() != null) {
+        this.setRobotPosition(seedMeasurement.getRobotPosition());
+      }
+    } 
+    else {
+      cameraSubsystem.setMode(CameraMode.TRACKING);
+      // When enabled, fuse the vision measurement with the odometry
+      VisionMeasurement visionMeasurement = cameraSubsystem.getLatestVisionMeasurement(getGyroscopeRotation());
+      if (visionMeasurement != null & visionMeasurement.getRobotPosition() != null) {
+        this.addVisionMeasurement(visionMeasurement);
+      }
     }
   }
 
@@ -678,7 +647,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private void displayDiagnostics() {
     if (displayOdometryDiagnostics) {
       if (cameraSubsystem != null) {
-        VisionMeasurement visionBotPose = cameraSubsystem.getVisionBotPoseOrb();
+        VisionMeasurement visionBotPose = cameraSubsystem.getVisionBotPoseMT2();
         if (visionBotPose.getRobotPosition() != null) {
           SmartDashboard.putNumber("vision x", visionBotPose.getRobotPosition().getX());
           SmartDashboard.putNumber("vision y", visionBotPose.getRobotPosition().getY());
