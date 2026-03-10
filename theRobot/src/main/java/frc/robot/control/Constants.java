@@ -23,7 +23,7 @@ public final class Constants {
     //////// SPINDEXER CONSTANTS ///////////
     // 10 balls per second / 4 balls per rotation 
     public static final double spindexerSpeedRotationsPerMinute  = 1200;
-    public static final double laserInchDetectionRange = 4.0; 
+    public static final double kickerBallDetectionRangeInches = 4.0; 
     public static final int spindexerSensorLaserCanID = 27;
     public static final int spindexerTalonFXCanID = 18;
     public static final double spindexerGearRatio = 25.0; //TODO get the actual number
@@ -164,8 +164,6 @@ public final class Constants {
     public static final double hoodMinPositionRotations = 0.0;
     public static final double hoodMaxPositionRotations = 0.635; // TODO measure this on device
 
-    public static final int servoDefaultPosition = 1000; // fully retracted position
-
     /// Intake Constants
     public static final int intakeWristMotorCanID = 17;
     public static final int intakeWristEncoderCanID = 32;
@@ -176,11 +174,4 @@ public final class Constants {
     public static final double intakeWristDeployedPositionRotations = 0.0; // TODO measure this on device
 
     public static final int intakeRollerCanId = 16;
-
-    // Hood servo pulse widths
-    public static final int HOOD_MIN_PULSE = 1000;
-    public static final int HOOD_MAX_PULSE = 2000;
-    // Distances corresponding to min and max hood positions
-    public static final double HOOD_MIN_DISTANCE_METERS = 1.0;
-    public static final double HOOD_MAX_DISTANCE_METERS = 8.27;
 }

@@ -161,8 +161,7 @@ public class ManualInputInterfaces {
                 }),
                 new ButtonPressCommand(
                     "driverController.start()",
-                    "enable camera seeding"),
-                new InstantCommand(() -> {subsystemCollection.getCameraSubsystem().clearRecentVisionYaws();})))
+                    "enable camera seeding")))
             .onFalse(
                 new ParallelCommandGroup(
                     new InstantCommand(() -> {

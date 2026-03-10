@@ -125,6 +125,13 @@ public class HoodSubsystem extends SubsystemBase {
         return positionTargetReached && velocityIsSmall;
     }
 
+    /**
+     * retracts the hood
+     */
+    public void retract(){
+        setExtendoPosition(Constants.hoodMinPositionRotations);
+    }
+
     private void configureMotor() {
         TalonFXSConfiguration config = new TalonFXSConfiguration();
         config.ExternalFeedback.FeedbackRemoteSensorID = Constants.hoodEncoderCanID;

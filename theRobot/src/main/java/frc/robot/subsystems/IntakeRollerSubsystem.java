@@ -18,7 +18,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
@@ -27,12 +26,8 @@ import frc.robot.control.Constants;
  * Runs the Intake which intakes the ball into the robot
  */
 public class IntakeRollerSubsystem extends SubsystemBase {
-
-    // TODO: Remove the follower in the final mechanism
     private TalonFX intakeTalonFX;
-
     private final VelocityVoltage leaderController = new VelocityVoltage(0.0);
-
     private double targetRPS = 0.0;
 
     private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.09009009009).withKV(0.4504504505).withKP(0.4)
@@ -47,29 +42,10 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     }
 
     /*
-     * Sets the target rpm
-     */
-    public void runRPM(double rpm) {
-        this.targetRPS = rpmToRPS(rpm);
-    }
-
-    private double rpmToRPS(double rpm) {
-        return rpm / 60.0;
-    }
-
-    /*
      * Get the rpm from the lead motor
      */
     public double getRPM() {
         return intakeTalonFX.getVelocity().getValueAsDouble() * 60;
-    }
-
-    /*
-     * Stop both motors and set the targetRPS to 0
-     */
-    public void stop() {
-        targetRPS = 0.0;
-        intakeTalonFX.stopMotor();
     }
 
     /*
@@ -80,7 +56,21 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         leaderController.withVelocity(targetRPS);
         intakeTalonFX.setControl(leaderController);
         SmartDashboard.putNumber("Intake Real RPM", getRPM());
-        SmartDashboard.putNumber("Intake Follow Real RPM", intakeTalonFX.getVelocity().getValueAsDouble() * 60);
+    }
+
+    /*
+     * Sets the target rpm
+     */
+    public void runRPM(double rpm) {
+        this.targetRPS = rpmToRPS(rpm);
+    }
+
+    /*
+     * Stop motor and set the targetRPS to 0
+     */
+    public void stop() {
+        targetRPS = 0.0;
+        intakeTalonFX.stopMotor();
     }
 
     /*
@@ -114,4 +104,9 @@ public class IntakeRollerSubsystem extends SubsystemBase {
                             + response.toString());
         }
     }
+
+    private double rpmToRPS(double rpm) {
+        return rpm / 60.0;
+    }
+
 }

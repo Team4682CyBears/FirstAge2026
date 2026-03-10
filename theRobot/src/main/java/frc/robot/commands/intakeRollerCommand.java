@@ -2,8 +2,8 @@
 // Bishop Blanchet Robotics
 // Home of the Cybears
 // FRC - Rebuilt - 2026
-// File: KickerCommand.java
-// Intent: command to set kicker speed
+// File: IntakeRollerCommand.java
+// Intent: command to set intake roller speed
 // ************************************************************
 
 // ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
@@ -16,14 +16,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeRollerSubsystem;
 
 /**
- * Command to set the kicker speed.
+ * Command to set the roller speed.
  */
 public class intakeRollerCommand extends Command {
     private final IntakeRollerSubsystem intakeRollerSubsystem;
     private final DoubleSupplier intakeSpeedSupplier;
 
     /**
-     * Constructs a new KickerCommand.
+     * Constructs a new IntakeRollerCommand.
      * @param intakeRollerSubsystem
      * @param intakeSpeedSupplier
      */

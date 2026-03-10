@@ -36,7 +36,6 @@ public class InstalledHardware {
     public static final boolean bareDrivetrainInstalled = true;
 
     // Shooter related hardware
-    // Disabled: we are removing shooter/hood controls for this branch
     public static final boolean shooterInstalled = true;
     public static final boolean hoodMotorInstalled = true;
     public static final boolean hoodEncoderInstalled = true;

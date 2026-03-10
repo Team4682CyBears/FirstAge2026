@@ -1,3 +1,13 @@
+// ************************************************************
+// Bishop Blanchet Robotics
+// Home of the Cybears
+// FRC - Rebuilt - 2026
+// File: IntakeWrist.jave
+// Intent: Retracts and deploys the intake
+// ************************************************************
+
+// ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
+
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusCode;
@@ -20,7 +30,7 @@ public class IntakeWristSubsystem extends SubsystemBase {
 
     // wrist gearing
     private static final double intakeWristGearRatio = 1.0/5.0 * 1.0/5.0 * 22.0/32.0;
-    private static final double intakeWristLowVelocityTol = 10; // TODO test this on device with motion magic profile
+    private static final double intakeWristLowVelocityTol = 10;
 
     private TalonFX motor;
     private MotionMagicVoltage voltageController = new MotionMagicVoltage(0.0);
@@ -30,13 +40,14 @@ public class IntakeWristSubsystem extends SubsystemBase {
     private double desiredExtension = Constants.intakeWristRetractedPositionRotations;
 
     private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.5).withKI(0.003).withKD(0.0).withKG(0.22)
-            .withKV(3.85).withKS(0.5); // TODO: Find real values. DO NOT SET KD!!
+            .withKV(3.85).withKS(0.5); // DO NOT SET KD!!
 
     public IntakeWristSubsystem(int motorCanID) {
         if (InstalledHardware.intakeWristMotorInstalled) {
             this.motor = new TalonFX(motorCanID);
             configureMotor();
         }
+        // wrist starts retracted
         this.motor.setPosition(Constants.intakeWristRetractedPositionRotations);
     }
 
@@ -62,11 +73,11 @@ public class IntakeWristSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        intakeWristIsAtDesiredExtension = isExtendoWithinTolerance();
+        intakeWristIsAtDesiredExtension = isPositionWithinTolerance();
         if (!intakeWristIsAtDesiredExtension){
             motor.setControl(voltageController.withPosition(desiredExtension));
         }
-        SmartDashboard.putNumber("IntakeWrist Motor Encoder Extendo", getPosition());
+        SmartDashboard.putNumber("IntakeWrist Motor Encoder Position", getPosition());
     }
 
     /**
@@ -134,12 +145,12 @@ public class IntakeWristSubsystem extends SubsystemBase {
     }
 
     /**
-     * A method to test whether the extendo is within tolerance of the target
-     * extendo
+     * A method to test whether the position is within tolerance of the target
+     * position
      * 
-     * @return true if the extendo is within tolerance
+     * @return true if the position is within tolerance
      */
-    private boolean isExtendoWithinTolerance() {
+    private boolean isPositionWithinTolerance() {
         //if deployed never asume within tolerance to keep driving
         if (intakeWristMode == IntakeWristMode.DEPLOYED){
             return false;
