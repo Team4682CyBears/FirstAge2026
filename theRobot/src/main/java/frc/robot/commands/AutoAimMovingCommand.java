@@ -79,7 +79,7 @@ public class AutoAimMovingCommand extends Command {
     drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.JOYSTICK);
     subsystems.getDriveTrainPowerSubsystem().resetPowerReductionFactor();
     shooter.stop();
-    hood.setExtendoPosition(0.0);
+    hood.retract();
   }
 
   public boolean isFinished() {

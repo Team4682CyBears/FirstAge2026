@@ -2,8 +2,8 @@
 // Bishop Blanchet Robotics
 // Home of the Cybears
 // FRC - Rebuilt - 2026
-// File: KickerSubsystem.java
-// Intent: Run two krakens to kick the ball into the shooter
+// File: SpinnedSpindexerSubsystem.java
+// Intent: Run spindexer to feed the ball into the kicker
 // ************************************************************
 
 // ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
@@ -24,12 +24,11 @@ import frc.robot.control.Constants;
 import frc.robot.common.TofSensorLaser;
 
 /* 
- * Runs the kicker which kicks the ball into the shooter consistiently
- */
-/*
- * 
+ * Runs the spindexer which feeds the ball into the kicker consistiently
+ * Provides two run methods:
  * a) a run method that runs the spindexer at a constant rate indepedent of the sensor state. 
-b) a run method that when set to run, if there is no ball in the kicker, the spindexer should run at the constant speed. If there is a ball in the kicker, the spindexer should stop. 
+ * b) a run method that when set to run, if there is no ball in the kicker, the spindexer  
+ * runs at the constant speed. If there is a ball in the kicker, the spindexer stops. 
  */
 public class SpindexerSpinner extends SubsystemBase {
 
@@ -54,7 +53,7 @@ public class SpindexerSpinner extends SubsystemBase {
      */
     public SpindexerSpinner(int motorCanID, int sensorCanID) {
         spindexerTalonFX = new TalonFX(motorCanID);
-        spindexerToF = new TofSensorLaser(sensorCanID);
+        spindexerToF = new TofSensorLaser(sensorCanID, Constants.kickerBallDetectionRangeInches);
         configureMotor();
     }
 
@@ -97,7 +96,7 @@ public class SpindexerSpinner extends SubsystemBase {
     public void periodic() {
         if (targetRPS == 0.0) {
             stop();
-        } else if (!continuousMode && spindexerToF.tofActivated()) {
+        } else if (!continuousMode && spindexerToF.isDetected()) {
             // stop the motor, but don't set target RPM to 0
             spindexerTalonFX.stopMotor();
         } else {

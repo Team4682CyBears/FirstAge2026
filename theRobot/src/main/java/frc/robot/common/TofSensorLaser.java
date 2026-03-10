@@ -7,21 +7,17 @@
 
 package frc.robot.common;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.units.measure.Distance;
-import frc.robot.control.Constants;
 import au.grapplerobotics.LaserCan;
 
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Millimeters;
 
-import com.ctre.phoenix6.StatusSignal;
-
 import au.grapplerobotics.ConfigurationFailedException;
-import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
  * The TofSensorlaser creates a new laserCan object and is named ToFSensorlaser_canID
@@ -29,9 +25,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
  */
 public class TofSensorLaser {
     private LaserCan laserSensor;
-    private int canID;
     private String displayName;
-    private double maxRange;
+    private double maxRange = Meters.of(1.3).in(Inches);
+    private double detectionDistanceInches;
 
     /**
      * Constructor method for TofSensorlaser
@@ -40,9 +36,8 @@ public class TofSensorLaser {
      * Sets the timing budget to 33ms. 
      * @param canID
      */
-    public TofSensorLaser(int canID){
-        this.maxRange = Constants.laserInchDetectionRange;
-        this.canID = canID;
+    public TofSensorLaser(int canID, double detectionDistanceInches){
+        this.detectionDistanceInches = detectionDistanceInches;
         this.displayName = "TofSesorLaser_" + canID;
         laserSensor = new LaserCan(canID);
         try {
@@ -60,29 +55,19 @@ public class TofSensorLaser {
      * 
      */ 
     // use wpilib units to convert to inches. metersToInches and inchesToMeters
-    public Double getRangeInches() {
+    public double getRangeInches() {
         Measurement measurement = laserSensor.getMeasurement();
-        if (measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT){
-            Distance distance = Millimeters.of(measurement.distance_mm);
-            return (distance.in(Inches));
-        }
-        // if invalid, return the max range as a default
-        return Constants.laserInchDetectionRange; 
+        return getRangeInches(measurement);
     }
 
     /**
-     * Checks if result is valid 
+     * Checks if object is detected
      * @return true if distance is valid and within the max range (MAX_RANGE_METERS)
-     * Also checks if its ac
      */
-    public boolean tofActivated() {
+    public boolean isDetected() {
         Measurement measurement = laserSensor.getMeasurement();
-        
-        //use the code:
-        // laserSensor.getMeasurement();
-        // returnmeasurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT
-        double distance = getRangeInches();
-        return (distance >= 0 && measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT && distance <= maxRange);
+        double distance = getRangeInches(measurement);
+        return (isValid(measurement) && distance >= 0 && distance <= detectionDistanceInches);
     }
 
     /**
@@ -91,6 +76,19 @@ public class TofSensorLaser {
      */
     public void publishTelemetery(){
         SmartDashboard.putNumber(displayName + " DistanceIn ", getRangeInches());
-        SmartDashboard.putBoolean(displayName + "tofActivated ", tofActivated());
+        SmartDashboard.putBoolean(displayName + "tofActivated ", isDetected());
+    }
+
+    private double getRangeInches(Measurement measurement){
+        if (isValid(measurement)){
+            Distance distance = Millimeters.of(measurement.distance_mm);
+            return (distance.in(Inches));
+        }
+        // if invalid, return the max range as a default
+        return maxRange;
+    }
+
+    private boolean isValid(Measurement measurement) {
+        return measurement != null && measurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
     }
 }
