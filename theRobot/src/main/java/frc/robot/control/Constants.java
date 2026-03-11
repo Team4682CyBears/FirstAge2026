@@ -162,16 +162,16 @@ public final class Constants {
     public static final double hoodEncoderAbsoluteOffset = 0.7220;
     public static final double hoodExtendoTolerance = 0.01;
     public static final double hoodMinPositionRotations = 0.0;
-    public static final double hoodMaxPositionRotations = 0.635; // TODO measure this on device
+    public static final double hoodMaxPositionRotations = 0.635; 
 
     /// Intake Constants
     public static final int intakeWristMotorCanID = 17;
     public static final int intakeWristEncoderCanID = 32;
 
-    public static final double intakeWristEncoderAbsoluteOffset = -0.417; // TODO zero on-device
+    public static final double intakeWristEncoderAbsoluteOffset = -0.542; 
     public static final double intakeWristTolerance = 0.01;
-    public static final double intakeWristRetractedPositionRotations = 0.25;
-    public static final double intakeWristDeployedPositionRotations = 0.0; // TODO measure this on device
+    public static final double intakeWristRetractedPositionRotations = 0.206;
+    public static final double intakeWristDeployedPositionRotations = 0.011475; 
 
     public static final int intakeRollerCanId = 16;
 }

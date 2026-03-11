@@ -214,6 +214,13 @@ public class ManualInputInterfaces {
             this.driverController.y().whileTrue(new AutoAimMovingCommand(subsystemCollection,
                     subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
 
+            this.driverController.y().onTrue(new InstantCommand(() -> {
+                                    if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                                        this.subsystemCollection.getDriveTrainSubsystem()
+                                                .setSeedingCamera(true);
+                                    }
+                                }));
+
         }
 
         // initialize the dashboard value using the defined constant so it

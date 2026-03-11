@@ -34,7 +34,8 @@ import frc.robot.control.IntakeWristMode;
 public class IntakeWristSubsystem extends SubsystemBase {
 
     // wrist gearing
-    private static final double intakeWristGearRatio = 1.0/5.0 * 1.0/5.0 * 22.0/32.0;
+    private static final double intakeWristRotorToSensorRatio = 1.0/5.0 * 1.0/5.0;
+    private static final double intakeWristSensorToMechanismRatio = 16.0/32.0;
     private static final double intakeWristLowVelocityTol = 10;
 
     private TalonFX motor;
@@ -57,8 +58,11 @@ public class IntakeWristSubsystem extends SubsystemBase {
             this.motor = new TalonFX(motorCanID);
             configureMotor();
         }
-        // wrist starts retracted
-        this.motor.setPosition(Constants.intakeWristRetractedPositionRotations);
+        // this has to be done last
+        if (!InstalledHardware.intakeWristEncoderInstalled){
+            // wrist starts retracted
+            this.motor.setPosition(Constants.intakeWristRetractedPositionRotations);
+        }
     }
 
     /**
@@ -141,13 +145,13 @@ public class IntakeWristSubsystem extends SubsystemBase {
         if (!InstalledHardware.intakeWristEncoderInstalled) {
             config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
             // when using the internal sensor, configure the gear ratio between the sensor to mechanism.
-            config.Feedback.SensorToMechanismRatio = 1.0/intakeWristGearRatio;
+            config.Feedback.SensorToMechanismRatio = 1.0/(intakeWristRotorToSensorRatio * intakeWristSensorToMechanismRatio);
         } else {
             config.Feedback.FeedbackRemoteSensorID = Constants.intakeWristEncoderCanID;
             config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;  
-            config.Feedback.SensorToMechanismRatio = 1.0;
+            config.Feedback.SensorToMechanismRatio = 1.0 / intakeWristSensorToMechanismRatio;
             // when using the external sensor, configure the gear ratio between the rotor to sensor. 
-            config.Feedback.RotorToSensorRatio = 1.0 / intakeWristGearRatio;
+            config.Feedback.RotorToSensorRatio = 1.0 / intakeWristRotorToSensorRatio;
         }
 
         config.Slot0 = slot0Configs;
