@@ -11,9 +11,47 @@
           }
         },
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "TopTrenchToTopClimb"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAimOn"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpindexerKickerOn"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAimOn"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpindexerKickerOff"
+                }
+              }
+            ]
           }
         }
       ]

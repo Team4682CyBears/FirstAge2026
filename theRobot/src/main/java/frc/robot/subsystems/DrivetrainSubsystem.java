@@ -56,6 +56,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private boolean displayOdometryDiagnostics = true;
 
+  private boolean autoAimMovingEnabled = false;
+
   StructArrayPublisher<SwerveModuleState> publisher;
 
   private final double deltaTimeSeconds = 0.02; // 20ms scheduler time tick
@@ -259,6 +261,24 @@ public class DrivetrainSubsystem extends SubsystemBase {
    */
   public void setUseVision(boolean shouldUseVision) {
     this.useVision = shouldUseVision;
+  }
+
+  /**
+   * Set whether auto-aim-moving mode is enabled.
+   *
+   * @param enabled true to enable auto-aim moving mode
+   */
+  public void setAutoAimMovingEnabled(boolean enabled) {
+    this.autoAimMovingEnabled = enabled;
+  }
+
+  /**
+   * Query whether auto-aim-moving mode is enabled.
+   *
+   * @return true if auto-aim moving is enabled
+   */
+  public boolean isAutoAimMovingEnabled() {
+    return this.autoAimMovingEnabled;
   }
 
   /**

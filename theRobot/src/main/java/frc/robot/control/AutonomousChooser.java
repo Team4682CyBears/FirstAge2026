@@ -149,25 +149,35 @@ public class AutonomousChooser {
         && subsystems.isDriveTrainPowerSubsystemAvailable()
         && subsystems.isHoodSubsystemAvailable()
         && subsystems.isShooterSubsystemAvailable()) {
+
         NamedCommands.registerCommand(
-            "AutoAim",
-            new AutoAimMovingCommand(
+            "AutoAimOn",
+            new ToggleAutoAimMovingCommand(
                 subsystems,
-                subsystems.getDriveTrainSubsystem().getShooterAimer()));
+                subsystems.getDriveTrainSubsystem().getShooterAimer(),
+                true));
+        NamedCommands.registerCommand(
+            "AutoAimOff",
+            new ToggleAutoAimMovingCommand(
+                subsystems,
+                subsystems.getDriveTrainSubsystem().getShooterAimer(),
+                false));
     }
 
-    if (subsystems.isSpinnerSpindexerSubsystemAvaible()) {
+    if (subsystems.isSpinnerSpindexerSubsystemAvaible()
+        && subsystems.isKickerSubsystemAvailable()) {
         NamedCommands.registerCommand(
-            "Spindexer",
-            new SpindexerCommand(subsystems.getSpindexerSpinnerSubsystem(), true));
-    }
-
-    if (subsystems.isKickerSubsystemAvailable()) {
-        NamedCommands.registerCommand(
-            "Kicker",
-            new KickerCommand(
+            "SpindexerKickerOn",
+            new ToggleSpindexerKickerCommand(
+                subsystems.getSpindexerSpinnerSubsystem(),
                 subsystems.getKickerSubsystem(),
-                () -> Constants.KICKER_RPM));
+                true));
+        NamedCommands.registerCommand(
+            "SpindexerKickerOff",
+            new ToggleSpindexerKickerCommand(
+                subsystems.getSpindexerSpinnerSubsystem(),
+                subsystems.getKickerSubsystem(),
+                false));
     }
 
     if (subsystems.isIntakeWristSubsystemAvailable()
