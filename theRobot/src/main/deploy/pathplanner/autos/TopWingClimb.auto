@@ -5,72 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoAim"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Kicker"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Spindexer"
-                }
-              },
-              {
-                "type": "sequential",
-                "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 3.0
-                      }
-                    },
-                    {
-                      "type": "path",
-                      "data": {
-                        "pathName": "TopWing"
-                      }
-                    },
-                    {
-                      "type": "parallel",
-                      "data": {
-                        "commands": [
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "AutoAim"
-                            }
-                          },
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "Kicker"
-                            }
-                          },
-                          {
-                            "type": "named",
-                            "data": {
-                              "name": "Spindexer"
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
+            "pathName": "TopWing"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopTrenchToTopClimb"
           }
         }
       ]

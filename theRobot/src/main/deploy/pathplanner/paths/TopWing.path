@@ -61,20 +61,7 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [
-    {
-      "name": "IntakeToggle",
-      "waypointRelativePos": 0.2952380952380954,
-      "endWaypointRelativePos": null,
-      "command": null
-    },
-    {
-      "name": "IntakeToggle",
-      "waypointRelativePos": 1.7190476190476178,
-      "endWaypointRelativePos": null,
-      "command": null
-    }
-  ],
+  "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
