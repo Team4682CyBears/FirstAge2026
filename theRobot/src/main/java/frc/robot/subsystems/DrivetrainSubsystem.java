@@ -398,8 +398,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       ChassisSpeeds reducedChassisSpeeds = new ChassisSpeeds(
           chassisSpeeds.vxMetersPerSecond * this.speedReductionFactor,
           chassisSpeeds.vyMetersPerSecond * this.speedReductionFactor,
-          // different speed reduction factor for rotation
-          chassisSpeeds.omegaRadiansPerSecond * Math.min(1.0, this.speedReductionFactor * 1.25));
+          chassisSpeeds.omegaRadiansPerSecond);
 
       // apply acceleration control
       // TODO should test this at practice feild

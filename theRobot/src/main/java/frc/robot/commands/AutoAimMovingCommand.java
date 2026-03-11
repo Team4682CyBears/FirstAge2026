@@ -56,7 +56,7 @@ public class AutoAimMovingCommand extends Command {
       drivetrain.setShootingAimTarget(predicted);
     }
 
-    //subsystems.getDriveTrainPowerSubsystem().setReducedPowerReductionFactor();
+    subsystems.getDriveTrainPowerSubsystem().setReducedPowerReductionFactor();
   }
 
   public void execute() {
