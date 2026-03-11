@@ -19,6 +19,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -35,7 +36,7 @@ public class IntakeWristSubsystem extends SubsystemBase {
 
     // wrist gearing
     private static final double intakeWristRotorToSensorRatio = 1.0/5.0 * 1.0/5.0;
-    private static final double intakeWristSensorToMechanismRatio = 16.0/32.0;
+    private static final double intakeWristSensorToMechanismRatio = 18.0/32.0;
     private static final double intakeWristLowVelocityTol = 10;
 
     private TalonFX motor;
@@ -46,8 +47,8 @@ public class IntakeWristSubsystem extends SubsystemBase {
     private IntakeWristMode intakeWristMode = IntakeWristMode.RETRACTED;
     private double desiredExtension = Constants.intakeWristRetractedPositionRotations;
 
-    private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.5).withKI(0.003).withKD(0.0).withKG(0.22)
-            .withKV(3.85).withKS(0.5); // DO NOT SET KD!!
+    private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.36).withKI(0.003).withKD(0.0).withKG(0.24)
+            .withKV(3.85).withKS(0.5).withGravityType(GravityTypeValue.Arm_Cosine); // DO NOT SET KD!!
 
     public IntakeWristSubsystem(int motorCanID, int encoderCanID) {
         if (InstalledHardware.intakeWristEncoderInstalled) {
