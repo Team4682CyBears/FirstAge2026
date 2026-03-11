@@ -264,7 +264,7 @@ public class RobotContainer {
    */
   private void initializeIntakeSubsystems() {
     try {
-      subsystems.setIntakeWristSubsystem(new IntakeWristSubsystem(Constants.intakeWristMotorCanID));
+      subsystems.setIntakeWristSubsystem(new IntakeWristSubsystem(Constants.intakeWristMotorCanID, Constants.intakeWristEncoderCanID));
       subsystems.setIntakeRollerSubsystem(new IntakeRollerSubsystem(Constants.intakeRollerCanId));
       DataLogManager.log("SUCCESS: initializeIntakeSubsystems");
     } catch (Exception ex) {
