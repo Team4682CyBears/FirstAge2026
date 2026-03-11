@@ -11,15 +11,20 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
@@ -29,10 +34,12 @@ import frc.robot.control.IntakeWristMode;
 public class IntakeWristSubsystem extends SubsystemBase {
 
     // wrist gearing
-    private static final double intakeWristGearRatio = 1.0/5.0 * 1.0/5.0 * 22.0/32.0;
+    private static final double intakeWristRotorToSensorRatio = 1.0/5.0 * 1.0/5.0;
+    private static final double intakeWristSensorToMechanismRatio = 16.0/32.0;
     private static final double intakeWristLowVelocityTol = 10;
 
     private TalonFX motor;
+    private CANcoder encoder;
     private MotionMagicVoltage voltageController = new MotionMagicVoltage(0.0);
 
     private boolean intakeWristIsAtDesiredExtension = true;
@@ -42,13 +49,20 @@ public class IntakeWristSubsystem extends SubsystemBase {
     private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.5).withKI(0.003).withKD(0.0).withKG(0.22)
             .withKV(3.85).withKS(0.5); // DO NOT SET KD!!
 
-    public IntakeWristSubsystem(int motorCanID) {
+    public IntakeWristSubsystem(int motorCanID, int encoderCanID) {
+        if (InstalledHardware.intakeWristEncoderInstalled) {
+            this.encoder = new CANcoder(encoderCanID);
+            configureEncoder();
+        }
         if (InstalledHardware.intakeWristMotorInstalled) {
             this.motor = new TalonFX(motorCanID);
             configureMotor();
         }
-        // wrist starts retracted
-        this.motor.setPosition(Constants.intakeWristRetractedPositionRotations);
+        // this has to be done last
+        if (!InstalledHardware.intakeWristEncoderInstalled){
+            // wrist starts retracted
+            this.motor.setPosition(Constants.intakeWristRetractedPositionRotations);
+        }
     }
 
     /**
@@ -110,14 +124,38 @@ public class IntakeWristSubsystem extends SubsystemBase {
         }
     }
 
+    private void configureEncoder() {
+        CANcoderConfiguration ccConfig = new CANcoderConfiguration();
+        ccConfig.MagnetSensor.MagnetOffset = Constants.intakeWristEncoderAbsoluteOffset;
+        // sensor range is (0 .. 0.25) so setting this to 0.9 to be outside the viable range
+        ccConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.9;
+    
+        ccConfig.MagnetSensor.SensorDirection = SensorDirectionValue.Clockwise_Positive;
+        // apply configs
+        StatusCode response = encoder.getConfigurator().apply(ccConfig);
+        if (!response.isOK()) {
+            DataLogManager.log(
+                    "CANcoder ID " + encoder.getDeviceID() + " failed config with error " + response.toString());
+        }
+    }
+
     private void configureMotor() {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
-        config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+        if (!InstalledHardware.intakeWristEncoderInstalled) {
+            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+            // when using the internal sensor, configure the gear ratio between the sensor to mechanism.
+            config.Feedback.SensorToMechanismRatio = 1.0/(intakeWristRotorToSensorRatio * intakeWristSensorToMechanismRatio);
+        } else {
+            config.Feedback.FeedbackRemoteSensorID = Constants.intakeWristEncoderCanID;
+            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;  
+            config.Feedback.SensorToMechanismRatio = 1.0 / intakeWristSensorToMechanismRatio;
+            // when using the external sensor, configure the gear ratio between the rotor to sensor. 
+            config.Feedback.RotorToSensorRatio = 1.0 / intakeWristRotorToSensorRatio;
+        }
+
         config.Slot0 = slot0Configs;
         config.ClosedLoopRamps.withVoltageClosedLoopRampPeriod(0.02);
-
-        config.Feedback.SensorToMechanismRatio = 1.0/intakeWristGearRatio;
 
         config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 

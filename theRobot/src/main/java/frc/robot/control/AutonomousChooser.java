@@ -145,21 +145,41 @@ public class AutonomousChooser {
                 subsystems.getDriveTrainSubsystem());
 
         // Register named commands
-        if (subsystems.isDriveTrainPowerSubsystemAvailable()) {
-            NamedCommands.registerCommand("StartAiming", 
-                new InstantCommand(() -> {
-                    subsystems.getDriveTrainSubsystem().setSwerveYawMode(SwerveYawMode.AUTO);
-                    com.pathplanner.lib.controllers.PPHolonomicDriveController.overrideRotationFeedback(
-                        () -> subsystems.getDriveTrainSubsystem().getAutoYawVelocityRadiansPerSecond()
-                    );
-                }));
+    if (subsystems.isDriveTrainSubsystemAvailable()
+        && subsystems.isDriveTrainPowerSubsystemAvailable()
+        && subsystems.isHoodSubsystemAvailable()
+        && subsystems.isShooterSubsystemAvailable()) {
+        NamedCommands.registerCommand(
+            "AutoAim",
+            new AutoAimMovingCommand(
+                subsystems,
+                subsystems.getDriveTrainSubsystem().getShooterAimer()));
+    }
 
-            NamedCommands.registerCommand("StopAiming", 
-                new InstantCommand(() -> {
-                    subsystems.getDriveTrainSubsystem().setSwerveYawMode(SwerveYawMode.JOYSTICK); 
-                    com.pathplanner.lib.controllers.PPHolonomicDriveController.clearRotationFeedbackOverride();
-                }));
-        }
+    if (subsystems.isSpinnerSpindexerSubsystemAvaible()) {
+        NamedCommands.registerCommand(
+            "Spindexer",
+            new SpindexerCommand(subsystems.getSpindexerSpinnerSubsystem(), true));
+    }
+
+    if (subsystems.isKickerSubsystemAvailable()) {
+        NamedCommands.registerCommand(
+            "Kicker",
+            new KickerCommand(
+                subsystems.getKickerSubsystem(),
+                () -> Constants.KICKER_RPM));
+    }
+
+    if (subsystems.isIntakeWristSubsystemAvailable()
+        && subsystems.isIntakeRollerSubsystemAvailable()) {
+        NamedCommands.registerCommand(
+            "IntakeToggle",
+            new ToggleIntakeDeployCommand(
+                subsystems.getIntakeWristSubsystem(),
+                subsystems.getIntakeRollerSubsystem()));
+    }
+
+
     }
 
     public static boolean getShouldMirrorPath() {

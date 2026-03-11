@@ -47,7 +47,11 @@ public class AutoAimMovingCommand extends Command {
 
   public void initialize() {
     drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.AUTO);
-    aimer.setDesiredTarget(aimer.getHubPositionFromAlliance());
+
+    Alliance alliance = DriverStation.getAlliance().get();
+    hub = (alliance == Alliance.Blue) ? Constants.blueHubPosition : Constants.redHubPosition;
+    aimer.setDesiredTarget(hub);
+    subsystems.getDriveTrainPowerSubsystem().setReducedPowerReductionFactor();
   }
 
   public void execute() {
