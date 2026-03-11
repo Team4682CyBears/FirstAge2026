@@ -185,11 +185,11 @@ public class ShooterAimer {
     return yawOk && hoodOk && shooterOk && kickerOk;
   }
 
-  public double minShooterSpeed() {
+  public double getMinShooterSpeedRPM() {
     return shooterRpmLookupTable.getMinInput();
   }
 
-  public double minKickerSpeed() {
+  public double getMinKickerSpeedRPM() {
     return kickerRpmLookupTable.getMinInput();
   }
 }

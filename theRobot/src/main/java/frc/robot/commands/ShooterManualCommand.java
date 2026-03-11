@@ -38,14 +38,18 @@ public class ShooterManualCommand extends Command {
 
     @Override
     public void initialize() {
-        shooter.runRPM(aimer.minShooterSpeed());
-        kicker.runRPM(aimer.minKickerSpeed());
+        shooter.runRPM(aimer.getMinShooterSpeedRPM());
+        kicker.runRPM(aimer.getMinKickerSpeedRPM());
         hood.setExtendoPosition(0.0);
         drivetrain.setSwerveYawMode(SwerveYawMode.JOYSTICK);
     }
 
     @Override
     public void execute() {
+        shooter.runRPM(aimer.getMinShooterSpeedRPM());
+        kicker.runRPM(aimer.getMinKickerSpeedRPM());
+        hood.setExtendoPosition(0.0);
+        drivetrain.setSwerveYawMode(SwerveYawMode.JOYSTICK);
     }
 
     @Override

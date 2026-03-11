@@ -29,7 +29,7 @@ public class InstalledHardware {
 
     // External Input Hardware
     public static final boolean driverXboxControllerInstalled = true;
-    public static final boolean coDriverXboxControllerInstalled = false;
+    public static final boolean coDriverXboxControllerInstalled = true;
 
     // DriveTrain Related Hardware
     public static final boolean drivetrainInstalled = true;
