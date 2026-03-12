@@ -21,8 +21,8 @@ import com.pathplanner.lib.path.PathConstraints;
 public final class Constants {
 
     //////// SPINDEXER CONSTANTS ///////////
-    // 10 balls per second / 4 balls per rotation 
-    public static final double spindexerSpeedRotationsPerMinute  = 1200;
+    // 10 balls per second / 4 balls per rotation
+    public static final double spindexerSpeedRotationsPerMinute  = 300;
     public static final double kickerBallDetectionRangeInches = 4.0; 
     public static final int spindexerSensorLaserCanID = 27;
     public static final int spindexerTalonFXCanID = 18;
@@ -143,6 +143,8 @@ public final class Constants {
     // Shooter RPM bounds
     public static final double SHOOTER_MIN_RPM = 0.0;
     public static final double SHOOTER_MAX_RPM = 6500.0;
+    public static final double SHOOTER_PONDER_RPM = 1000.0;
+    public static final double SHOOTER_CLOSE_RPM = 3000.0;
 
     // ********************************************************************
     // Kicker Constants

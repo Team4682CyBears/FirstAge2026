@@ -95,9 +95,10 @@ public class AutonomousChooser {
                 subsystems.getDriveTrainSubsystem().getShooterAimer()).withTimeout(5.0);
         Command shoot = new SequentialCommandGroup(
         new WaitCommand(0.5),
-        new KickerSpindexerCommand(
+        new KickerSpindexerAgitateCommand(
             subsystems.getKickerSubsystem(),
-            subsystems.getSpindexerSpinnerSubsystem())
+            subsystems.getSpindexerSpinnerSubsystem(),
+            subsystems.getIntakeWristSubsystem())
             .withTimeout(5.0));
         
         return new ParallelCommandGroup(aim, shoot);
@@ -163,9 +164,10 @@ public class AutonomousChooser {
         && subsystems.isKickerSubsystemAvailable()) {
         NamedCommands.registerCommand(
             "SpindexerKickerOn",
-            new KickerSpindexerCommand(
+            new KickerSpindexerAgitateCommand(
                 subsystems.getKickerSubsystem(),
-                subsystems.getSpindexerSpinnerSubsystem()).withTimeout(5));
+                subsystems.getSpindexerSpinnerSubsystem(),
+                subsystems.getIntakeWristSubsystem()).withTimeout(5));
     }
 
     if (subsystems.isIntakeWristSubsystemAvailable()
