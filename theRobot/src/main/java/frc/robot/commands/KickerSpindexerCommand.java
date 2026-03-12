@@ -10,7 +10,7 @@
 
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
+import frc.robot.control.Constants;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.KickerSubsystem;
@@ -22,7 +22,6 @@ import frc.robot.subsystems.SpindexerSpinner;
 public class KickerSpindexerCommand extends Command {
     private final KickerSubsystem kickerSubsystem;
     private final SpindexerSpinner spindexerSpinner;
-    private final DoubleSupplier kickSpeedSupplier;
 
     /**
      * Constructs a new KickerSpindexerCommand.
@@ -33,17 +32,15 @@ public class KickerSpindexerCommand extends Command {
      */
     public KickerSpindexerCommand(
             KickerSubsystem kickerSubsystem,
-            SpindexerSpinner spindexerSpinner,
-            DoubleSupplier kickSpeedSupplier) {
+            SpindexerSpinner spindexerSpinner) {
         this.kickerSubsystem = kickerSubsystem;
         this.spindexerSpinner = spindexerSpinner;
-        this.kickSpeedSupplier = kickSpeedSupplier;
         addRequirements(kickerSubsystem, spindexerSpinner);
     }
 
     @Override
     public void initialize() {
-        kickerSubsystem.runRPM(kickSpeedSupplier.getAsDouble());
+        kickerSubsystem.runRPM(Constants.KICKER_RPM);
         spindexerSpinner.runRPMContinus();
     }
 

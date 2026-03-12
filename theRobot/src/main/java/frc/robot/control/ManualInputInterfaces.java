@@ -215,16 +215,10 @@ public class ManualInputInterfaces {
                     subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
         }
 
-        // initialize the dashboard value using the defined constant so it
-        // matches what the commands read when running. Previous versions
-        // started at 0 which could cause confusion if the constant no
-        // longer matched.
         SmartDashboard.putNumber("Kicker RPM", Constants.KICKER_RPM);
         if (InstalledHardware.kickerInstalled) {
             this.driverController.rightBumper()
-                    .whileTrue(new KickerCommand(this.subsystemCollection.getKickerSubsystem(), () -> {
-                        return SmartDashboard.getNumber("Kicker RPM", Constants.KICKER_RPM);
-                    }));
+                    .whileTrue(new KickerCommand(this.subsystemCollection.getKickerSubsystem()));
         }
 
         if (InstalledHardware.spindexerInstalled) {
@@ -237,8 +231,7 @@ public class ManualInputInterfaces {
         this.driverController.rightTrigger().whileTrue(new KickerSpindexerAgitateCommand(
             this.subsystemCollection.getKickerSubsystem(),
             this.subsystemCollection.getSpindexerSpinnerSubsystem(),
-            this.subsystemCollection.getIntakeWristSubsystem(),
-            () -> SmartDashboard.getNumber("Kicker RPM", Constants.KICKER_RPM)));
+            this.subsystemCollection.getIntakeWristSubsystem()));
     }
 
         // Driver B toggles intake deploy/retract and runs/stops roller while deployed

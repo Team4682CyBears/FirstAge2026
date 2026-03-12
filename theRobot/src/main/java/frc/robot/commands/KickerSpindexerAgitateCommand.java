@@ -10,7 +10,6 @@
 
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,7 +27,6 @@ public class KickerSpindexerAgitateCommand extends Command {
     private final KickerSubsystem kickerSubsystem;
     private final SpindexerSpinner spindexerSpinner;
     private final IntakeWristSubsystem intakeWristSubsystem;
-    private final DoubleSupplier kickSpeedSupplier;
     private final Timer timer = new Timer();
     private final double togglePeriodSeconds;
 
@@ -46,9 +44,8 @@ public class KickerSpindexerAgitateCommand extends Command {
     public KickerSpindexerAgitateCommand(
             KickerSubsystem kickerSubsystem,
             SpindexerSpinner spindexerSpinner,
-            IntakeWristSubsystem intakeWristSubsystem,
-            DoubleSupplier kickSpeedSupplier) {
-        this(kickerSubsystem, spindexerSpinner, intakeWristSubsystem, kickSpeedSupplier, defaultTogglePeriodSeconds);
+            IntakeWristSubsystem intakeWristSubsystem) {
+        this(kickerSubsystem, spindexerSpinner, intakeWristSubsystem, defaultTogglePeriodSeconds);
     }
 
     /**
@@ -64,19 +61,17 @@ public class KickerSpindexerAgitateCommand extends Command {
             KickerSubsystem kickerSubsystem,
             SpindexerSpinner spindexerSpinner,
             IntakeWristSubsystem intakeWristSubsystem,
-            DoubleSupplier kickSpeedSupplier,
             double togglePeriodSeconds) {
         this.kickerSubsystem = kickerSubsystem;
         this.spindexerSpinner = spindexerSpinner;
         this.intakeWristSubsystem = intakeWristSubsystem;
-        this.kickSpeedSupplier = kickSpeedSupplier;
         this.togglePeriodSeconds = togglePeriodSeconds;
         addRequirements(kickerSubsystem, spindexerSpinner, intakeWristSubsystem);
     }
 
     @Override
     public void initialize() {
-        kickerSubsystem.runRPM(kickSpeedSupplier.getAsDouble());
+    kickerSubsystem.runRPM(Constants.KICKER_RPM);
         spindexerSpinner.runRPMContinus();
         wristIsDeployed = true;
         intakeWristSubsystem.setPosition(Constants.intakeWristDeployedPositionRotations);
