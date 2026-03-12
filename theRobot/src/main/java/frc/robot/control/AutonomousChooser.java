@@ -161,16 +161,10 @@ public class AutonomousChooser {
         && subsystems.isKickerSubsystemAvailable()) {
         NamedCommands.registerCommand(
             "SpindexerKickerOn",
-            new ToggleSpindexerKickerCommand(
-                subsystems.getSpindexerSpinnerSubsystem(),
+            new KickerSpindexerCommand(
                 subsystems.getKickerSubsystem(),
-                true));
-        NamedCommands.registerCommand(
-            "SpindexerKickerOff",
-            new ToggleSpindexerKickerCommand(
                 subsystems.getSpindexerSpinnerSubsystem(),
-                subsystems.getKickerSubsystem(),
-                false));
+                () -> SmartDashboard.getNumber("Kicker RPM", Constants.KICKER_RPM)).withTimeout(5));
     }
 
     if (subsystems.isIntakeWristSubsystemAvailable()
