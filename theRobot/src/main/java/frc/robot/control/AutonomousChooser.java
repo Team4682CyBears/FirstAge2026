@@ -152,16 +152,9 @@ public class AutonomousChooser {
 
         NamedCommands.registerCommand(
             "AutoAimOn",
-            new ToggleAutoAimMovingCommand(
+            new AutoAimMovingCommand(
                 subsystems,
-                subsystems.getDriveTrainSubsystem().getShooterAimer(),
-                true));
-        NamedCommands.registerCommand(
-            "AutoAimOff",
-            new ToggleAutoAimMovingCommand(
-                subsystems,
-                subsystems.getDriveTrainSubsystem().getShooterAimer(),
-                false));
+                subsystems.getDriveTrainSubsystem().getShooterAimer()).withTimeout(5));
     }
 
     if (subsystems.isSpinnerSpindexerSubsystemAvaible()

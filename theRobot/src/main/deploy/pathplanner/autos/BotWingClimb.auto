@@ -5,53 +5,33 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "IntakeToggle"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "BotWing"
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoAimOn"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "SpindexerKickerOn"
-                }
-              }
-            ]
+            "name": "AutoAimOn"
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 2.0
+            "pathName": "BotTrenchToPoo"
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoAimOn"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "SpindexerKickerOff"
-                }
-              }
-            ]
+            "name": "AutoAimOn"
           }
         }
       ]
