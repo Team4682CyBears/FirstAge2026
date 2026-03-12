@@ -171,7 +171,7 @@ public final class Constants {
     public static final double intakeWristEncoderAbsoluteOffset = -0.5448; 
     public static final double intakeWristTolerance = 0.01;
     public static final double intakeWristRetractedPositionRotations = 0.206;
-    public static final double intakeWristDeployedPositionRotations = 0.011475; 
+    public static final double intakeWristDeployedPositionRotations = 0.0; 
 
     public static final int intakeRollerCanId = 16;
 }
