@@ -232,12 +232,14 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getSpindexerSpinnerSubsystem(), false));
         }
 
-        if (InstalledHardware.kickerInstalled && InstalledHardware.spindexerInstalled) {
-            this.driverController.rightTrigger().whileTrue(new KickerSpindexerCommand(
-                    this.subsystemCollection.getKickerSubsystem(),
-                    this.subsystemCollection.getSpindexerSpinnerSubsystem(),
-                    () -> SmartDashboard.getNumber("Kicker RPM", Constants.KICKER_RPM)));
-        }
+    if (InstalledHardware.kickerInstalled && InstalledHardware.spindexerInstalled
+        && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
+        this.driverController.rightTrigger().whileTrue(new KickerSpindexerAgitateCommand(
+            this.subsystemCollection.getKickerSubsystem(),
+            this.subsystemCollection.getSpindexerSpinnerSubsystem(),
+            this.subsystemCollection.getIntakeWristSubsystem(),
+            () -> SmartDashboard.getNumber("Kicker RPM", Constants.KICKER_RPM)));
+    }
 
         // Driver B toggles intake deploy/retract and runs/stops roller while deployed
         if (this.subsystemCollection.isIntakeWristSubsystemAvailable()
