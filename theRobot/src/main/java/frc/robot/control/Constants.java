@@ -168,9 +168,11 @@ public final class Constants {
     public static final int intakeWristMotorCanID = 17;
     public static final int intakeWristEncoderCanID = 32;
 
-    public static final double intakeWristEncoderAbsoluteOffset = -0.5448; 
-    public static final double intakeWristTolerance = 0.01;
-    public static final double intakeWristRetractedPositionRotations = 0.206;
+    public static final double intakeWristEncoderAbsoluteOffset = 0.61411; 
+    public static final double intakeWristTolerance = 0.05;
+    public static final double intakeWristStartingPositionRotations = 0.586;
+    public static final double intakeWristDefensivePositionRotations = 0.511;
+    public static final double intakeWristAgitateStowPositionRotations = 0.3439;
     public static final double intakeWristDeployedPositionRotations = 0.0; 
 
     public static final int intakeRollerCanId = 16;

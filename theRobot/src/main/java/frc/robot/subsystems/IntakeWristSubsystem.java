@@ -15,11 +15,11 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.ExternalFeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -38,17 +38,20 @@ public class IntakeWristSubsystem extends SubsystemBase {
     private static final double intakeWristRotorToSensorRatio = 1.0/5.0 * 1.0/5.0;
     private static final double intakeWristSensorToMechanismRatio = 18.0/32.0;
     private static final double intakeWristLowVelocityTol = 10;
+    // if using voltageOut control, here's the values you would use for forward and reverse.
+    private static final double intakeWristForwardVoltage = 1.5;
+    private static final double intakeWristReverseVoltage = -1.4;
 
     private TalonFX motor;
     private CANcoder encoder;
-    private MotionMagicVoltage voltageController = new MotionMagicVoltage(0.0);
+    private MotionMagicVoltage voltageController = new MotionMagicVoltage(0.0).withOverrideBrakeDurNeutral(true);
 
     private boolean intakeWristIsAtDesiredExtension = true;
     private IntakeWristMode intakeWristMode = IntakeWristMode.RETRACTED;
-    private double desiredExtension = Constants.intakeWristRetractedPositionRotations;
+    private double desiredExtension = Constants.intakeWristDefensivePositionRotations;
 
-    private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.36).withKI(0.003).withKD(0.0).withKG(0.24)
-            .withKV(3.85).withKS(0.5).withGravityType(GravityTypeValue.Arm_Cosine); // DO NOT SET KD!!
+    private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.2).withKI(0.003).withKD(0.0)
+            .withKV(2.5).withKS(0.44); // DO NOT SET KD!!
 
     public IntakeWristSubsystem(int motorCanID, int encoderCanID) {
         if (InstalledHardware.intakeWristEncoderInstalled) {
@@ -62,7 +65,9 @@ public class IntakeWristSubsystem extends SubsystemBase {
         // this has to be done last
         if (!InstalledHardware.intakeWristEncoderInstalled){
             // wrist starts retracted
-            this.motor.setPosition(Constants.intakeWristRetractedPositionRotations);
+            this.motor.setPosition(Constants.intakeWristStartingPositionRotations);
+        } else {
+            this.motor.setPosition(this.encoder.getPosition().getValueAsDouble());
         }
     }
 
@@ -88,11 +93,15 @@ public class IntakeWristSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        intakeWristIsAtDesiredExtension = isPositionWithinTolerance();
         if (!intakeWristIsAtDesiredExtension){
             motor.setControl(voltageController.withPosition(desiredExtension));
+            intakeWristIsAtDesiredExtension = isPositionWithinTolerance();
+        } 
+        else {
+            stop();
         }
         SmartDashboard.putNumber("IntakeWrist Motor Encoder Position", getPosition());
+        SmartDashboard.putBoolean("IntakeWrist Motor Output Velocity", motor.getMotionMagicAtTarget().getValue());
     }
 
     /**
@@ -101,7 +110,7 @@ public class IntakeWristSubsystem extends SubsystemBase {
      */
     public void setPosition(double position) {
         desiredExtension = MathUtil.clamp(position, Constants.intakeWristDeployedPositionRotations,
-                Constants.intakeWristRetractedPositionRotations);
+                Constants.intakeWristDefensivePositionRotations);
         intakeWristIsAtDesiredExtension = false;
     }
 
@@ -117,12 +126,17 @@ public class IntakeWristSubsystem extends SubsystemBase {
                     setPosition(Constants.intakeWristDeployedPositionRotations);
                     break;
                 case RETRACTED:
-                    setPosition(Constants.intakeWristRetractedPositionRotations);
+                    setPosition(Constants.intakeWristDefensivePositionRotations);
                     break;
                 default:
-                    setPosition(Constants.intakeWristRetractedPositionRotations);
+                    setPosition(Constants.intakeWristDefensivePositionRotations);
             }
         }
+    }
+
+    public void stop() {
+        motor.stopMotor();
+        intakeWristIsAtDesiredExtension = true;
     }
 
     private void configureEncoder() {
@@ -149,8 +163,10 @@ public class IntakeWristSubsystem extends SubsystemBase {
             config.Feedback.SensorToMechanismRatio = 1.0/(intakeWristRotorToSensorRatio * intakeWristSensorToMechanismRatio);
         } else {
             config.Feedback.FeedbackRemoteSensorID = Constants.intakeWristEncoderCanID;
-            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;  
-            config.Feedback.SensorToMechanismRatio = 1.0 / intakeWristSensorToMechanismRatio;
+            config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder; 
+            // when using the external sensor, don't configure the gear ratio here. 
+            // use a 1:1 ratio and use positions directly from the encoder.  
+            config.Feedback.SensorToMechanismRatio = 1.0;
             // when using the external sensor, configure the gear ratio between the rotor to sensor. 
             config.Feedback.RotorToSensorRatio = 1.0 / intakeWristRotorToSensorRatio;
         }
@@ -172,9 +188,9 @@ public class IntakeWristSubsystem extends SubsystemBase {
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         // Borrowed from Crescendo2024 ShooterAngleSubsystem.java
-        config.MotionMagic.MotionMagicCruiseVelocity = 800.0;
-        config.MotionMagic.MotionMagicAcceleration = 160;
-        config.MotionMagic.MotionMagicJerk = 800;
+        config.MotionMagic.MotionMagicCruiseVelocity = 50.0;
+        config.MotionMagic.MotionMagicAcceleration = 25;
+        config.MotionMagic.MotionMagicJerk = 50;
 
         StatusCode response = motor.getConfigurator().apply(config);
         if (!response.isOK()) {
