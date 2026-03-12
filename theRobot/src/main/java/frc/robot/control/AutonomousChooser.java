@@ -92,14 +92,14 @@ public class AutonomousChooser {
     private Command getJustShoot(SubsystemCollection subsystems) {
         Command aim = new AutoAimMovingCommand(
                 subsystems,
-                subsystems.getDriveTrainSubsystem().getShooterAimer()).withTimeout(5);
+                subsystems.getDriveTrainSubsystem().getShooterAimer()).withTimeout(5.0);
         Command shoot = new SequentialCommandGroup(
         new WaitCommand(0.5),
         new KickerSpindexerCommand(
             subsystems.getKickerSubsystem(),
             subsystems.getSpindexerSpinnerSubsystem())
-            .withTimeout(5));
-
+            .withTimeout(5.0));
+        
         return new ParallelCommandGroup(aim, shoot);
     }
     

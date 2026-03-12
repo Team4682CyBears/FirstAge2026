@@ -215,7 +215,6 @@ public class ManualInputInterfaces {
                     subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
         }
 
-        SmartDashboard.putNumber("Kicker RPM", Constants.KICKER_RPM);
         if (InstalledHardware.kickerInstalled) {
             this.driverController.rightBumper()
                     .whileTrue(new KickerCommand(this.subsystemCollection.getKickerSubsystem()));

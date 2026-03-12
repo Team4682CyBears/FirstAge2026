@@ -56,8 +56,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private boolean displayOdometryDiagnostics = true;
 
-  private boolean autoAimMovingEnabled = false;
-
   StructArrayPublisher<SwerveModuleState> publisher;
 
   private final double deltaTimeSeconds = 0.02; // 20ms scheduler time tick

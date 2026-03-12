@@ -36,13 +36,6 @@ public class ShooterManualCommand extends Command {
         addRequirements(shooter, hood, kicker);
     }
 
-    @Override
-    public void initialize() {
-        shooter.runRPM(aimer.getMinShooterSpeedRPM());
-        kicker.runRPM(aimer.getMinKickerSpeedRPM());
-        hood.setExtendoPosition(0.0);
-        drivetrain.setSwerveYawMode(SwerveYawMode.JOYSTICK);
-    }
 
     @Override
     public void execute() {
