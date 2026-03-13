@@ -14,7 +14,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.*;
@@ -257,28 +259,32 @@ public class ManualInputInterfaces {
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
             // POV up/down now only adjust the shooter aimer offset; RPM control
             // has been removed from the co-driver controller.
-            this.coDriverController.povUp().onTrue(new InstantCommand(() -> {
+
+            double hubAdjustmentAmount = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue ? 0.1
+                            : -0.1;
+
+            this.coDriverController.povUp().and(this.coDriverController.b()).onTrue(new InstantCommand(() -> {
                 if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(0.0, 0.10);
+                            .applyTargetAdjustment(0.0, hubAdjustmentAmount);
                 }
             }));
-            this.coDriverController.povDown().onTrue(new InstantCommand(() -> {
+            this.coDriverController.povDown().and(this.coDriverController.b()).onTrue(new InstantCommand(() -> {
                 if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(0.0, -0.10);
+                            .applyTargetAdjustment(0.0, -hubAdjustmentAmount);
                 }
             }));
-            this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
+            this.coDriverController.povLeft().and(this.coDriverController.b()).onTrue(new InstantCommand(() -> {
                 if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(-0.10, 0.0);
+                            .applyTargetAdjustment(-hubAdjustmentAmount, 0.0);
                 }
             }));
-            this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
+            this.coDriverController.povRight().and(this.coDriverController.b()).onTrue(new InstantCommand(() -> {
                 if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(0.10, 0.0);
+                            .applyTargetAdjustment(hubAdjustmentAmount, 0.0);
                 }
             }));
 
@@ -289,8 +295,10 @@ public class ManualInputInterfaces {
             }));
 
             // if the left y stick has a magnitude greater than 0.1, run the command.
-            this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(new IntakeWristManualCommand(
-                    this.subsystemCollection.getIntakeWristSubsystem(), () -> this.coDriverController.getLeftY()));
+            this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).and(this.coDriverController.b())
+                    .whileTrue(new IntakeWristManualCommand(
+                            this.subsystemCollection.getIntakeWristSubsystem(),
+                            () -> this.coDriverController.getLeftY()));
             // when y is pressed, toggle the intake roller manual command
             this.coDriverController.y()
                     .toggleOnTrue(new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem()));
