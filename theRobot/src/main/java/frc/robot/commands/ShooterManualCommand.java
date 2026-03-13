@@ -11,6 +11,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.control.SwerveYawMode;
@@ -24,30 +25,21 @@ public class ShooterManualCommand extends Command {
     private HoodSubsystem hood;
     private KickerSubsystem kicker;
     private DrivetrainSubsystem drivetrain;
-    private ShooterAimer aimer;
 
     public ShooterManualCommand(SubsystemCollection subsystemCollection) {
         shooter = subsystemCollection.getShooterSubsystem();
         hood = subsystemCollection.getHoodSubsystem();
         kicker = subsystemCollection.getKickerSubsystem();
         drivetrain = subsystemCollection.getDriveTrainSubsystem();
-        this.aimer = drivetrain.getShooterAimer();
 
         addRequirements(shooter, hood, kicker);
     }
 
-    @Override
-    public void initialize() {
-        shooter.runRPM(aimer.getMinShooterSpeedRPM());
-        kicker.runRPM(aimer.getMinKickerSpeedRPM());
-        hood.setExtendoPosition(0.0);
-        drivetrain.setSwerveYawMode(SwerveYawMode.JOYSTICK);
-    }
 
     @Override
     public void execute() {
-        shooter.runRPM(aimer.getMinShooterSpeedRPM());
-        kicker.runRPM(aimer.getMinKickerSpeedRPM());
+        shooter.runRPM(Constants.SHOOTER_CLOSE_RPM);
+        kicker.runRPM(Constants.KICKER_RPM);
         hood.setExtendoPosition(0.0);
         drivetrain.setSwerveYawMode(SwerveYawMode.JOYSTICK);
     }

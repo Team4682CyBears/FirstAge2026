@@ -32,6 +32,7 @@ public class KickerSubsystem extends SubsystemBase {
     private final VelocityVoltage motorController = new VelocityVoltage(0.0);
 
     private double targetRPS = 0.0;
+    private boolean running = false;
 
     // Found based on experimentation on BearBones kicker V1
     private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.52)
@@ -50,6 +51,7 @@ public class KickerSubsystem extends SubsystemBase {
      */
     public void runRPM(double rpm) {
         this.targetRPS = rpmToRPS(rpm);
+        this.running = true;
     }
 
     private double rpmToRPS(double rpm) {
@@ -69,6 +71,16 @@ public class KickerSubsystem extends SubsystemBase {
     public void stop() {
         kickerTalonFX.stopMotor();
         targetRPS = 0.0;
+        running = false;
+    }
+
+    /**
+     * Returns true if the kicker has been commanded to run.
+     *
+     * @return true when running
+     */
+    public boolean isRunning() {
+        return running;
     }
 
     /*

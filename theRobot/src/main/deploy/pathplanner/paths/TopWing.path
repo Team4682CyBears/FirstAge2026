@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.523537254050926,
-        "y": 7.52357761863426
+        "x": 3.596627387152778,
+        "y": 7.442817491319445
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.270852936921296,
-        "y": 7.477912688078703
+        "x": 8.869286603009257,
+        "y": 7.464993851273148
       },
       "isLocked": false,
       "linkedName": "TopTrench"
@@ -20,36 +20,45 @@
         "y": 4.0
       },
       "prevControl": {
-        "x": 7.861836877893518,
-        "y": 8.166167173032408
+        "x": 7.868328571428572,
+        "y": 5.947442857142858
       },
       "nextControl": {
-        "x": 7.902289965781855,
-        "y": 3.7500104881065646
+        "x": 7.904065233664061,
+        "y": 3.7500330544346765
       },
       "isLocked": false,
       "linkedName": "Mid"
     },
     {
       "anchor": {
-        "x": 3.523537254050926,
-        "y": 7.52357761863426
+        "x": 3.596627387152778,
+        "y": 7.442817491319445
       },
       "prevControl": {
-        "x": 8.168303674768518,
-        "y": 8.209273292824074
+        "x": 7.868328571428572,
+        "y": 7.90397142857143
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "TopTrench"
+      "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.2,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 0.45,
+      "rotationDegrees": -90.0
+    }
+  ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.719047619047619,
-      "maxWaypointRelativePos": 1.5380952380952377,
+      "minWaypointRelativePos": 0.85,
+      "maxWaypointRelativePos": 1.4,
       "constraints": {
         "maxVelocity": 1.5,
         "maxAcceleration": 3.0,
@@ -71,7 +80,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 2.5,
+    "velocity": 0.0,
     "rotation": -90.0
   },
   "reversed": false,

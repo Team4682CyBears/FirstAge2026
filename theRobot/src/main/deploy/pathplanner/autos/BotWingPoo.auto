@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeToggle"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BotWing"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoAimOn"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BotTrenchToPoo"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoAimOn"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

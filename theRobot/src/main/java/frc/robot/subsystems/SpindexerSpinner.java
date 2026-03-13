@@ -39,6 +39,7 @@ public class SpindexerSpinner extends SubsystemBase {
 
     private double targetRPS = 0.0;
     private boolean continuousMode = false;
+    private boolean running = false;
     // Found based on experimentation on BearBones kicker V1
     private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.4)
             .withKD(0.0);
@@ -63,11 +64,13 @@ public class SpindexerSpinner extends SubsystemBase {
     public void runRPMContinus() {
         this.targetRPS = rpmToRPS(Constants.spindexerSpeedRotationsPerMinute);
         this.continuousMode = true;
+        this.running = true;
     }
 
     public void runRPMWtihSensor() {
         this.targetRPS = rpmToRPS(Constants.spindexerSpeedRotationsPerMinute);
         this.continuousMode = false;
+        this.running = true;
     }
 
     private double rpmToRPS(double rpm) {
@@ -87,6 +90,16 @@ public class SpindexerSpinner extends SubsystemBase {
     public void stop() {
         targetRPS = 0.0;
         spindexerTalonFX.stopMotor();
+        running = false;
+    }
+
+    /**
+     * Returns true if the spindexer has been commanded to run.
+     *
+     * @return true when running
+     */
+    public boolean isRunning() {
+        return running;
     }
 
     /*
