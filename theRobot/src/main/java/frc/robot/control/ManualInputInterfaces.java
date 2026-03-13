@@ -225,13 +225,13 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getSpindexerSpinnerSubsystem(), false));
         }
 
-    if (InstalledHardware.kickerInstalled && InstalledHardware.spindexerInstalled
-        && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
-        this.driverController.rightTrigger().whileTrue(new KickerSpindexerAgitateCommand(
-            this.subsystemCollection.getKickerSubsystem(),
-            this.subsystemCollection.getSpindexerSpinnerSubsystem(),
-            this.subsystemCollection.getIntakeWristSubsystem()));
-    }
+        if (InstalledHardware.kickerInstalled && InstalledHardware.spindexerInstalled
+                && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
+            this.driverController.rightTrigger().whileTrue(new KickerSpindexerAgitateCommand(
+                    this.subsystemCollection.getKickerSubsystem(),
+                    this.subsystemCollection.getSpindexerSpinnerSubsystem(),
+                    this.subsystemCollection.getIntakeWristSubsystem()));
+        }
 
         // Driver B toggles intake deploy/retract and runs/stops roller while deployed
         if (this.subsystemCollection.isIntakeWristSubsystemAvailable()
@@ -287,6 +287,13 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer().resetTargetAdjustment();
                 }
             }));
+
+            // if the left y stick has a magnitude greater than 0.1, run the command.
+            this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(new IntakeWristManualCommand(
+                    this.subsystemCollection.getIntakeWristSubsystem(), () -> this.coDriverController.getLeftY()));
+            // when y is pressed, toggle the intake roller manual command
+            this.coDriverController.y()
+                    .toggleOnTrue(new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem()));
         }
     }
 }
