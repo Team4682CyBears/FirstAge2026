@@ -287,6 +287,10 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer().resetTargetAdjustment();
                 }
             }));
+
+            // if the left y stick has a magnitude greater than 0.1, run the command.
+            this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(new IntakeManualCommand(
+                    this.subsystemCollection.getIntakeWristSubsystem(), () -> this.coDriverController.getLeftY()));
         }
     }
 }
