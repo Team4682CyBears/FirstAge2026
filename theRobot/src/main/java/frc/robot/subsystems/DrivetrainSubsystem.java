@@ -406,14 +406,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
           chassisSpeeds.omegaRadiansPerSecond);
 
       // THIS IS NOT NEEDED because the chassis speeds are set above. 
-      // if (swerveYawMode == SwerveYawMode.AUTO) {
-      //   // ensure the current auto-yaw velocity is up to date before using it
-      //   setAutoYawVelocityRadiansPerSecond();
-      //   reducedChassisSpeeds = new ChassisSpeeds(
-      //       reducedChassisSpeeds.vxMetersPerSecond,
-      //       reducedChassisSpeeds.vyMetersPerSecond,
-      //       this.autoYawVelocityRadiansPerSecond);
-      // }
+      if (swerveYawMode == SwerveYawMode.AUTO) {
+        reducedChassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(reducedChassisSpeeds);
+      }
 
       // apply acceleration control
       // TODO should test this at practice feild
@@ -429,25 +424,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // do not apply acceleration limis or speed limits.
       // assumes this is used by a trajectory follower that already imposes those
       // constraints.
-      double rot = chassisSpeeds.omegaRadiansPerSecond;
-      // THIS IS NOT NEEDED because it happens above. 
-      // if (swerveYawMode == SwerveYawMode.AUTO) {
-      //   setAutoYawVelocityRadiansPerSecond();
-      //   rot = this.autoYawVelocityRadiansPerSecond;
-      // }
+      if (swerveYawMode == SwerveYawMode.AUTO) {
+        this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
+      }
       drivetrain.setControl(robotCentricDriveController
           .withVelocityX(chassisSpeeds.vxMetersPerSecond)
           .withVelocityY(chassisSpeeds.vyMetersPerSecond)
-          .withRotationalRate(rot));
+          .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
     }
-  
-    // THIS IS NOT NEEDED because it happens above. 
-    // // note: auto yaw already computed above during the control logic; if
-    // // someone switches to AUTO but then does not request any chassis speeds
-    // // we still want the value updated so the getter is correct.
-    // if (swerveYawMode == SwerveYawMode.AUTO) {
-    //   setAutoYawVelocityRadiansPerSecond();
-    // }
 
     displayDiagnostics();
   }
