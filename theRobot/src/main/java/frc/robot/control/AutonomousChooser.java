@@ -157,7 +157,7 @@ public class AutonomousChooser {
             "AutoAimOn",
             new AutoAimMovingCommand(
                 subsystems,
-                subsystems.getDriveTrainSubsystem().getShooterAimer()).withTimeout(5));
+                subsystems.getDriveTrainSubsystem().getShooterAimer()).withTimeout(5.0));
     }
 
     if (subsystems.isSpinnerSpindexerSubsystemAvaible()
@@ -167,7 +167,7 @@ public class AutonomousChooser {
             new KickerSpindexerAgitateCommand(
                 subsystems.getKickerSubsystem(),
                 subsystems.getSpindexerSpinnerSubsystem(),
-                subsystems.getIntakeWristSubsystem()).withTimeout(5));
+                subsystems.getIntakeWristSubsystem()).withTimeout(5.0));
     }
 
     if (subsystems.isIntakeWristSubsystemAvailable()
