@@ -21,8 +21,8 @@ import com.pathplanner.lib.path.PathConstraints;
 public final class Constants {
 
     //////// SPINDEXER CONSTANTS ///////////
-    // 10 balls per second / 4 balls per rotation 
-    public static final double spindexerSpeedRotationsPerMinute  = 1200;
+    // 10 balls per second / 4 balls per rotation
+    public static final double spindexerSpeedRotationsPerMinute  = 300;
     public static final double kickerBallDetectionRangeInches = 4.0; 
     public static final int spindexerSensorLaserCanID = 27;
     public static final int spindexerTalonFXCanID = 18;
@@ -143,6 +143,8 @@ public final class Constants {
     // Shooter RPM bounds
     public static final double SHOOTER_MIN_RPM = 0.0;
     public static final double SHOOTER_MAX_RPM = 6500.0;
+    public static final double SHOOTER_PONDER_RPM = 1000.0;
+    public static final double SHOOTER_CLOSE_RPM = 3000.0;
 
     // ********************************************************************
     // Kicker Constants
@@ -162,16 +164,18 @@ public final class Constants {
     public static final double hoodEncoderAbsoluteOffset = 0.7220;
     public static final double hoodExtendoTolerance = 0.01;
     public static final double hoodMinPositionRotations = 0.0;
-    public static final double hoodMaxPositionRotations = 0.635; // TODO measure this on device
+    public static final double hoodMaxPositionRotations = 0.635; 
 
     /// Intake Constants
     public static final int intakeWristMotorCanID = 17;
     public static final int intakeWristEncoderCanID = 32;
 
-    public static final double intakeWristEncoderAbsoluteOffset = -0.417; // TODO zero on-device
-    public static final double intakeWristTolerance = 0.01;
-    public static final double intakeWristRetractedPositionRotations = 0.25;
-    public static final double intakeWristDeployedPositionRotations = 0.0; // TODO measure this on device
+    public static final double intakeWristEncoderAbsoluteOffset = 0.61411; 
+    public static final double intakeWristTolerance = 0.05;
+    public static final double intakeWristStartingPositionRotations = 0.586;
+    public static final double intakeWristDefensivePositionRotations = 0.511;
+    public static final double intakeWristAgitateStowPositionRotations = 0.3439;
+    public static final double intakeWristDeployedPositionRotations = 0.0; 
 
     public static final int intakeRollerCanId = 16;
 }

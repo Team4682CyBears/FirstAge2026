@@ -5,21 +5,33 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "HubToOutpost"
+            "name": "IntakeToggle"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "OutpostToDepot"
+            "pathName": "TopWing"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoAimOn"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "DepotToTopClimb"
+            "pathName": "TopTrenchToPoo"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoAimOn"
           }
         }
       ]

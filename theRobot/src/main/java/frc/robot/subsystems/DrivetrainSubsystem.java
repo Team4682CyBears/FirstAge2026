@@ -260,7 +260,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public void setUseVision(boolean shouldUseVision) {
     this.useVision = shouldUseVision;
   }
-
+  
   /**
    * Enable or disable the camera seeding mode.  When seeding is active the
    * drivetrain periodically forces the limelight into its "seeding" IMU mode
@@ -398,8 +398,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
       ChassisSpeeds reducedChassisSpeeds = new ChassisSpeeds(
           chassisSpeeds.vxMetersPerSecond * this.speedReductionFactor,
           chassisSpeeds.vyMetersPerSecond * this.speedReductionFactor,
-          // different speed reduction factor for rotation
-          chassisSpeeds.omegaRadiansPerSecond * Math.min(1.0, this.speedReductionFactor * 1.25));
+          chassisSpeeds.omegaRadiansPerSecond);
+
+      if (swerveYawMode == SwerveYawMode.AUTO) {
+        // ensure the current auto-yaw velocity is up to date before using it
+        setAutoYawVelocityRadiansPerSecond();
+        reducedChassisSpeeds = new ChassisSpeeds(
+            reducedChassisSpeeds.vxMetersPerSecond,
+            reducedChassisSpeeds.vyMetersPerSecond,
+            this.autoYawVelocityRadiansPerSecond);
+      }
 
       // apply acceleration control
       // TODO should test this at practice feild
@@ -415,11 +423,19 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // do not apply acceleration limis or speed limits.
       // assumes this is used by a trajectory follower that already imposes those
       // constraints.
+      double rot = chassisSpeeds.omegaRadiansPerSecond;
+      if (swerveYawMode == SwerveYawMode.AUTO) {
+        setAutoYawVelocityRadiansPerSecond();
+        rot = this.autoYawVelocityRadiansPerSecond;
+      }
       drivetrain.setControl(robotCentricDriveController
           .withVelocityX(chassisSpeeds.vxMetersPerSecond)
           .withVelocityY(chassisSpeeds.vyMetersPerSecond)
-          .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
+          .withRotationalRate(rot));
     }
+    // note: auto yaw already computed above during the control logic; if
+    // someone switches to AUTO but then does not request any chassis speeds
+    // we still want the value updated so the getter is correct.
     if (swerveYawMode == SwerveYawMode.AUTO) {
       setAutoYawVelocityRadiansPerSecond();
     }
@@ -665,6 +681,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("RobotFieldYCoordinateMeters", drivetrain.getState().Pose.getY());
 
       SmartDashboard.putBoolean("UseVision", useVision);
+      if (swerveYawMode == SwerveYawMode.AUTO) {
+        SmartDashboard.putNumber("AutoYawVelocity", autoYawVelocityRadiansPerSecond);
+      }
     }
   }
 }
