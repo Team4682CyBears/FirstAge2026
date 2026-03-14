@@ -153,6 +153,7 @@ public final class Constants {
     public static final double SHOOTER_MAX_RPM = 6500.0;
     public static final double SHOOTER_PONDER_RPM = 1000.0;
     public static final double SHOOTER_CLOSE_RPM = 3000.0;
+    public static final double SHOOTER_RPM_OFFSET = 220;
 
     // ********************************************************************
     // Kicker Constants

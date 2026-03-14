@@ -215,12 +215,6 @@ public class ManualInputInterfaces {
                     subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
         }
 
-        if (InstalledHardware.kickerInstalled) {
-            this.driverController.rightBumper()
-                    .whileTrue(new AutoAimShuttlingCommand(subsystemCollection,
-                            subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
-        }
-
         if (InstalledHardware.spindexerInstalled) {
             this.driverController.leftBumper().whileTrue(new SpindexerCommand(
                     this.subsystemCollection.getSpindexerSpinnerSubsystem(), false));
@@ -241,6 +235,9 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getIntakeWristSubsystem(),
                     this.subsystemCollection.getIntakeRollerSubsystem()));
         }
+
+        this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
+
     }
 
     /**

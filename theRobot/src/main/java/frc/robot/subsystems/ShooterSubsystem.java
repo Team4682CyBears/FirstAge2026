@@ -22,6 +22,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.control.Constants;
 import frc.robot.control.HardwareConstants;
 
 /*
@@ -54,7 +55,12 @@ public class ShooterSubsystem extends SubsystemBase {
      * Run the motor at the target velocity in rpm
      */
     public void runRPM(double targetRPM) {
-        PIDController.setSetpoint(targetRPM, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
+        if (targetRPM != 0.0){
+            PIDController.setSetpoint(targetRPM + Constants.SHOOTER_RPM_OFFSET, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
+        }
+        else {
+            PIDController.setSetpoint(targetRPM, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
+        }
     }
 
     /*

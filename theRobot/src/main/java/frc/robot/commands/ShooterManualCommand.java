@@ -37,7 +37,7 @@ public class ShooterManualCommand extends Command {
     @Override
     public void execute() {
         shooter.runRPM(Constants.SHOOTER_CLOSE_RPM);
-        hood.setExtendoPosition(0.0);
+        hood.setExtendoPosition(0.12);
         drivetrain.setSwerveYawMode(SwerveYawMode.JOYSTICK);
     }
 
