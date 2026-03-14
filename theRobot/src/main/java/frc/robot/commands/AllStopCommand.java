@@ -39,6 +39,15 @@ public class AllStopCommand extends Command {
         if (this.subsystems.isKickerSubsystemAvailable()) {
             addRequirements(this.subsystems.getKickerSubsystem());
         }
+        if (this.subsystems.isIntakeRollerSubsystemAvailable()) {
+            addRequirements(this.subsystems.getIntakeRollerSubsystem());
+        }
+        if (this.subsystems.isIntakeWristSubsystemAvailable()) {
+            addRequirements(this.subsystems.getIntakeWristSubsystem());
+        }
+        if (this.subsystems.isSpinnerSpindexerSubsystemAvaible()) {
+            addRequirements(this.subsystems.getSpindexerSpinnerSubsystem());
+        }
     }
 
     @Override
@@ -55,6 +64,15 @@ public class AllStopCommand extends Command {
         }
         if (this.subsystems.isKickerSubsystemAvailable()) {
             this.subsystems.getKickerSubsystem().stop();
+        }
+        if (this.subsystems.isIntakeRollerSubsystemAvailable()) {
+            this.subsystems.getIntakeRollerSubsystem().stop();
+        }
+        if (this.subsystems.isIntakeWristSubsystemAvailable()) {
+            this.subsystems.getIntakeWristSubsystem().stop();
+        }
+        if (this.subsystems.isSpinnerSpindexerSubsystemAvaible()) {
+            this.subsystems.getSpindexerSpinnerSubsystem().stop();
         }
         CommandScheduler.getInstance().cancelAll();
         System.out.println("I CLEARED ALL COMMANDS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");

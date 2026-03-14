@@ -39,12 +39,15 @@ public class IntakeWristSubsystem extends SubsystemBase {
     private static final double intakeWristSensorToMechanismRatio = 18.0/32.0;
     private static final double intakeWristLowVelocityTol = 10;
     // if using voltageOut control, here's the values you would use for forward and reverse.
-    private static final double intakeWristForwardVoltage = 1.5;
-    private static final double intakeWristReverseVoltage = -1.4;
+    public static final double intakeWristForwardVoltage = 1.9;
+    public static final double intakeWristReverseVoltage = -1.8;
 
     private TalonFX motor;
     private CANcoder encoder;
     private MotionMagicVoltage voltageController = new MotionMagicVoltage(0.0).withOverrideBrakeDurNeutral(true);
+    // For manual mode;
+    private boolean isManualMode = false;
+    private VoltageOut voltageOut = new VoltageOut(0.0);
 
     private boolean intakeWristIsAtDesiredExtension = true;
     private IntakeWristMode intakeWristMode = IntakeWristMode.RETRACTED;
@@ -93,12 +96,13 @@ public class IntakeWristSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        if (!intakeWristIsAtDesiredExtension){
-            motor.setControl(voltageController.withPosition(desiredExtension));
-            intakeWristIsAtDesiredExtension = isPositionWithinTolerance();
-        } 
-        else {
-            stop();
+        if (!isManualMode) {
+            if (!intakeWristIsAtDesiredExtension) {
+                motor.setControl(voltageController.withPosition(desiredExtension));
+                intakeWristIsAtDesiredExtension = isPositionWithinTolerance();
+            } else {
+                stop();
+            }
         }
         SmartDashboard.putNumber("IntakeWrist Motor Encoder Position", getPosition());
         SmartDashboard.putBoolean("IntakeWrist Motor Output Velocity", motor.getMotionMagicAtTarget().getValue());
@@ -109,12 +113,14 @@ public class IntakeWristSubsystem extends SubsystemBase {
      * @param position
      */
     public void setPosition(double position) {
+        isManualMode = false;
         desiredExtension = MathUtil.clamp(position, Constants.intakeWristDeployedPositionRotations,
                 Constants.intakeWristDefensivePositionRotations);
         intakeWristIsAtDesiredExtension = false;
     }
 
     public void setMode(IntakeWristMode mode){
+        isManualMode = false;
         if (mode == intakeWristMode){
             // already in this mode
             return;
@@ -132,6 +138,12 @@ public class IntakeWristSubsystem extends SubsystemBase {
                     setPosition(Constants.intakeWristDefensivePositionRotations);
             }
         }
+    }
+
+    // For manual control, auto sets the mode to manual
+    public void runVoltage(double volts) {
+        isManualMode = true;
+        motor.setControl(voltageOut.withOutput(volts));
     }
 
     public void stop() {
