@@ -39,8 +39,8 @@ public class IntakeWristSubsystem extends SubsystemBase {
     private static final double intakeWristSensorToMechanismRatio = 18.0/32.0;
     private static final double intakeWristLowVelocityTol = 10;
     // if using voltageOut control, here's the values you would use for forward and reverse.
-    public static final double intakeWristForwardVoltage = 1.5;
-    public static final double intakeWristReverseVoltage = -1.4;
+    public static final double intakeWristForwardVoltage = 1.9;
+    public static final double intakeWristReverseVoltage = -1.8;
 
     private TalonFX motor;
     private CANcoder encoder;

@@ -290,7 +290,7 @@ public class ManualInputInterfaces {
 
             // if the left y stick has a magnitude greater than 0.1, run the command.
             this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(new IntakeWristManualCommand(
-                    this.subsystemCollection.getIntakeWristSubsystem(), () -> this.coDriverController.getLeftY()));
+                    this.subsystemCollection.getIntakeWristSubsystem(), () -> -this.coDriverController.getLeftY()));
             // when y is pressed, toggle the intake roller manual command
             this.coDriverController.y()
                     .toggleOnTrue(new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem()));
