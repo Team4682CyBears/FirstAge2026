@@ -50,14 +50,22 @@ public final class Constants {
     // Field Constants (These are in field-position, not FMAP coordinates)
 
     // Total field dimensions in meters
-   public static final double FIELD_LENGTH = 16.540988; // 651.22 inches
-   public static final double FIELD_WIDTH = 8.069326;   // 317.69 inches
+    public static final double FIELD_LENGTH = 16.540988; // 651.22 inches
+    public static final double FIELD_WIDTH = 8.069326;   // 317.69 inches
 
-   // Blue Hub is 182.11 inches from the alliance wall
-   public static final Translation2d blueHubPosition = new Translation2d(4.625594, FIELD_WIDTH / 2.0);
+    // Blue Hub is 182.11 inches from the alliance wall
+    public static final Translation2d blueHubPosition = new Translation2d(4.625594, FIELD_WIDTH / 2.0);
 
-   // Red Hub is mirrored (Field length - Blue X)
-   public static final Translation2d redHubPosition = new Translation2d(FIELD_LENGTH - blueHubPosition.getX(), FIELD_WIDTH / 2.0);
+    // Red Hub is mirrored (Field length - Blue X)
+    public static final Translation2d redHubPosition = new Translation2d(FIELD_LENGTH - blueHubPosition.getX(), FIELD_WIDTH / 2.0);
+
+    public static final double shuttleOffsetFromWall = 0.5;
+
+    // left and right are relative to (0,0) facing other end of the field
+    public static final Translation2d blueLeftShuttlePosition = new Translation2d(shuttleOffsetFromWall, shuttleOffsetFromWall);
+    public static final Translation2d blueRightShuttlePosition = new Translation2d(shuttleOffsetFromWall, FIELD_WIDTH - shuttleOffsetFromWall);
+    public static final Translation2d redLeftShuttlePosition = new Translation2d(FIELD_LENGTH - shuttleOffsetFromWall, shuttleOffsetFromWall);
+    public static final Translation2d redRightShuttlePosition = new Translation2d(FIELD_LENGTH - shuttleOffsetFromWall, FIELD_WIDTH - shuttleOffsetFromWall);
 
     // *****************************************************************
     // Physical Shooter Offsets

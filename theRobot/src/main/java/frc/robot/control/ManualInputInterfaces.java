@@ -217,7 +217,8 @@ public class ManualInputInterfaces {
 
         if (InstalledHardware.kickerInstalled) {
             this.driverController.rightBumper()
-                    .whileTrue(new KickerCommand(this.subsystemCollection.getKickerSubsystem()));
+                    .whileTrue(new AutoAimShuttlingCommand(subsystemCollection,
+                            subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
         }
 
         if (InstalledHardware.spindexerInstalled) {

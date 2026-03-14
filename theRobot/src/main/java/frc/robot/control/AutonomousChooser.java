@@ -94,10 +94,9 @@ public class AutonomousChooser {
                 subsystems).withTimeout(5.0);
         Command shoot = new SequentialCommandGroup(
                 new WaitCommand(0.5),
-                new KickerSpindexerAgitateCommand(
+                new KickerSpindexerCommand(
                         subsystems.getKickerSubsystem(),
-                        subsystems.getSpindexerSpinnerSubsystem(),
-                        subsystems.getIntakeWristSubsystem())
+                        subsystems.getSpindexerSpinnerSubsystem())
                         .withTimeout(5.0));
 
         return new ParallelCommandGroup(aim, shoot);
