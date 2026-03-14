@@ -294,7 +294,11 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getIntakeWristSubsystem(), () -> -this.coDriverController.getLeftY()));
             // when y is pressed, toggle the intake roller manual command
             this.coDriverController.y()
-                    .toggleOnTrue(new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem()));
+                    .toggleOnTrue(
+                            new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(), true));
+            this.coDriverController.a()
+                    .toggleOnTrue(
+                            new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(), false));
         }
     }
 }

@@ -16,16 +16,20 @@ import frc.robot.subsystems.IntakeRollerSubsystem;
 
 public class IntakeRollerManualCommand extends Command {
     private final IntakeRollerSubsystem intakeRollerSubsystem;
+    // 1 = intake, -1 = outtake
+    private final boolean shouldIntake;
 
-    public IntakeRollerManualCommand(IntakeRollerSubsystem intakeRollerSubsystem) {
+    public IntakeRollerManualCommand(IntakeRollerSubsystem intakeRollerSubsystem, boolean shouldIntake) {
         this.intakeRollerSubsystem = intakeRollerSubsystem;
+        this.shouldIntake = shouldIntake;
         addRequirements(intakeRollerSubsystem);
     }
 
     @Override
     public void execute() {
+        double direction = shouldIntake ? 1 : -1;
         double rpm = SmartDashboard.getNumber("Intake RPM", 5000);
-        intakeRollerSubsystem.runRPM(rpm);
+        intakeRollerSubsystem.runRPM(rpm * direction);
     }
 
     @Override
