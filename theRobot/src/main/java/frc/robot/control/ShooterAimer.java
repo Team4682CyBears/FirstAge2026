@@ -65,7 +65,7 @@ public class ShooterAimer {
       { 1.0, 2912 },
       { 1.3037, 3000 },
       { 4.7448, 4000 },
-      { 8.2705, 6500 } };
+      { 8.2705, 5500 } };
   private final double[][] kickerRpmLookupTableData = {
       { 1.0, 2000 },
       { 8.2705, 2000 } };

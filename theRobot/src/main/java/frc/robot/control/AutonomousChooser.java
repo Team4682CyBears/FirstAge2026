@@ -164,7 +164,7 @@ public class AutonomousChooser {
                     new KickerSpindexerAgitateCommand(
                             subsystems.getKickerSubsystem(),
                             subsystems.getSpindexerSpinnerSubsystem(),
-                            subsystems.getIntakeWristSubsystem()).withTimeout(4.5));
+                            subsystems.getIntakeWristSubsystem()).withTimeout(4.8));
         }
 
         if (subsystems.isIntakeWristSubsystemAvailable()
@@ -174,6 +174,11 @@ public class AutonomousChooser {
                     new ToggleIntakeDeployCommand(
                             subsystems.getIntakeWristSubsystem(),
                             subsystems.getIntakeRollerSubsystem()));
+        }
+
+        if (subsystems.isShooterSubsystemAvailable()) {
+            NamedCommands.registerCommand("RevShooter",
+                    new ShootCommand(subsystems.getShooterSubsystem(), () -> 3000.0));
         }
 
     }

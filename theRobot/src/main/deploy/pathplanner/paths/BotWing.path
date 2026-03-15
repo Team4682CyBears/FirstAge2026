@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 7.897595118834653,
-        "y": 1.5115553539483764
+        "y": 1.5115553539483761
       },
       "nextControl": {
         "x": 7.933331781070142,
@@ -70,7 +70,14 @@
     }
   ],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "RevShooter",
+      "waypointRelativePos": 1.3016949152542385,
+      "endWaypointRelativePos": 1.8915254237288144,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 3.0,
     "maxAcceleration": 3.0,

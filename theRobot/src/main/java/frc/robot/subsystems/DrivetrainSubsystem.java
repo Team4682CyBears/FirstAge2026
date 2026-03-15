@@ -509,7 +509,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         // vison gives a bad read
         lessThanAMeter = visionComputedMeasurement.getTranslation()
             .getDistance(getRobotPosition().getTranslation()) <= 1;
-        if (lessThanAMeter) {
+        if (true) {
           drivetrain.addVisionMeasurement(visionComputedMeasurement, visionMeasurement.getTimestamp());
         }
       }

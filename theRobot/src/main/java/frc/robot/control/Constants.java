@@ -59,7 +59,8 @@ public final class Constants {
     // Red Hub is mirrored (Field length - Blue X)
     public static final Translation2d redHubPosition = new Translation2d(FIELD_LENGTH - blueHubPosition.getX(), FIELD_WIDTH / 2.0);
 
-    public static final double shuttleOffsetFromWall = 0.5;
+    // meters
+    public static final double shuttleOffsetFromWall = 1.5;
 
     // left and right are relative to (0,0) facing other end of the field
     public static final Translation2d blueLeftShuttlePosition = new Translation2d(shuttleOffsetFromWall, shuttleOffsetFromWall);
@@ -153,7 +154,7 @@ public final class Constants {
     public static final double SHOOTER_MAX_RPM = 6500.0;
     public static final double SHOOTER_PONDER_RPM = 1000.0;
     public static final double SHOOTER_CLOSE_RPM = 3000.0;
-    public static final double SHOOTER_RPM_OFFSET = 220;
+    public static final double SHOOTER_RPM_OFFSET = 200;
 
     // ********************************************************************
     // Kicker Constants
@@ -179,7 +180,8 @@ public final class Constants {
     public static final int intakeWristMotorCanID = 17;
     public static final int intakeWristEncoderCanID = 32;
 
-    public static final double intakeWristEncoderAbsoluteOffset = 0.61411-.026; 
+    public static final double intakeWristEncoderAbsoluteOffset = 0.61411-0.026-.313-.453;
+     
     public static final double intakeWristTolerance = 0.05;
     public static final double intakeWristStartingPositionRotations = 0.586;
     public static final double intakeWristDefensivePositionRotations = 0.511;

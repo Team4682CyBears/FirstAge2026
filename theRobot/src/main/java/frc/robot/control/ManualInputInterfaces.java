@@ -237,7 +237,8 @@ public class ManualInputInterfaces {
         }
 
         this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
-
+        this.driverController.a().whileTrue(new AutoAimShuttlingCommand(subsystemCollection,
+                    subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
     }
 
     /**
@@ -258,25 +259,25 @@ public class ManualInputInterfaces {
             this.coDriverController.povUp().onTrue(new InstantCommand(() -> {
                 if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(0.0, 0.10);
+                            .applyTargetAdjustment(0.1, 0.0);
                 }
             }));
             this.coDriverController.povDown().onTrue(new InstantCommand(() -> {
                 if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(0.0, -0.10);
+                            .applyTargetAdjustment(-0.1, 0.0);
                 }
             }));
             this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
                 if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(-0.10, 0.0);
+                            .applyTargetAdjustment(0.10, -0.10);
                 }
             }));
             this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
                 if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(0.10, 0.0);
+                            .applyTargetAdjustment(0.0, 0.1);
                 }
             }));
 
@@ -287,7 +288,7 @@ public class ManualInputInterfaces {
             }));
 
             // if the left y stick has a magnitude greater than 0.1, run the command.
-            this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(new IntakeWristManualCommand(
+            this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).and(this.coDriverController.b()).whileTrue(new IntakeWristManualCommand(
                     this.subsystemCollection.getIntakeWristSubsystem(), () -> -this.coDriverController.getLeftY()));
             // when y is pressed, toggle the intake roller manual command
             this.coDriverController.y()

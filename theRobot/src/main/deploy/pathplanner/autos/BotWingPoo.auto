@@ -17,21 +17,35 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "AutoAimOn"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpindexerKickerOn"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAimOn"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.2
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "SpindexerKickerOn"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {

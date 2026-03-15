@@ -42,6 +42,7 @@ public class InstalledHardware {
 
     // Spindexer
     public static final boolean spindexerInstalled = true;
+    public static final boolean spindexerSensorInstalled = false;
     
     // Kicker
     public static final boolean kickerInstalled = true;
