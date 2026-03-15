@@ -93,7 +93,7 @@ public class AutonomousChooser {
         Command aim = new ShooterManualCommand(
                 subsystems).withTimeout(5.0);
         Command shoot = new SequentialCommandGroup(
-                new WaitCommand(0.8),
+                new WaitCommand(0.7),
                 new KickerSpindexerCommand(
                         subsystems.getKickerSubsystem(),
                         subsystems.getSpindexerSpinnerSubsystem())
