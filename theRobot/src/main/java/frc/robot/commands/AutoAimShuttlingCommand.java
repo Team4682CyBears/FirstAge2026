@@ -51,30 +51,13 @@ public class AutoAimShuttlingCommand extends Command {
 
   public void initialize() {
     drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.AUTO);
-    aimer.setDesiredTarget(aimer.getHubPositionFromAlliance());
+    aimer.setDesiredTarget(getShuttleTarget());
     subsystems.getDriveTrainPowerSubsystem().setReducedPowerReductionFactor();
   }
 
   public void execute() {
     // set to shuttle target
-    Pose2d robotPosition = drivetrain.getRobotPosition();
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    Translation2d shuttlePos;
-    if (alliance == Alliance.Blue) {
-      if (robotPosition.getX() < Constants.FIELD_LENGTH / 2.0) {
-        shuttlePos = Constants.blueLeftShuttlePosition;
-      } else {
-        shuttlePos = Constants.blueRightShuttlePosition;
-      }
-    } else {
-      // red side
-      if (robotPosition.getX() < Constants.FIELD_LENGTH / 2.0) {
-        shuttlePos = Constants.redLeftShuttlePosition;
-      } else {
-        shuttlePos = Constants.redRightShuttlePosition;
-      }
-    }
-    aimer.setDesiredTarget(shuttlePos);
+    aimer.setDesiredTarget(getShuttleTarget());
 
 
 
@@ -98,5 +81,17 @@ public class AutoAimShuttlingCommand extends Command {
 
   public boolean isFinished() {
     return false;
+  }
+
+  private Translation2d getShuttleTarget() {
+    Pose2d robotPosition = drivetrain.getRobotPosition();
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    boolean isLeftSide = robotPosition.getX() < Constants.FIELD_LENGTH / 2.0;
+
+    if (alliance == Alliance.Blue) {
+      return isLeftSide ? Constants.blueLeftShuttlePosition : Constants.blueRightShuttlePosition;
+    }
+
+    return isLeftSide ? Constants.redLeftShuttlePosition : Constants.redRightShuttlePosition;
   }
 }
