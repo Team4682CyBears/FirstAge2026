@@ -61,14 +61,14 @@ public class AutoAimShuttlingCommand extends Command {
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
     Translation2d shuttlePos;
     if (alliance == Alliance.Blue) {
-      if (robotPosition.getX() < Constants.FIELD_WIDTH / 2.0) {
+      if (robotPosition.getX() < Constants.FIELD_LENGTH / 2.0) {
         shuttlePos = Constants.blueLeftShuttlePosition;
       } else {
         shuttlePos = Constants.blueRightShuttlePosition;
       }
     } else {
       // red side
-      if (robotPosition.getX() < Constants.FIELD_WIDTH / 2.0) {
+      if (robotPosition.getX() < Constants.FIELD_LENGTH / 2.0) {
         shuttlePos = Constants.redLeftShuttlePosition;
       } else {
         shuttlePos = Constants.redRightShuttlePosition;

@@ -53,8 +53,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
   private boolean useVision = true;
 
-  private boolean lessThanAMeter = false;
-
   private boolean displayOdometryDiagnostics = true;
 
   StructArrayPublisher<SwerveModuleState> publisher;
@@ -507,11 +505,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       if (visionComputedMeasurement != null) {
         // we want to reject vision measurements that are more than 1 meter away in case
         // vison gives a bad read
-        lessThanAMeter = visionComputedMeasurement.getTranslation()
-            .getDistance(getRobotPosition().getTranslation()) <= 1;
-        if (true) {
-          drivetrain.addVisionMeasurement(visionComputedMeasurement, visionMeasurement.getTimestamp());
-        }
+        drivetrain.addVisionMeasurement(visionComputedMeasurement, visionMeasurement.getTimestamp());
       }
     }
   }
@@ -632,7 +626,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
           SmartDashboard.putNumber("vision theta", visionBotPose.getRobotPosition().getRotation().getDegrees());
           SmartDashboard.putNumber("vision timestamp", visionBotPose.getTimestamp());
           SmartDashboard.putNumber("robot timestamp", Timer.getFPGATimestamp());
-          SmartDashboard.putBoolean("VisionWithinAMeter", lessThanAMeter);
         }
         SmartDashboard.putNumber("VisionFiducialCount", cameraSubsystem.getLastFiducialCount());
         SmartDashboard.putNumber("VisionMaxFiducialAmbiguity", cameraSubsystem.getLastMaxFiducialAmbiguity());

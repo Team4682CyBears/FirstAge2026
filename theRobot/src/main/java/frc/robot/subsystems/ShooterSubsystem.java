@@ -56,10 +56,10 @@ public class ShooterSubsystem extends SubsystemBase {
      */
     public void runRPM(double targetRPM) {
         if (targetRPM != 0.0){
-            PIDController.setSetpoint(targetRPM + Constants.SHOOTER_RPM_OFFSET, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
+            PIDController.setSetpoint(targetRPM + Math.copySign(Constants.SHOOTER_RPM_OFFSET, targetRPM), com.revrobotics.spark.SparkBase.ControlType.kVelocity);
         }
         else {
-            PIDController.setSetpoint(targetRPM, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
+            PIDController.setSetpoint(0.0, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
         }
     }
 
