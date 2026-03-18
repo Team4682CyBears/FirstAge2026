@@ -125,15 +125,15 @@ public class TurretSubsystem extends SubsystemBase {
     private Translation2d getDefaultAimTarget() {
         Pose2d robotPose = drivetrain.getRobotPosition();
         Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-        boolean onOurHalf = alliance == Alliance.Blue
-                ? robotPose.getX() <= Constants.FIELD_LENGTH / 2.0
-                : robotPose.getX() >= Constants.FIELD_LENGTH / 2.0;
+    boolean onOurHalf = alliance == Alliance.Blue
+        ? robotPose.getX() <= Constants.FIELD_LENGTH_X / 2.0
+        : robotPose.getX() >= Constants.FIELD_LENGTH_X / 2.0;
 
         if (onOurHalf) {
             return shooterAimer.getHubPositionFromAlliance();
         }
 
-        boolean isLeftSide = robotPose.getY() >= Constants.FIELD_WIDTH / 2.0;
+    boolean isLeftSide = robotPose.getY() >= Constants.FIELD_WIDTH_Y / 2.0;
         
         if (alliance == Alliance.Blue) {
             return isLeftSide ? Constants.blueLeftShuttlePosition : Constants.blueRightShuttlePosition;

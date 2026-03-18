@@ -415,13 +415,13 @@ public class ShooterAimer {
    */
   protected double hoodExtensionForDistance(double distanceMeters) { //USED
     if (distanceMeters <= hoodExtensionLookupTable.getMinInput()) {
-      return Constants.hoodMinPositionRotations;
+      return hoodExtensionLookupTable.getMinOutput();
     }
     if (distanceMeters >= hoodExtensionLookupTable.getMaxInput()) {
       return Constants.hoodMaxPositionRotations;
     }
     double ext = hoodExtensionLookupTable.queryTable(distanceMeters);
-    return MathUtil.clamp(ext, Constants.hoodMinPositionRotations, Constants.hoodMaxPositionRotations);
+    return MathUtil.clamp(ext, hoodExtensionLookupTable.getMinOutput(), Constants.hoodMaxPositionRotations);
   }
 
   /**
@@ -446,10 +446,10 @@ public class ShooterAimer {
       return shooterRpmLookupTable.getMinOutput();
     }
     if (distanceMeters >= shooterRpmLookupTable.getMaxInput()) {
-      return Constants.SHOOTER_MAX_RPM;
+      return shooterRpmLookupTable.getMaxOutput();
     }
     return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), shooterRpmLookupTable.getMinOutput(),
-        Constants.SHOOTER_MAX_RPM);
+        shooterRpmLookupTable.getMaxOutput());
   }
 
   private double tofForDistance(double distanceMeters) { //USED
