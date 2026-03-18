@@ -200,11 +200,6 @@ public class CameraSubsystem extends SubsystemBase {
     return Math.min(leftAmb, rightAmb);
   }
 
-  private double getTagId(String limelightName) {
-    NetworkTable table = limelightName.equals(leftLimelightName) ? leftTable : rightTable;
-    return table.getEntry("tid").getDouble(noTagInSightId);
-  }
-
   private String selectBestLimelightName(int leftCount, double leftAmb, int rightCount, double rightAmb) {
     if (leftCount == 0 && rightCount == 0) {
       return null;
@@ -216,17 +211,6 @@ public class CameraSubsystem extends SubsystemBase {
       return leftAmb < rightAmb ? leftLimelightName : rightLimelightName;
     }
     return leftLimelightName;
-  }
-
-  private Pose2d getVisionBotPoseInTargetSpace(String limelightName) {
-    if (limelightName == null) return null;
-    double tagId = getTagId(limelightName);
-    if (tagId == noTagInSightId) return null;
-    
-    double[] botpose = LimelightHelpers.getBotPose_TargetSpace(limelightName);
-    if (botpose == null || botpose.length == 0) return null;
-    
-    return LimelightHelpers.toPose2D(botpose);
   }
 
   private VisionMeasurement getSeedPoseFromVision() {
@@ -241,33 +225,6 @@ public class CameraSubsystem extends SubsystemBase {
     
     return new VisionMeasurement(new Pose2d(MT2pose.getTranslation(), Rotation2d.fromDegrees(medianYaw)),
     MT2timestamp);
-  }
-
-  public double getTagId() {
-    double leftTag = getTagId(leftLimelightName);
-    double rightTag = getTagId(rightLimelightName);
-    
-    LimelightHelpers.PoseEstimate left = getPoseEstimateMT1(leftLimelightName);
-    LimelightHelpers.PoseEstimate right = getPoseEstimateMT1(rightLimelightName);
-
-    int leftCount = left != null ? left.tagCount : 0;
-    int rightCount = right != null ? right.tagCount : 0;
-    double leftAmb = left != null ? getMaxRawFiducialAmbiguity(left.rawFiducials) : 0.0;
-    double rightAmb = right != null ? getMaxRawFiducialAmbiguity(right.rawFiducials) : 0.0;
-    
-    String bestLimelight = selectBestLimelightName(
-      leftCount, leftAmb,
-      rightCount, rightAmb
-    );
-
-    if (bestLimelight != null && bestLimelight.equals(leftLimelightName) && leftTag != noTagInSightId) {
-      return leftTag;
-    }
-    if (bestLimelight != null && bestLimelight.equals(rightLimelightName) && rightTag != noTagInSightId) {
-      return rightTag;
-    }
-    if (leftTag != noTagInSightId) return leftTag;
-    return rightTag;
   }
 
   public int getLastFiducialCount() { return lastFiducialCount; }
@@ -327,22 +284,6 @@ public class CameraSubsystem extends SubsystemBase {
     ArrayList<Double> modifiedList = new ArrayList<Double>(list);
     Collections.sort(modifiedList);
     return modifiedList.get((int) (modifiedList.size() / 2));
-  }
-
-  public Pose2d getVisionBotPoseInTargetSpace() {
-    LimelightHelpers.PoseEstimate left = getPoseEstimateMT1(leftLimelightName);
-    LimelightHelpers.PoseEstimate right = getPoseEstimateMT1(rightLimelightName);
-
-    int leftCount = left != null ? left.tagCount : 0;
-    int rightCount = right != null ? right.tagCount : 0;
-    double leftAmb = left != null ? getMaxRawFiducialAmbiguity(left.rawFiducials) : 0.0;
-    double rightAmb = right != null ? getMaxRawFiducialAmbiguity(right.rawFiducials) : 0.0;
-    
-    String limelightName = selectBestLimelightName(
-      leftCount, leftAmb,
-      rightCount, rightAmb
-    );
-    return getVisionBotPoseInTargetSpace(limelightName);
   }
 
   public void setMode(CameraMode newMode) {
