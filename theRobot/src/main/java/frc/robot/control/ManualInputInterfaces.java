@@ -211,8 +211,10 @@ public class ManualInputInterfaces {
                                     "driverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
 
-            this.driverController.y().whileTrue(new AutoAimMovingCommand(subsystemCollection,
-                    subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+        if (this.subsystemCollection.isTurretSubsystemAvailable()) {
+        this.driverController.y().whileTrue(new AutoAimMovingCommand(subsystemCollection,
+            subsystemCollection.getTurretSubsystem().getShooterAimer()));
+        }
         }
 
         if (InstalledHardware.spindexerInstalled) {
@@ -236,9 +238,11 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getIntakeRollerSubsystem()));
         }
 
-        this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
-        this.driverController.a().whileTrue(new AutoAimShuttlingCommand(subsystemCollection,
-                    subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+        if (this.subsystemCollection.isTurretSubsystemAvailable()) {
+            this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
+            this.driverController.a().whileTrue(new AutoAimShuttlingCommand(subsystemCollection,
+                        subsystemCollection.getTurretSubsystem().getShooterAimer()));
+        }
     }
 
     /**
@@ -257,33 +261,33 @@ public class ManualInputInterfaces {
             // POV up/down now only adjust the shooter aimer offset; RPM control
             // has been removed from the co-driver controller.
             this.coDriverController.povUp().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
-                    this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
+                if (this.subsystemCollection.isTurretSubsystemAvailable()) {
+                    this.subsystemCollection.getTurretSubsystem().getShooterAimer()
                             .applyTargetAdjustment(0.1, 0.0);
                 }
             }));
             this.coDriverController.povDown().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
-                    this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
+                if (this.subsystemCollection.isTurretSubsystemAvailable()) {
+                    this.subsystemCollection.getTurretSubsystem().getShooterAimer()
                             .applyTargetAdjustment(-0.1, 0.0);
                 }
             }));
             this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
-                    this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
+                if (this.subsystemCollection.isTurretSubsystemAvailable()) {
+                    this.subsystemCollection.getTurretSubsystem().getShooterAimer()
                             .applyTargetAdjustment(0.10, -0.10);
                 }
             }));
             this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
-                    this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
+                if (this.subsystemCollection.isTurretSubsystemAvailable()) {
+                    this.subsystemCollection.getTurretSubsystem().getShooterAimer()
                             .applyTargetAdjustment(0.0, 0.1);
                 }
             }));
 
             this.coDriverController.start().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
-                    this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer().resetTargetAdjustment();
+                if (this.subsystemCollection.isTurretSubsystemAvailable()) {
+                    this.subsystemCollection.getTurretSubsystem().getShooterAimer().resetTargetAdjustment();
                 }
             }));
 

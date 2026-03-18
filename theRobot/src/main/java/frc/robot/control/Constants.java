@@ -76,6 +76,15 @@ public final class Constants {
             shooterXOffsetFromCenterOfRobot, shooterYOffsetFromCenterOfRobot);
     public static final Rotation2d shooterYawOffset = Rotation2d.fromDegrees(-60.0); 
     // *****************************************************************
+    // Turret Constants
+    public static final int turretMotorCanId = 33; // TODO update with final CAN ID
+    public static final double turretGearRatio = 1.0; // TODO update with real gear ratio
+    public static final double turretMinAngleDegrees = 0.0;
+    public static final double turretMaxAngleDegrees = 270.0;
+    public static final double turretPositionKp = 12.0;
+    public static final double turretPositionKi = 0.0;
+    public static final double turretPositionKd = 0.4;
+    // *****************************************************************
     // standard stuff constants - motors rotation, etc.
     public static final double DegreesPerRevolution = 360.0;
     // NEO maximum RPM

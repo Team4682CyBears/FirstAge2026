@@ -11,39 +11,56 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
 import frc.robot.control.SubsystemCollection;
-import frc.robot.control.SwerveYawMode;
-import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.control.TurretAimMode;
 import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class ShooterManualCommand extends Command {
     private ShooterSubsystem shooter;
     private HoodSubsystem hood;
-    private DrivetrainSubsystem drivetrain;
+    private KickerSubsystem kicker;
+    private TurretSubsystem turret;
+    private ShooterAimer aimer;
 
     public ShooterManualCommand(SubsystemCollection subsystemCollection) {
         shooter = subsystemCollection.getShooterSubsystem();
         hood = subsystemCollection.getHoodSubsystem();
-        drivetrain = subsystemCollection.getDriveTrainSubsystem();
+        kicker = subsystemCollection.getKickerSubsystem();
+    turret = subsystemCollection.getTurretSubsystem();
+    this.aimer = turret != null ? turret.getShooterAimer() : null;
 
-        addRequirements(shooter, hood);
+        addRequirements(shooter, hood, kicker);
+        if (turret != null) {
+            addRequirements(turret);
+        }
     }
-
 
     @Override
     public void execute() {
-        shooter.runRPM(Constants.SHOOTER_CLOSE_RPM);
-        hood.setExtendoPosition(0.12);
-        drivetrain.setSwerveYawMode(SwerveYawMode.JOYSTICK);
+        if (aimer != null) {
+            shooter.runRPM(aimer.getMinShooterSpeedRPM());
+            kicker.runRPM(aimer.getMinKickerSpeedRPM());
+        }
+        hood.setExtendoPosition(0.0);
+        if (turret != null) {
+            turret.setTurretAimMode(TurretAimMode.JOYSTICK);
+        }
     }
 
     @Override
     public void end(boolean interrupted) {
         this.shooter.stop();
+        this.kicker.stop();
+        if (aimer != null) {
+            aimer.clearShootingAimTarget();
+        }
+        if (turret != null) {
+            turret.setTurretAimMode(TurretAimMode.AUTO);
+        }
     }
 
     @Override

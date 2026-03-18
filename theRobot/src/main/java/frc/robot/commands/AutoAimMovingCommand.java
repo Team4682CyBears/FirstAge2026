@@ -9,44 +9,40 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
-import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.control.Constants;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.control.ShooterAimer;
 import frc.robot.control.SubsystemCollection;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.control.TurretAimMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.geometry.Translation2d;
 
 public class AutoAimMovingCommand extends Command {
   private final SubsystemCollection subsystems;
-  private final DrivetrainSubsystem drivetrain;
+  private final TurretSubsystem turret;
   private final HoodSubsystem hood;
   private final ShooterSubsystem shooter;
-  private final KickerSubsystem kicker;
   private final ShooterAimer aimer;
-  private Translation2d hub;
 
   //
   public AutoAimMovingCommand(SubsystemCollection subsystemCollection,
       ShooterAimer aimer) {
     this.subsystems = subsystemCollection;
-    this.drivetrain = subsystemCollection.getDriveTrainSubsystem();
+  this.turret = subsystemCollection.getTurretSubsystem();
     this.hood = subsystemCollection.getHoodSubsystem();
     this.shooter = subsystemCollection.getShooterSubsystem();
-    this.kicker = subsystemCollection.getKickerSubsystem();
     this.aimer = aimer;
     // We are not declaring drivetrain subsystem as a requirement because it is only
     // setting the swerve yaw mode
     //TODO kicker needs to be added as a requirement once testing is done.
     addRequirements(hood, shooter);
+    if (turret != null) {
+      addRequirements(turret);
+    }
   }
 
   public void initialize() {
-    drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.AUTO);
+    turret.setTurretAimMode(TurretAimMode.AUTO);
     aimer.setDesiredTarget(aimer.getHubPositionFromAlliance());
     subsystems.getDriveTrainPowerSubsystem().setReducedPowerReductionFactor();
   }
@@ -64,7 +60,7 @@ public class AutoAimMovingCommand extends Command {
 
   public void end(boolean interrupted) {
     aimer.clearShootingAimTarget();
-    drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.JOYSTICK);
+    turret.setTurretAimMode(TurretAimMode.AUTO);
     subsystems.getDriveTrainPowerSubsystem().resetPowerReductionFactor();
     shooter.stop();
     hood.retract();

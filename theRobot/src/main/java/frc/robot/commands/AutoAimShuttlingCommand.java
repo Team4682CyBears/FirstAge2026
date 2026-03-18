@@ -12,9 +12,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
 import frc.robot.control.SubsystemCollection;
+import frc.robot.control.TurretAimMode;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,6 +26,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class AutoAimShuttlingCommand extends Command {
   private final SubsystemCollection subsystems;
   private final DrivetrainSubsystem drivetrain;
+  private final TurretSubsystem turret;
   private final HoodSubsystem hood;
   private final ShooterSubsystem shooter;
   private final ShooterAimer aimer;
@@ -36,6 +39,7 @@ public class AutoAimShuttlingCommand extends Command {
       ShooterAimer aimer) {
     this.subsystems = subsystemCollection;
     this.drivetrain = subsystemCollection.getDriveTrainSubsystem();
+  this.turret = subsystemCollection.getTurretSubsystem();
     this.hood = subsystemCollection.getHoodSubsystem();
     this.shooter = subsystemCollection.getShooterSubsystem();
     this.aimer = aimer;
@@ -43,10 +47,13 @@ public class AutoAimShuttlingCommand extends Command {
     // setting the swerve yaw mode
     //TODO kicker needs to be added as a requirement once testing is done.
     addRequirements(hood, shooter);
+    if (turret != null) {
+      addRequirements(turret);
+    }
   }
 
   public void initialize() {
-    drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.AUTO);
+    turret.setTurretAimMode(TurretAimMode.AUTO);
     aimer.setDesiredTarget(getShuttleTarget());
     subsystems.getDriveTrainPowerSubsystem().setReducedPowerReductionFactor();
   }
@@ -69,7 +76,7 @@ public class AutoAimShuttlingCommand extends Command {
 
   public void end(boolean interrupted) {
     aimer.clearShootingAimTarget();
-    drivetrain.setSwerveYawMode(frc.robot.control.SwerveYawMode.JOYSTICK);
+    turret.setTurretAimMode(TurretAimMode.AUTO);
     subsystems.getDriveTrainPowerSubsystem().resetPowerReductionFactor();
     shooter.stop();
     hood.retract();

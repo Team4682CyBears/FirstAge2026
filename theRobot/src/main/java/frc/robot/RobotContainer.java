@@ -22,6 +22,7 @@ import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.IntakeRollerSubsystem;
 import frc.robot.subsystems.IntakeWristSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.control.AutonomousChooser;
 import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
@@ -61,6 +62,9 @@ public class RobotContainer {
     
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
+
+  // init the turret subsystem (requires drivetrain)
+  this.initializeTurretSubsystem();
 
     // init the shooter aimer (needs drivetrain, shooter and hood)
     this.initializeShooterAimer();
@@ -295,12 +299,26 @@ public class RobotContainer {
    */
   private void initializeShooterAimer() {
     if (subsystems.isDriveTrainSubsystemAvailable() && subsystems.isHoodSubsystemAvailable()
-        && subsystems.isShooterSubsystemAvailable()) {
-      ShooterAimer aimer = new ShooterAimer(subsystems.getDriveTrainSubsystem(), subsystems);
-      subsystems.getDriveTrainSubsystem().setShooterAimer(aimer);
+        && subsystems.isShooterSubsystemAvailable() && subsystems.isTurretSubsystemAvailable()) {
+      ShooterAimer aimer = new ShooterAimer(subsystems.getDriveTrainSubsystem(),
+          subsystems.getTurretSubsystem(), subsystems);
+      subsystems.getTurretSubsystem().setShooterAimer(aimer);
       DataLogManager.log("SUCCESS: initializeShooterAimer");
     } else {
       DataLogManager.log("FAIL: initializeShooterAimer");
+    }
+  }
+
+  /**
+   * A method to init the turret subsystem
+   */
+  private void initializeTurretSubsystem() {
+    if (InstalledHardware.turretInstalled && subsystems.isDriveTrainSubsystemAvailable()) {
+      subsystems.setTurretSubsystem(
+          new TurretSubsystem(Constants.turretMotorCanId, subsystems.getDriveTrainSubsystem()));
+      DataLogManager.log("SUCCESS: initializeTurretSubsystem");
+    } else {
+      DataLogManager.log("FAIL: initializeTurretSubsystem");
     }
   }
 

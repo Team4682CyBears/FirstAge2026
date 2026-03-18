@@ -20,11 +20,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.common.LookupTableDouble;
 import frc.robot.subsystems.DrivetrainSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class ShooterAimer {
   private final DrivetrainSubsystem drivetrain;
+  private final TurretSubsystem turret;
   private final SubsystemCollection subsystemCollection;
 
   // NOTE protected flags and methods below exposed for unit testing purposes
@@ -33,6 +35,7 @@ public class ShooterAimer {
   protected boolean displayDiagnostics = false;
 
   private Translation2d desiredTarget = null;
+  private boolean useDefaultTarget = true;
   private Translation2d targetAdjustment = new Translation2d(0.0, 0.0);
   private Translation2d predictedTarget = null;
   private double distance = 0.0;
@@ -86,8 +89,9 @@ public class ShooterAimer {
    * shooterRPM, kickerRPM, autoYaw angle, autoYaw velocity, hoodExtension
    * requires drivetrain to call calculate() method in periodic when in auto-yaw mode. 
    */
-  public ShooterAimer(DrivetrainSubsystem drivetrain, SubsystemCollection subsystemCollection) {
+  public ShooterAimer(DrivetrainSubsystem drivetrain, TurretSubsystem turret, SubsystemCollection subsystemCollection) {
     this.drivetrain = drivetrain;
+    this.turret = turret;
     this.subsystemCollection = subsystemCollection;
   }
 
@@ -137,6 +141,7 @@ public class ShooterAimer {
     autoYaw = new Rotation2d();
     autoYawVelocity = 0.0;
     predictedTimeOfFlight = Constants.DEFAULT_PROJECTILE_TIME_OF_FLIGHT_SECONDS;
+    useDefaultTarget = true;
   }
 
 
@@ -246,7 +251,7 @@ public class ShooterAimer {
    * the target values
    */
   public boolean isAtPosition() {
-    Rotation2d currentYaw = drivetrain.getGyroscopeRotation();
+    Rotation2d currentYaw = getCurrentYawRotation();
     double yawErr = Math.abs(MathUtil.angleModulus(currentYaw.minus(autoYaw).getRadians()));
     boolean yawOk = yawErr < Math.toRadians(yawToleranceDegrees); // 3 deg tolerance
 
@@ -294,6 +299,16 @@ public class ShooterAimer {
    */
   public void setDesiredTarget(Translation2d target) {
     this.desiredTarget = target;
+    useDefaultTarget = false;
+  }
+
+  /**
+   * Sets a default target that may be overridden by explicit commands.
+   */
+  public void setDefaultDesiredTarget(Translation2d target) {
+    if (useDefaultTarget) {
+      this.desiredTarget = target;
+    }
   }
 
   /**
@@ -400,10 +415,13 @@ public class ShooterAimer {
    * pulse.
    */
   protected double hoodExtensionForDistance(double distanceMeters) { //USED
-    // Lookup table should return a double representing hood extension in rotations.
+    if (distanceMeters <= hoodExtensionLookupTable.getMinInput()) {
+      return Constants.hoodMinPositionRotations;
+    }
+    if (distanceMeters >= hoodExtensionLookupTable.getMaxInput()) {
+      return Constants.hoodMaxPositionRotations;
+    }
     double ext = hoodExtensionLookupTable.queryTable(distanceMeters);
-    // Clamp to mechanical limits (use hood rotation bounds from Constants if
-    // available)
     return MathUtil.clamp(ext, Constants.hoodMinPositionRotations, Constants.hoodMaxPositionRotations);
   }
 
@@ -425,11 +443,24 @@ public class ShooterAimer {
    * @return shooter RPM
    */
   protected double shooterRpmForDistance(double distanceMeters) { //USED
-    return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), Constants.SHOOTER_MIN_RPM,
+    if (distanceMeters <= shooterRpmLookupTable.getMinInput()) {
+      return shooterRpmLookupTable.getMinOutput();
+    }
+    if (distanceMeters >= shooterRpmLookupTable.getMaxInput()) {
+      return Constants.SHOOTER_MAX_RPM;
+    }
+    return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), shooterRpmLookupTable.getMinOutput(),
         Constants.SHOOTER_MAX_RPM);
   }
 
   private double tofForDistance(double distanceMeters) { //USED
     return tofLookupTable.queryTable(distanceMeters);
+  }
+
+  private Rotation2d getCurrentYawRotation() {
+    if (turret != null) {
+      return turret.getTurretFieldRotation();
+    }
+    return drivetrain.getGyroscopeRotation();
   }
 }

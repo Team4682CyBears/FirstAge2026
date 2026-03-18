@@ -385,7 +385,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       updateVisionMeasurements(CameraMode.TRACKING);
     }
 
-    if (swerveYawMode == SwerveYawMode.AUTO) {
+    if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
       shooterAimer.calculate(); // update all the shooterAimer parameters
       this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
     }
@@ -404,7 +404,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
           chassisSpeeds.omegaRadiansPerSecond);
 
       // THIS IS NOT NEEDED because the chassis speeds are set above. 
-      if (swerveYawMode == SwerveYawMode.AUTO) {
+      if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
         reducedChassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(reducedChassisSpeeds);
       }
 
@@ -422,7 +422,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // do not apply acceleration limis or speed limits.
       // assumes this is used by a trajectory follower that already imposes those
       // constraints.
-      if (swerveYawMode == SwerveYawMode.AUTO) {
+      if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
         this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
       }
       drivetrain.setControl(robotCentricDriveController
@@ -636,7 +636,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("RobotFieldYCoordinateMeters", drivetrain.getState().Pose.getY());
 
       SmartDashboard.putBoolean("UseVision", useVision);
-      if (swerveYawMode == SwerveYawMode.AUTO) {
+      if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
         SmartDashboard.putNumber("AutoYawVelocity", getAutoYawVelocityRadiansPerSecond());
       }
     }

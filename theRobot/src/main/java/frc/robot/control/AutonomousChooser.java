@@ -148,13 +148,14 @@ public class AutonomousChooser {
         if (subsystems.isDriveTrainSubsystemAvailable()
                 && subsystems.isDriveTrainPowerSubsystemAvailable()
                 && subsystems.isHoodSubsystemAvailable()
-                && subsystems.isShooterSubsystemAvailable()) {
+        && subsystems.isShooterSubsystemAvailable()
+        && subsystems.isTurretSubsystemAvailable()) {
 
             NamedCommands.registerCommand(
                     "AutoAimOn",
                     new AutoAimMovingCommand(
                             subsystems,
-                            subsystems.getDriveTrainSubsystem().getShooterAimer()).withTimeout(5.0));
+                subsystems.getTurretSubsystem().getShooterAimer()).withTimeout(5.0));
         }
 
         if (subsystems.isSpinnerSpindexerSubsystemAvaible()

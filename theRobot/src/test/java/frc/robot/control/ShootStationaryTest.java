@@ -32,7 +32,7 @@ class ShootStationaryTest {
     assert HAL.initialize(500, 0); // initialize the HAL, crash if failed
     subsystemCollection = new SubsystemCollection();
     drivetrain = new DrivetrainSubsystem(subsystemCollection);
-    shooterAimer = new ShooterAimer(drivetrain, subsystemCollection);
+      shooterAimer = new ShooterAimer(drivetrain, null, subsystemCollection);
     // set target
     shooterAimer.setDesiredTarget(Constants.blueHubPosition);
     shooterAimer.calculate();
