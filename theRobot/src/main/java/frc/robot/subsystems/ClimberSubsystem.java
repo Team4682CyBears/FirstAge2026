@@ -36,6 +36,7 @@ public class ClimberSubsystem extends SubsystemBase {
     private final SparkClosedLoopController PIDController;
 
     private static final double ROTATIONS_PER_INCH = 2.0; // Placeholder
+    // position of the top of the sensor range
     private static final double SENSOR_POSITION_ABOVE_FLOOR_INCHES = 1.0; // Mostly Placeholder
     private static final double MIN_HEIGHT_ABOVE_FLOOR_INCHES = 0.0; // Placeholder
     private static final double MAX_HEIGHT_INCHES = 25.0; // Placeholder
@@ -115,9 +116,11 @@ public class ClimberSubsystem extends SubsystemBase {
         boolean currentDetected = isDetected();
         double velocity = getVelocity();
 
+        // if we are going up and we previously detected it and now we don't, zero the sensor
         if (velocity > 0.1 && (lastHallEffectState && !currentDetected)) {
             LeadMotor.getEncoder().setPosition(SENSOR_POSITION_ABOVE_FLOOR_INCHES);
-        } 
+        }
+        // if we are going down and we previously didn't detected it and now we do, zero the sensor
         else if (velocity < -0.1 && (!lastHallEffectState && currentDetected)) {
             LeadMotor.getEncoder().setPosition(SENSOR_POSITION_ABOVE_FLOOR_INCHES);
         }
