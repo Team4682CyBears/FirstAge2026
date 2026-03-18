@@ -240,6 +240,8 @@ public class CameraSubsystem extends SubsystemBase {
   private void updatePreferredLimelightLEDs(int leftCount, double leftAmb, int rightCount, double rightAmb) {
     String preferred = selectBestLimelightName(leftCount, leftAmb, rightCount, rightAmb);
     if (preferred == null || preferred.equals(lastPreferredLimelight)) {
+      LimelightHelpers.setLEDMode_PipelineControl(leftLimelightName);
+      LimelightHelpers.setLEDMode_PipelineControl(rightLimelightName);
       return;
     }
 
