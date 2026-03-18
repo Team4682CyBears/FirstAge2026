@@ -32,14 +32,10 @@ import frc.robot.generated.LimelightHelpers;
  */
 public class CameraSubsystem extends SubsystemBase {
 
-  private final int noTagInSightId = -1;
   private static final int MIN_FIDUCIALS_FOR_VISION = 1;
 
   private final String leftLimelightName = Constants.limelightLeftName;
   private final String rightLimelightName = Constants.limelightRightName;
-
-  private NetworkTable leftTable = NetworkTableInstance.getDefault().getTable(leftLimelightName);
-  private NetworkTable rightTable = NetworkTableInstance.getDefault().getTable(rightLimelightName);
 
   private final ArrayList<Double> recentVisionYaws = new ArrayList<Double>();
   private final int recentVisionYawsMaxSize = 15;
