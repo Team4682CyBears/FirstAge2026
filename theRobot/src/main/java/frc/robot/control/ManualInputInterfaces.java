@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.*;
 
@@ -37,6 +36,15 @@ public class ManualInputInterfaces {
      */
     public ManualInputInterfaces(SubsystemCollection currentCollection) {
         subsystemCollection = currentCollection;
+    }
+
+    /**
+     * A method to return the driver controller for rumble needs
+     * 
+     * @return
+     */
+    public final XboxController getDriverController() {
+        return driverControllerForRumbleOnly;
     }
 
     /**
@@ -287,16 +295,23 @@ public class ManualInputInterfaces {
                 }
             }));
 
-            // if the left y stick has a magnitude greater than 0.1, run the command.
-            this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).and(this.coDriverController.b()).whileTrue(new IntakeWristManualCommand(
-                    this.subsystemCollection.getIntakeWristSubsystem(), () -> -this.coDriverController.getLeftY()));
-            // when y is pressed, toggle the intake roller manual command
-            this.coDriverController.y()
-                    .toggleOnTrue(
-                            new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(), true));
-            this.coDriverController.a()
-                    .toggleOnTrue(
-                            new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(), false));
+        if (this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
+        // if the left y stick has a magnitude greater than 0.1, run the command.
+        this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).and(this.coDriverController.b())
+            .whileTrue(new IntakeWristManualCommand(
+                this.subsystemCollection.getIntakeWristSubsystem(),
+                () -> -this.coDriverController.getLeftY()));
+        }
+
+        if (this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
+        // when y is pressed, toggle the intake roller manual command
+        this.coDriverController.y()
+            .toggleOnTrue(
+                new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(), true));
+        this.coDriverController.a()
+            .toggleOnTrue(
+                new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(), false));
+        }
         }
     }
 }
