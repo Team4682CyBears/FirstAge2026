@@ -56,7 +56,7 @@ public class ShooterAimer {
 
   // NOTE: these three LUTs need to have the same min input and max input range.
   private final double[][] hoodExtensionLookupTableData = {
-      { 1.0000, 0.8 },
+      { 1.0000, 0.08 },
       { 1.3037, 0.12 },
       { 3.4408, 0.45 },
       { 4.7448, 0.637 },
@@ -367,7 +367,6 @@ public class ShooterAimer {
           drivetrain.getGyroscopeRotation()
               .minus(Constants.shooterYawOffset) // take out shooter yaw offset
               .minus(Rotation2d.fromDegrees(Math.copySign(-90, fieldSpeeds.omegaRadiansPerSecond))));
-      System.out.println("ShooterAimer|ComputePredictedTarget->RotVelocityVector " + rotVelocityVector);
       fieldSpeedsTranslation = fieldSpeedsTranslation.plus(rotVelocityVector);
     }
 
