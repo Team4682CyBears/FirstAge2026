@@ -41,7 +41,6 @@ public class AutoAimShuttlingCommand extends Command {
     this.aimer = aimer;
     // We are not declaring drivetrain subsystem as a requirement because it is only
     // setting the swerve yaw mode
-    //TODO kicker needs to be added as a requirement once testing is done.
     addRequirements(hood, shooter);
   }
 
@@ -63,8 +62,6 @@ public class AutoAimShuttlingCommand extends Command {
     shooter.runRPM(shooterRpm);
     SmartDashboard.putNumber("Calc Shooter Speed", shooterRpm);
     SmartDashboard.putNumber("Calced Hood Extendo", ext);
-    // double kickerRpm = aimer.kickerRpmForDistance(distance);
-    // kicker.runRPM(kickerRpm);
   }
 
   public void end(boolean interrupted) {

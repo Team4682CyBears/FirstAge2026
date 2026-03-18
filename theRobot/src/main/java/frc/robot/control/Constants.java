@@ -176,6 +176,8 @@ public final class Constants {
     public static final double hoodMinPositionRotations = 0.0;
     public static final double hoodMaxPositionRotations = 0.635; 
 
+    public static final double HOOD_CLOSE_EXTENDO_POSITION = 0.12;
+
     /// Intake Constants
     public static final int intakeWristMotorCanID = 17;
     public static final int intakeWristEncoderCanID = 32;

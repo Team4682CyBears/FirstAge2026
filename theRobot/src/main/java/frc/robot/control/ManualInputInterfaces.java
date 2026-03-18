@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.common.IntakeDirection;
 import frc.robot.commands.*;
 
 public class ManualInputInterfaces {
@@ -328,10 +329,12 @@ public class ManualInputInterfaces {
         // when y is pressed, toggle the intake roller manual command
         this.coDriverController.y()
             .toggleOnTrue(
-                new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(), true));
+        new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(),
+            IntakeDirection.INTAKE));
         this.coDriverController.a()
             .toggleOnTrue(
-                new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(), false));
+        new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(),
+            IntakeDirection.OUTTAKE));
         }
         }
     }
