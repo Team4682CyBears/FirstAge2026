@@ -11,24 +11,17 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
-import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
 import frc.robot.control.SubsystemCollection;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.geometry.Translation2d;
 
 public class AutoAimMovingCommand extends Command {
   private final SubsystemCollection subsystems;
   private final DrivetrainSubsystem drivetrain;
   private final HoodSubsystem hood;
   private final ShooterSubsystem shooter;
-  private final KickerSubsystem kicker;
   private final ShooterAimer aimer;
-  private Translation2d hub;
 
   //
   public AutoAimMovingCommand(SubsystemCollection subsystemCollection,
@@ -37,7 +30,6 @@ public class AutoAimMovingCommand extends Command {
     this.drivetrain = subsystemCollection.getDriveTrainSubsystem();
     this.hood = subsystemCollection.getHoodSubsystem();
     this.shooter = subsystemCollection.getShooterSubsystem();
-    this.kicker = subsystemCollection.getKickerSubsystem();
     this.aimer = aimer;
     // We are not declaring drivetrain subsystem as a requirement because it is only
     // setting the swerve yaw mode
