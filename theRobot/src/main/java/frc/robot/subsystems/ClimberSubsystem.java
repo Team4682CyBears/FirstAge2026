@@ -173,7 +173,7 @@ public class ClimberSubsystem extends SubsystemBase {
         SparkFlexConfig followConfig = new SparkFlexConfig();
         followConfig.idleMode(IdleMode.kBrake);
         followConfig.follow(LeadMotor); 
-        followConfig.inverted(true);
+        followConfig.inverted(false);
 
         error = FollowMotor.configure(followConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         checkError(error, FollowMotor.getDeviceId());
