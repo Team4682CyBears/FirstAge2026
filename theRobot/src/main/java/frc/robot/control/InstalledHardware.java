@@ -53,6 +53,7 @@ public class InstalledHardware {
     // Intake wrist encoder
     public static final boolean intakeWristEncoderInstalled = true;
     public static final boolean intakeWristMotorInstalled = true;
+    public static final boolean intakeRollerInstalled = true;
 
     // TOF Sensor Hardware
     // Important! You must disable any TOF sensor that is not installed!!

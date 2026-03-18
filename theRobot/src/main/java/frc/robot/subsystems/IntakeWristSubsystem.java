@@ -66,11 +66,13 @@ public class IntakeWristSubsystem extends SubsystemBase {
             configureMotor();
         }
         // this has to be done last
-        if (!InstalledHardware.intakeWristEncoderInstalled){
-            // wrist starts retracted
-            this.motor.setPosition(Constants.intakeWristStartingPositionRotations);
-        } else {
-            this.motor.setPosition(this.encoder.getPosition().getValueAsDouble());
+        if (this.motor != null) {
+            if (this.encoder == null){
+                // wrist starts retracted
+                this.motor.setPosition(Constants.intakeWristStartingPositionRotations);
+            } else {
+                this.motor.setPosition(this.encoder.getPosition().getValueAsDouble());
+            }
         }
     }
 
@@ -88,7 +90,13 @@ public class IntakeWristSubsystem extends SubsystemBase {
      * @return wrist position in rotations
      */
     public double getPosition() {
-        return motor.getPosition().getValueAsDouble();
+        if (encoder != null) {
+            return encoder.getPosition().getValueAsDouble();
+        }
+        if (motor != null) {
+            return motor.getPosition().getValueAsDouble();
+        }
+        return 0.0;
     }
 
     /**
@@ -96,6 +104,12 @@ public class IntakeWristSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
+        if (motor == null) {
+            if (encoder != null) {
+                SmartDashboard.putNumber("IntakeWrist Encoder Position", encoder.getPosition().getValueAsDouble());
+            }
+            return;
+        }
         if (!isManualMode) {
             if (!intakeWristIsAtDesiredExtension) {
                 motor.setControl(voltageController.withPosition(desiredExtension));
@@ -114,6 +128,9 @@ public class IntakeWristSubsystem extends SubsystemBase {
      */
     public void setPosition(double position) {
         isManualMode = false;
+        if (motor == null) {
+            return;
+        }
         desiredExtension = MathUtil.clamp(position, Constants.intakeWristDeployedPositionRotations,
                 Constants.intakeWristDefensivePositionRotations);
         intakeWristIsAtDesiredExtension = false;
@@ -143,11 +160,15 @@ public class IntakeWristSubsystem extends SubsystemBase {
     // For manual control, auto sets the mode to manual
     public void runVoltage(double volts) {
         isManualMode = true;
-        motor.setControl(voltageOut.withOutput(volts));
+        if (motor != null) {
+            motor.setControl(voltageOut.withOutput(volts));
+        }
     }
 
     public void stop() {
-        motor.stopMotor();
+        if (motor != null) {
+            motor.stopMotor();
+        }
         intakeWristIsAtDesiredExtension = true;
     }
 
@@ -226,7 +247,8 @@ public class IntakeWristSubsystem extends SubsystemBase {
         // settling.
         boolean positionTargetReached = Math
                 .abs(getPosition() - desiredExtension) < Constants.intakeWristTolerance;
-        boolean velocityIsSmall = Math.abs(motor.getVelocity().getValueAsDouble()) < intakeWristLowVelocityTol;
+    boolean velocityIsSmall = motor == null
+        || Math.abs(motor.getVelocity().getValueAsDouble()) < intakeWristLowVelocityTol;
         return positionTargetReached && velocityIsSmall;
     }
 

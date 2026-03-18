@@ -90,16 +90,19 @@ public class AutonomousChooser {
     }
 
     private Command getJustShoot(SubsystemCollection subsystems) {
-        Command aim = new ShooterManualCommand(
-                subsystems).withTimeout(5.0);
-        Command shoot = new SequentialCommandGroup(
-                new WaitCommand(0.7),
-                new KickerSpindexerCommand(
-                        subsystems.getKickerSubsystem(),
-                        subsystems.getSpindexerSpinnerSubsystem())
-                        .withTimeout(5.0));
-
-        return new ParallelCommandGroup(aim, shoot);
+        if (InstalledHardware.shooterInstalled && InstalledHardware.hoodMotorInstalled && InstalledHardware.hoodEncoderInstalled) {
+            Command aim = new ShooterManualCommand(
+                    subsystems).withTimeout(5.0);
+            Command shoot = new SequentialCommandGroup(
+                    new WaitCommand(0.7),
+                    new KickerSpindexerCommand(
+                            subsystems.getKickerSubsystem(),
+                            subsystems.getSpindexerSpinnerSubsystem())
+                            .withTimeout(5.0));
+            return new ParallelCommandGroup(aim, shoot);
+        } else {
+            return new InstantCommand();
+        }
     }
 
     private Command getBotWingPoo() {

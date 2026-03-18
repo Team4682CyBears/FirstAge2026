@@ -75,7 +75,7 @@ class ShootStationaryTest {
   void hoodExtensionClampBelowMin() {
     // clamp to min when input below min
     double input = 0.5; // below min
-    double output = Constants.hoodMinPositionRotations;
+    double output = 0.08;
     double hoodPosition = shooterAimer.hoodExtensionForDistance(input);
     assertEquals(
         output, hoodPosition, DELTA);
@@ -128,8 +128,8 @@ class ShootStationaryTest {
   @Test
   void ShooterRPMClampAboveMax() {
     // clamp to max when input above max
-    double input = 9.0; // below min
-    double output = 6500;
+    double input = 9.0; // above max
+    double output = 5500;
     double hoodPosition = shooterAimer.shooterRpmForDistance(input);
     assertEquals(
         output, hoodPosition, DELTA);

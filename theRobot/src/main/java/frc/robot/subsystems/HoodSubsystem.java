@@ -86,8 +86,13 @@ public class HoodSubsystem extends SubsystemBase {
      * @return hood extendo in rotations
      */
     public double getHoodPosition() {
-        return InstalledHardware.hoodEncoderInstalled ? encoder.getAbsolutePosition().getValueAsDouble()
-                : motor.getPosition().getValueAsDouble();
+        if (encoder != null) {
+            return encoder.getAbsolutePosition().getValueAsDouble();
+        }
+        if (motor != null) {
+            return motor.getPosition().getValueAsDouble();
+        }
+        return 0.0;
     }
 
     /**
@@ -95,7 +100,13 @@ public class HoodSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        
+        if (motor == null) {
+            if (encoder != null) {
+                SmartDashboard.putNumber("Hood Absolute Position",
+                        encoder.getAbsolutePosition().getValueAsDouble());
+            }
+            return;
+        }
         if (!hoodIsAtDesiredExtension) {
             // use motionMagic voltage control
             motor.setControl(
@@ -104,8 +115,10 @@ public class HoodSubsystem extends SubsystemBase {
             hoodIsAtDesiredExtension = isExtendoWithinTolerance(desiredExtension);
         }
         SmartDashboard.putBoolean("Hood Within Tolerance", hoodIsAtDesiredExtension);
-        SmartDashboard.putNumber("Hood Absolute Position",
-                encoder.getAbsolutePosition().getValueAsDouble());
+        if (encoder != null) {
+            SmartDashboard.putNumber("Hood Absolute Position",
+                    encoder.getAbsolutePosition().getValueAsDouble());
+        }
         SmartDashboard.putNumber("Hood Motor Encoder Extendo", motor.getPosition().getValueAsDouble());
     }
 
@@ -121,7 +134,8 @@ public class HoodSubsystem extends SubsystemBase {
         // settling.
         boolean positionTargetReached = Math
                 .abs(getHoodPosition() - desiredExtension) < Constants.hoodExtendoTolerance;
-        boolean velocityIsSmall = Math.abs(motor.getVelocity().getValueAsDouble()) < hoodExtendoLowVelocityTol;
+    boolean velocityIsSmall = motor == null
+        || Math.abs(motor.getVelocity().getValueAsDouble()) < hoodExtendoLowVelocityTol;
         return positionTargetReached && velocityIsSmall;
     }
 

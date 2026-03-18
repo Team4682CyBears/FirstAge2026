@@ -53,8 +53,11 @@ public class ShooterManualCommand extends Command {
         if (aimer != null) {
             shooter.runRPM(aimer.getMinShooterSpeedRPM());
             kicker.runRPM(aimer.getMinKickerSpeedRPM());
+        } else {
+            shooter.runRPM(Constants.SHOOTER_CLOSE_RPM);
+            kicker.runRPM(Constants.KICKER_RPM);
         }
-        hood.setExtendoPosition(0.0);
+        hood.setExtendoPosition(Constants.HOOD_CLOSE_EXTENDO_POSITION);
     }
 
     @Override

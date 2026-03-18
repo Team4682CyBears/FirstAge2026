@@ -268,9 +268,20 @@ public class RobotContainer {
    */
   private void initializeIntakeSubsystems() {
     try {
-      subsystems.setIntakeWristSubsystem(new IntakeWristSubsystem(Constants.intakeWristMotorCanID, Constants.intakeWristEncoderCanID));
-      subsystems.setIntakeRollerSubsystem(new IntakeRollerSubsystem(Constants.intakeRollerCanId));
-      DataLogManager.log("SUCCESS: initializeIntakeSubsystems");
+      if (InstalledHardware.intakeWristMotorInstalled || InstalledHardware.intakeWristEncoderInstalled) {
+        subsystems.setIntakeWristSubsystem(
+            new IntakeWristSubsystem(Constants.intakeWristMotorCanID, Constants.intakeWristEncoderCanID));
+        DataLogManager.log("SUCCESS: initializeIntakeWristSubsystem");
+      } else {
+        DataLogManager.log("FAIL: initializeIntakeWristSubsystem");
+      }
+
+      if (InstalledHardware.intakeRollerInstalled) {
+        subsystems.setIntakeRollerSubsystem(new IntakeRollerSubsystem(Constants.intakeRollerCanId));
+        DataLogManager.log("SUCCESS: initializeIntakeRollerSubsystem");
+      } else {
+        DataLogManager.log("FAIL: initializeIntakeRollerSubsystem");
+      }
     } catch (Exception ex) {
       DataLogManager.log("FAIL: initializeIntakeSubsystems - " + ex.toString());
     }

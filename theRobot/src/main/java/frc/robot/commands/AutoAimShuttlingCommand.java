@@ -59,8 +59,6 @@ public class AutoAimShuttlingCommand extends Command {
     shooter.runRPM(shooterRpm);
     SmartDashboard.putNumber("Calc Shooter Speed", shooterRpm);
     SmartDashboard.putNumber("Calced Hood Extendo", ext);
-    // double kickerRpm = aimer.kickerRpmForDistance(distance);
-    // kicker.runRPM(kickerRpm);
   }
 
   public void end(boolean interrupted) {
@@ -79,5 +77,4 @@ public class AutoAimShuttlingCommand extends Command {
   public boolean isFinished() {
     return false;
   }
-
 }
