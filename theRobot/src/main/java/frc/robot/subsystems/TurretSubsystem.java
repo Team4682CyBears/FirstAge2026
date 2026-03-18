@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
 import frc.robot.control.HardwareConstants;
+import frc.robot.control.InstalledHardware;
 import frc.robot.control.ShooterAimer;
 import frc.robot.control.TurretAimMode;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -96,7 +97,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (turretAimMode == TurretAimMode.AUTO && shooterAimer != null) {
+        if (InstalledHardware.useTurretForAiming && turretAimMode == TurretAimMode.AUTO && shooterAimer != null) {
             Translation2d defaultTarget = getDefaultAimTarget();
             shooterAimer.setDefaultDesiredTarget(defaultTarget);
             shooterAimer.calculate();
