@@ -81,8 +81,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public double getTurretAngleRadians() {
-        double motorRotations = turretMotor.getPosition().getValueAsDouble();
-        double turretRotations = motorRotations / Constants.turretGearRatio;
+        double turretRotations = turretMotor.getPosition().getValueAsDouble();
         return turretRotations * 2.0 * Math.PI;
     }
 
@@ -105,8 +104,8 @@ public class TurretSubsystem extends SubsystemBase {
             setTurretAngleRadians(desiredTurretAngle);
         }
 
-        double targetMotorRotations = radiansToMotorRotations(targetTurretAngleRadians);
-        positionController.withPosition(targetMotorRotations);
+        double targetTurretRotations = targetTurretAngleRadians / (2.0 * Math.PI);
+        positionController.withPosition(targetTurretRotations);
         turretMotor.setControl(positionController);
 
         SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getTurretAngleRadians()));
@@ -116,33 +115,10 @@ public class TurretSubsystem extends SubsystemBase {
     private double computeDesiredTurretAngleRadians() {
         double robotYawRadians = drivetrain.getGyroscopeRotation().getRadians();
         double desiredFieldYawRadians = shooterAimer.getAutoYaw().getRadians();
-        double desiredRelativeRadians = MathUtil.inputModulus(
-                desiredFieldYawRadians - robotYawRadians,
-                0.0,
-                2.0 * Math.PI);
-        return wrapAngleToTurretRange(desiredRelativeRadians);
-    }
-
-    private double wrapAngleToTurretRange(double desiredRelativeRadians) {
-        double range = maxTurretAngleRadians - minTurretAngleRadians;
-        if (range <= 0.0) {
-            return minTurretAngleRadians;
-        }
-
-        double normalizedDesired = MathUtil.inputModulus(desiredRelativeRadians, 0.0, 2.0 * Math.PI);
-        double normalizedMin = MathUtil.inputModulus(minTurretAngleRadians, 0.0, 2.0 * Math.PI);
-        double normalizedMax = MathUtil.inputModulus(maxTurretAngleRadians, 0.0, 2.0 * Math.PI);
-
-        boolean inRange = normalizedMin <= normalizedMax
-                ? normalizedDesired >= normalizedMin && normalizedDesired <= normalizedMax
-                : normalizedDesired >= normalizedMin || normalizedDesired <= normalizedMax;
-        if (inRange) {
-            return normalizedDesired;
-        }
-
-        double distanceToMin = Math.abs(MathUtil.angleModulus(normalizedDesired - normalizedMin));
-        double distanceToMax = Math.abs(MathUtil.angleModulus(normalizedDesired - normalizedMax));
-        return distanceToMin <= distanceToMax ? normalizedMin : normalizedMax;
+        
+        double desiredRelativeRadians = desiredFieldYawRadians - robotYawRadians;
+        desiredRelativeRadians = MathUtil.angleModulus(desiredRelativeRadians);
+        return MathUtil.clamp(desiredRelativeRadians, minTurretAngleRadians, maxTurretAngleRadians);
     }
 
     private Translation2d getDefaultAimTarget() {
@@ -156,20 +132,19 @@ public class TurretSubsystem extends SubsystemBase {
             return shooterAimer.getHubPositionFromAlliance();
         }
 
-    boolean isLeftSide = robotPose.getY() <= Constants.FIELD_WIDTH / 2.0;
+        boolean isLeftSide = robotPose.getY() >= Constants.FIELD_WIDTH / 2.0;
+        
         if (alliance == Alliance.Blue) {
             return isLeftSide ? Constants.blueLeftShuttlePosition : Constants.blueRightShuttlePosition;
         }
         return isLeftSide ? Constants.redLeftShuttlePosition : Constants.redRightShuttlePosition;
     }
 
-    private double radiansToMotorRotations(double turretAngleRadians) {
-        double turretRotations = turretAngleRadians / (2.0 * Math.PI);
-        return turretRotations * Constants.turretGearRatio;
-    }
-
     private void configureMotor() {
         TalonFXConfiguration talonMotorConfig = new TalonFXConfiguration();
+        
+        talonMotorConfig.Feedback.SensorToMechanismRatio = Constants.turretGearRatio;
+
         talonMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         talonMotorConfig.Slot0 = slot0Configs;
         talonMotorConfig.Voltage.PeakForwardVoltage = Constants.falconMaxVoltage;
@@ -185,8 +160,8 @@ public class TurretSubsystem extends SubsystemBase {
 
         talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = radiansToMotorRotations(maxTurretAngleRadians);
-        talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = radiansToMotorRotations(minTurretAngleRadians);
+        talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = maxTurretAngleRadians / (2.0 * Math.PI);
+        talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = minTurretAngleRadians / (2.0 * Math.PI);
 
         StatusCode response = turretMotor.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {
