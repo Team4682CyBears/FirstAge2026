@@ -116,10 +116,10 @@ public class TurretSubsystem extends SubsystemBase {
     private double computeDesiredTurretAngleRadians() {
         double robotYawRadians = drivetrain.getGyroscopeRotation().getRadians();
         double desiredFieldYawRadians = shooterAimer.getAutoYaw().getRadians();
-        double desiredRelativeRadians = MathUtil.angleModulus(desiredFieldYawRadians - robotYawRadians);
-        if (desiredRelativeRadians < 0) {
-            desiredRelativeRadians += 2.0 * Math.PI;
-        }
+        double desiredRelativeRadians = MathUtil.inputModulus(
+                desiredFieldYawRadians - robotYawRadians,
+                0.0,
+                2.0 * Math.PI);
         return wrapAngleToTurretRange(desiredRelativeRadians);
     }
 
@@ -128,11 +128,21 @@ public class TurretSubsystem extends SubsystemBase {
         if (range <= 0.0) {
             return minTurretAngleRadians;
         }
-        double wrapped = desiredRelativeRadians % range;
-        if (wrapped < 0.0) {
-            wrapped += range;
+
+        double normalizedDesired = MathUtil.inputModulus(desiredRelativeRadians, 0.0, 2.0 * Math.PI);
+        double normalizedMin = MathUtil.inputModulus(minTurretAngleRadians, 0.0, 2.0 * Math.PI);
+        double normalizedMax = MathUtil.inputModulus(maxTurretAngleRadians, 0.0, 2.0 * Math.PI);
+
+        boolean inRange = normalizedMin <= normalizedMax
+                ? normalizedDesired >= normalizedMin && normalizedDesired <= normalizedMax
+                : normalizedDesired >= normalizedMin || normalizedDesired <= normalizedMax;
+        if (inRange) {
+            return normalizedDesired;
         }
-        return wrapped + minTurretAngleRadians;
+
+        double distanceToMin = Math.abs(MathUtil.angleModulus(normalizedDesired - normalizedMin));
+        double distanceToMax = Math.abs(MathUtil.angleModulus(normalizedDesired - normalizedMax));
+        return distanceToMin <= distanceToMax ? normalizedMin : normalizedMax;
     }
 
     private Translation2d getDefaultAimTarget() {
@@ -146,7 +156,7 @@ public class TurretSubsystem extends SubsystemBase {
             return shooterAimer.getHubPositionFromAlliance();
         }
 
-        boolean isLeftSide = robotPose.getX() < Constants.FIELD_LENGTH / 2.0;
+    boolean isLeftSide = robotPose.getY() <= Constants.FIELD_WIDTH / 2.0;
         if (alliance == Alliance.Blue) {
             return isLeftSide ? Constants.blueLeftShuttlePosition : Constants.blueRightShuttlePosition;
         }
