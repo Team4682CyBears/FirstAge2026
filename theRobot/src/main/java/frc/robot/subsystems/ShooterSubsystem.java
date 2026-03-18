@@ -22,6 +22,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.control.Constants;
 import frc.robot.control.HardwareConstants;
 
 /*
@@ -57,7 +58,12 @@ public class ShooterSubsystem extends SubsystemBase {
      * Run the motor at the target velocity in rpm
      */
     public void runRPM(double targetRPM) {
-        PIDController.setSetpoint(targetRPM, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
+        if (targetRPM != 0.0){
+            PIDController.setSetpoint(targetRPM + Math.copySign(Constants.SHOOTER_RPM_OFFSET, targetRPM), com.revrobotics.spark.SparkBase.ControlType.kVelocity);
+        }
+        else {
+            PIDController.setSetpoint(0.0, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
+        }
     }
 
     /*
@@ -93,11 +99,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
         // Derived values from testing on tardi
         LeadConfig.closedLoop
-                .p(.00027)
+                .p(.00025)
                 .i(0.0)
                 .d(0.001)
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .apply(new FeedForwardConfig().kS(.15).kV(.002)); // TODO: Calculate values for kS and kV
+                .apply(new FeedForwardConfig().kS(0.065).kV(.00172));
 
         REVLibError error = LeadMotor.configure(LeadConfig, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);

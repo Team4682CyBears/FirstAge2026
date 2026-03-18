@@ -2,42 +2,52 @@
 // Bishop Blanchet Robotics
 // Home of the Cybears
 // FRC - Rebuilt - 2026
-// File: KickerCommand.java
-// Intent: command to set kicker speed
+// File: KickerSpindexerCommand.java
+// Intent: command to run kicker and spindexer together
 // ************************************************************
 
 // ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
 
 package frc.robot.commands;
 
+import frc.robot.control.Constants;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.KickerSubsystem;
-import frc.robot.control.Constants;
+import frc.robot.subsystems.SpindexerSpinner;
 
 /**
- * Command to set the kicker speed.
+ * Command to run the kicker and spindexer together.
  */
-public class KickerCommand extends Command {
+public class KickerSpindexerCommand extends Command {
     private final KickerSubsystem kickerSubsystem;
+    private final SpindexerSpinner spindexerSpinner;
 
     /**
-     * Constructs a new KickerCommand.
+     * Constructs a new KickerSpindexerCommand.
+     *
      * @param kickerSubsystem
+     * @param spindexerSpinner
+     * @param kickSpeedSupplier
      */
-    public KickerCommand(KickerSubsystem kickerSubsystem) {
+    public KickerSpindexerCommand(
+            KickerSubsystem kickerSubsystem,
+            SpindexerSpinner spindexerSpinner) {
         this.kickerSubsystem = kickerSubsystem;
-        addRequirements(kickerSubsystem);
+        this.spindexerSpinner = spindexerSpinner;
+        addRequirements(kickerSubsystem, spindexerSpinner);
     }
 
     @Override
     public void initialize() {
-        this.kickerSubsystem.runRPM(Constants.KICKER_RPM);
+        kickerSubsystem.runRPM(Constants.KICKER_RPM);
+        spindexerSpinner.runRPMContinus();
     }
 
     @Override
     public void end(boolean interrupted) {
-        this.kickerSubsystem.stop();
+        kickerSubsystem.stop();
+        spindexerSpinner.stop();
     }
 
     @Override

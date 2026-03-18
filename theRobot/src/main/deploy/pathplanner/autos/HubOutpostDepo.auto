@@ -15,17 +15,11 @@
           "data": {
             "pathName": "OutpostToDepot"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "DepotToTopClimb"
-          }
         }
       ]
     }
   },
-  "resetOdom": true,
+  "resetOdom": false,
   "folder": null,
   "choreoAuto": false
 }

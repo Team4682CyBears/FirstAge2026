@@ -29,7 +29,7 @@ public class InstalledHardware {
 
     // External Input Hardware
     public static final boolean driverXboxControllerInstalled = true;
-    public static final boolean coDriverXboxControllerInstalled = false;
+    public static final boolean coDriverXboxControllerInstalled = true;
 
     // DriveTrain Related Hardware
     public static final boolean drivetrainInstalled = true;
@@ -40,8 +40,17 @@ public class InstalledHardware {
     public static final boolean hoodMotorInstalled = true;
     public static final boolean hoodEncoderInstalled = true;
 
+    // Spindexer
+    public static final boolean spindexerInstalled = true;
+    public static final boolean spindexerSensorInstalled = false;
+    
     // Kicker
     public static final boolean kickerInstalled = true;
+
+    // Intake wrist encoder
+    public static final boolean intakeWristEncoderInstalled = true;
+    public static final boolean intakeWristMotorInstalled = true;
+    public static final boolean intakeRollerInstalled = true;
 
     // TOF Sensor Hardware
     // Important! You must disable any TOF sensor that is not installed!!

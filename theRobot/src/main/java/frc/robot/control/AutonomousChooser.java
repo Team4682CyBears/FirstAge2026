@@ -27,12 +27,11 @@ import frc.robot.commands.*;
 public class AutonomousChooser {
     private final SendableChooser<AutonomousPath> autonomousPathChooser = new SendableChooser<>();
     private Command DoNothing;
-    private Command HubOutpostDepoClimb;
-    private Command BotWingClimb;
-    private Command BotLoopClimb;
-    private Command TopWingClimb;
-    private Command TopLoopClimb;
-    
+    private Command JustShoot;
+    private Command BotWingPoo;
+    private Command TopWingPoo;
+    private Command HubOutpostDepo;
+
     /**
      * Constructor for AutonomousChooser
      * 
@@ -43,23 +42,21 @@ public class AutonomousChooser {
         // here
         if (subsystems.isDriveTrainPowerSubsystemAvailable()) {
             autonomousPathChooser.setDefaultOption("Do Nothing", AutonomousPath.DONOTHING);
-            autonomousPathChooser.addOption("HubOutpostDepoClimb", AutonomousPath.HUBOUTPOSTDEPOCLIMB);
-            autonomousPathChooser.addOption("Bot Wing", AutonomousPath.BOTWINGCLIMB);
-            autonomousPathChooser.addOption("Bot Loop", AutonomousPath.BOTLOOPCLIMB);
-            autonomousPathChooser.addOption("Top Wing", AutonomousPath.TOPWINGCLIMB);
-            autonomousPathChooser.addOption("Top Loop", AutonomousPath.TOPLOOPCLIMB);
+            autonomousPathChooser.addOption("Just Shoot", AutonomousPath.JUSTSHOOT);
+            autonomousPathChooser.addOption("Bot Poo", AutonomousPath.BOTWINGPOO);
+            autonomousPathChooser.addOption("Top Poo", AutonomousPath.TOPWINGPOO);
+            autonomousPathChooser.addOption("Hub Outpost Depo", AutonomousPath.HUBOUTPOSTDEPO);
             SmartDashboard.putData(autonomousPathChooser);
 
             this.DoNothing = getDoNothing();
-            this.HubOutpostDepoClimb = getHubOutpostDepoClimb();
-            this.BotWingClimb = getBotWingClimb();
-            this.BotLoopClimb = getBotLoopClimb();
-            this.TopWingClimb = getTopWingClimb();
-            this.TopLoopClimb = getTopLoopClimb();
+            this.JustShoot = getJustShoot(subsystems);
+            this.BotWingPoo = getBotWingPoo();
+            this.TopWingPoo = getTopWingPoo();
+            this.HubOutpostDepo = getHubOutpostDepo();
         } else {
             DataLogManager.log(">>>>> NO auto routine becuase missing subsystems");
         }
-    }   
+    }
 
     /**
      * returns the path planner auto to be used in auto period
@@ -70,16 +67,14 @@ public class AutonomousChooser {
         switch (autonomousPathChooser.getSelected()) {
             case DONOTHING:
                 return this.DoNothing;
-            case HUBOUTPOSTDEPOCLIMB:
-                return this.HubOutpostDepoClimb;
-            case BOTWINGCLIMB:
-                return this.BotWingClimb;
-            case BOTLOOPCLIMB:
-                return this.BotLoopClimb;
-            case TOPWINGCLIMB:
-                return this.TopWingClimb;
-            case TOPLOOPCLIMB:
-                return this.TopLoopClimb;
+            case JUSTSHOOT:
+                return this.JustShoot;
+            case BOTWINGPOO:
+                return this.BotWingPoo;
+            case TOPWINGPOO:
+                return this.TopWingPoo;
+            case HUBOUTPOSTDEPO:
+                return this.HubOutpostDepo;
         }
         return new InstantCommand();
     }
@@ -94,24 +89,32 @@ public class AutonomousChooser {
                 getAutoPath());
     }
 
-    private Command getHubOutpostDepoClimb() {
-        return AutoBuilder.buildAuto("HubOutpostDepoClimb");
-    }
-    
-    private Command getBotWingClimb() {
-        return AutoBuilder.buildAuto("BotWingClimb");
+    private Command getJustShoot(SubsystemCollection subsystems) {
+        if (InstalledHardware.shooterInstalled && InstalledHardware.hoodMotorInstalled && InstalledHardware.hoodEncoderInstalled) {
+            Command aim = new ShooterManualCommand(
+                    subsystems).withTimeout(5.0);
+            Command shoot = new SequentialCommandGroup(
+                    new WaitCommand(0.7),
+                    new KickerSpindexerCommand(
+                            subsystems.getKickerSubsystem(),
+                            subsystems.getSpindexerSpinnerSubsystem())
+                            .withTimeout(5.0));
+            return new ParallelCommandGroup(aim, shoot);
+        } else {
+            return new InstantCommand();
+        }
     }
 
-    private Command getBotLoopClimb() {
-        return AutoBuilder.buildAuto("BotLoopClimb");
+    private Command getBotWingPoo() {
+        return AutoBuilder.buildAuto("BotWingPoo");
     }
 
-    private Command getTopWingClimb() {
-        return AutoBuilder.buildAuto("TopWingClimb");
+    private Command getTopWingPoo() {
+        return AutoBuilder.buildAuto("TopWingPoo");
     }
 
-    private Command getTopLoopClimb() {
-        return AutoBuilder.buildAuto("TopLoopClimb");
+    private Command getHubOutpostDepo() {
+        return AutoBuilder.buildAuto("HubOutpostDepo");
     }
 
     private Command getDoNothing() {
@@ -119,11 +122,10 @@ public class AutonomousChooser {
     }
 
     private enum AutonomousPath {
-        HUBOUTPOSTDEPOCLIMB,
-        BOTWINGCLIMB,
-        BOTLOOPCLIMB,
-        TOPWINGCLIMB,
-        TOPLOOPCLIMB,
+        JUSTSHOOT,
+        BOTWINGPOO,
+        TOPWINGPOO,
+        HUBOUTPOSTDEPO,
         DONOTHING,
     }
 
@@ -137,29 +139,51 @@ public class AutonomousChooser {
         AutoBuilder.configure(
                 subsystems.getDriveTrainSubsystem()::getRobotPosition, // Pose supplier
                 subsystems.getDriveTrainSubsystem()::setRobotPosition, // Position setter
-                subsystems.getDriveTrainSubsystem()::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-                (speeds, feedforwards) -> subsystems.getDriveTrainSubsystem().driveRobotCentric(speeds), 
+                subsystems.getDriveTrainSubsystem()::getChassisSpeedsRobotCentric, // ChassisSpeeds supplier. MUST BE
+                                                                                   // ROBOT RELATIVE
+                (speeds, feedforwards) -> subsystems.getDriveTrainSubsystem().driveRobotCentric(speeds),
                 Constants.pathFollower,
                 subsystems.getDriveTrainSubsystem().getPathPlannerConfig(),
                 () -> getShouldMirrorPath(),
                 subsystems.getDriveTrainSubsystem());
 
         // Register named commands
-        if (subsystems.isDriveTrainPowerSubsystemAvailable()) {
-            NamedCommands.registerCommand("StartAiming", 
-                new InstantCommand(() -> {
-                    subsystems.getDriveTrainSubsystem().setSwerveYawMode(SwerveYawMode.AUTO);
-                    com.pathplanner.lib.controllers.PPHolonomicDriveController.overrideRotationFeedback(
-                        () -> subsystems.getDriveTrainSubsystem().getAutoYawVelocityRadiansPerSecond()
-                    );
-                }));
+        if (subsystems.isDriveTrainSubsystemAvailable()
+                && subsystems.isDriveTrainPowerSubsystemAvailable()
+                && subsystems.isHoodSubsystemAvailable()
+                && subsystems.isShooterSubsystemAvailable()) {
 
-            NamedCommands.registerCommand("StopAiming", 
-                new InstantCommand(() -> {
-                    subsystems.getDriveTrainSubsystem().setSwerveYawMode(SwerveYawMode.JOYSTICK); 
-                    com.pathplanner.lib.controllers.PPHolonomicDriveController.clearRotationFeedbackOverride();
-                }));
+            NamedCommands.registerCommand(
+                    "AutoAimOn",
+                    new AutoAimMovingCommand(
+                            subsystems,
+                            subsystems.getDriveTrainSubsystem().getShooterAimer()).withTimeout(5.0));
         }
+
+        if (subsystems.isSpinnerSpindexerSubsystemAvaible()
+                && subsystems.isKickerSubsystemAvailable()) {
+            NamedCommands.registerCommand(
+                    "SpindexerKickerOn",
+                    new KickerSpindexerAgitateCommand(
+                            subsystems.getKickerSubsystem(),
+                            subsystems.getSpindexerSpinnerSubsystem(),
+                            subsystems.getIntakeWristSubsystem()).withTimeout(4.8));
+        }
+
+        if (subsystems.isIntakeWristSubsystemAvailable()
+                && subsystems.isIntakeRollerSubsystemAvailable()) {
+            NamedCommands.registerCommand(
+                    "IntakeToggle",
+                    new ToggleIntakeDeployCommand(
+                            subsystems.getIntakeWristSubsystem(),
+                            subsystems.getIntakeRollerSubsystem()));
+        }
+
+        if (subsystems.isShooterSubsystemAvailable()) {
+            NamedCommands.registerCommand("RevShooter",
+                    new ShootCommand(subsystems.getShooterSubsystem(), () -> 3000.0));
+        }
+
     }
 
     public static boolean getShouldMirrorPath() {

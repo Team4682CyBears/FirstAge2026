@@ -2,8 +2,8 @@
 // Bishop Blanchet Robotics
 // Home of the Cybears
 // FRC - Rebuilt - 2026
-// File: KickerSubsystem.java
-// Intent: Run two krakens to kick the ball into the shooter
+// File: IntakeRoller.jave
+// Intent: Moves balls into the intake
 // ************************************************************
 
 // ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
@@ -23,64 +23,29 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
 
 /* 
- * Runs the kicker which kicks the ball into the shooter consistiently
+ * Runs the Intake which intakes the ball into the robot
  */
-public class KickerSubsystem extends SubsystemBase {
-
-    private TalonFX kickerTalonFX;
-
-    private final VelocityVoltage motorController = new VelocityVoltage(0.0);
-
+public class IntakeRollerSubsystem extends SubsystemBase {
+    private TalonFX intakeTalonFX;
+    private final VelocityVoltage leaderController = new VelocityVoltage(0.0);
     private double targetRPS = 0.0;
-    private boolean running = false;
 
-    // Found based on experimentation on BearBones kicker V1
-    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.1199563795).withKV(0.1090512541).withKP(0.52)
+    private Slot0Configs slot0Configs = new Slot0Configs().withKS(0.09009009009).withKV(0.4504504505).withKP(0.4)
             .withKD(0.0);
 
     /*
-     * Initialize the kicker and configure the motor
+     * Initialize the intake roller and configure the motor
      */
-    public KickerSubsystem(int kickerTalonCanID) {
-        this.kickerTalonFX = new TalonFX(kickerTalonCanID);
+    public IntakeRollerSubsystem(int motorCanID) {
+        intakeTalonFX = new TalonFX(motorCanID);
         configureMotor();
-    }
-
-    /*
-     * Sets the target rpm
-     */
-    public void runRPM(double rpm) {
-        this.targetRPS = rpmToRPS(rpm);
-        this.running = true;
-    }
-
-    private double rpmToRPS(double rpm) {
-        return rpm / 60.0;
     }
 
     /*
      * Get the rpm from the lead motor
      */
     public double getRPM() {
-        return kickerTalonFX.getVelocity().getValueAsDouble() * 60 / Constants.kickerMotorGearRatio;
-    }
-
-    /*
-     * Stop both motors and set the targetRPS to 0
-     */
-    public void stop() {
-        kickerTalonFX.stopMotor();
-        targetRPS = 0.0;
-        running = false;
-    }
-
-    /**
-     * Returns true if the kicker has been commanded to run.
-     *
-     * @return true when running
-     */
-    public boolean isRunning() {
-        return running;
+        return intakeTalonFX.getVelocity().getValueAsDouble() * 60;
     }
 
     /*
@@ -88,15 +53,25 @@ public class KickerSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        if (targetRPS == 0.0) {
-            return;
-        }
-        motorController.withVelocity(targetRPS * Constants.kickerMotorGearRatio);
-        kickerTalonFX.setControl(motorController);
-        SmartDashboard.putNumber("Kicker Real RPM", getRPM());
+        leaderController.withVelocity(targetRPS);
+        intakeTalonFX.setControl(leaderController);
+        SmartDashboard.putNumber("Intake Real RPM", getRPM());
     }
 
-    
+    /*
+     * Sets the target rpm
+     */
+    public void runRPM(double rpm) {
+        this.targetRPS = rpmToRPS(rpm);
+    }
+
+    /*
+     * Stop motor and set the targetRPS to 0
+     */
+    public void stop() {
+        targetRPS = 0.0;
+        intakeTalonFX.stopMotor();
+    }
 
     /*
      * configures motor
@@ -122,12 +97,16 @@ public class KickerSubsystem extends SubsystemBase {
         // motor direction
         talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        StatusCode response = kickerTalonFX.getConfigurator().apply(talonMotorConfig);
+        StatusCode response = intakeTalonFX.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {
             System.out.println(
-                    "TalonFX ID " + kickerTalonFX.getDeviceID() + " failed config with error "
+                    "TalonFX ID " + intakeTalonFX.getDeviceID() + " failed config with error "
                             + response.toString());
         }
-
     }
+
+    private double rpmToRPS(double rpm) {
+        return rpm / 60.0;
+    }
+
 }

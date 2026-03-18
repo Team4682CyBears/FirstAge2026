@@ -23,10 +23,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.common.VisionMeasurement;
+import frc.robot.control.CameraMode;
 import frc.robot.control.Constants;
 import frc.robot.generated.LimelightHelpers;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.common.DistanceMeasurement;
 
 /**
@@ -38,21 +37,10 @@ public class CameraSubsystem extends SubsystemBase {
    * Set the internal botPoseSource (NT entry name) based on DriverStation alliance.
    * This mirrors the commented-out logic previously in RobotContainer.
    */
-  public void setBotPoseSource() {
-    DriverStation.getAlliance().ifPresent(alliance -> {
-      if (alliance == Alliance.Red) {
-        botPoseSource = "botpose_wpired";
-      } else if (alliance == Alliance.Blue) {
-        botPoseSource = "botpose_wpiblue";
-      } else {
-        botPoseSource = "botpose";
-      }
-    });
-  }
+
   private final int noTagInSightId = -1;
-  // we use this for teleop vision udpates with an origin in the bottom left blue
-  // side
-  private String botPoseSource = "botpose_wpiblue";
+  private static final int MIN_FIDUCIALS_FOR_VISION = 1;
+
   private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
   private final ArrayList<Double> recentVisionYaws = new ArrayList<Double>();
@@ -61,6 +49,8 @@ public class CameraSubsystem extends SubsystemBase {
   private double lastMaxFiducialAmbiguity = 0.0;
   private double lastHeartbeat = -1.0;
 
+  private CameraMode cameraMode = CameraMode.TRACKING;
+
   /**
    * a constructor for the camera subsystem class
    */
@@ -68,22 +58,17 @@ public class CameraSubsystem extends SubsystemBase {
   }
 
   /**
-   * a method that returns a vision measurement.
+   * a method that returns the MT1 vision measurement.
    * pose portion of the vision measurement is null if there is no valid
    * measurement.
    * 
-   * @return a vision measurement of the bot pose in field space
+   * @return a vision measurement of the MT1 bot pose in field space
    */
-  public VisionMeasurement getVisionBotPose() {
+  public VisionMeasurement getVisionBotPoseMT1() {
     // Use LimelightHelpers to get a PoseEstimate (includes timestamp + latency handling)
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
-    LimelightHelpers.PoseEstimate pe;
-    // Select helper based on alliance so we read the correct wpi entry
-    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-      pe = LimelightHelpers.getBotPoseEstimate_wpiRed("limelight");
-    } else {
-      pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-    }
+    // As of 2024, we only use wpiblue
+    LimelightHelpers.PoseEstimate pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
     if (pe != null && pe.pose != null) {
       // LimelightHelpers timestampSeconds is server-time (seconds since epoch), convert to FPGA time reference
       double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
@@ -92,14 +77,17 @@ public class CameraSubsystem extends SubsystemBase {
     return visionMeasurement;
   }
 
-  public VisionMeasurement getVisionBotPoseOrb() {
+  /**
+   * A method that returns the MT2 vision measurement
+   * pose position of the vision measurement is null if there is no valid 
+   * measurement.
+   * 
+   * @return a vision measurement of the MT2 bot pose in field space
+   */
+  public VisionMeasurement getVisionBotPoseMT2() {
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
-    LimelightHelpers.PoseEstimate pe;
-    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
-      pe = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2("limelight");
-    } else {
-      pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-    }
+    // As of 2024, we only use wpiblue
+    LimelightHelpers.PoseEstimate pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
     if (pe != null && pe.pose != null) {
       double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
       visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
@@ -110,22 +98,41 @@ public class CameraSubsystem extends SubsystemBase {
   /**
    * Returns the latest vision measurement only when a new limelight frame is
    * available. Also refreshes fiducial diagnostics and recent yaw history.
+   * Intended to be called by drivetrainSubsystem every periodic
    *
    * @param gyroRotation Current robot field rotation for limelight orientation
    * @return latest VisionMeasurement or null if no new frame was detected
    */
   public VisionMeasurement getLatestVisionMeasurement(Rotation2d gyroRotation) {
+    // if there isn't a new measurement, don't update anything
     double heartbeat = LimelightHelpers.getHeartbeat("limelight");
     if (heartbeat == lastHeartbeat) {
       return null;
     }
     lastHeartbeat = heartbeat;
-
-    LimelightHelpers.SetRobotOrientation("limelight", gyroRotation.getDegrees(), 0, 0, 0, 0, 0);
-    VisionMeasurement visionMeasurement = getVisionBotPoseOrb();
     updateFiducialDiagnostics();
-    updateRecentVisionYaws(visionMeasurement);
-    return visionMeasurement;
+
+    if (cameraMode == CameraMode.SEEDING) {
+      // use MT1 for yaws
+      updateRecentVisionYaws(getVisionBotPoseMT1());
+      // seed measurement uses MT2 position and recent Yaws (averaged from MT1)
+      VisionMeasurement seedMeasurement = getSeedPoseFromVision();
+      if (seedMeasurement != null && seedMeasurement.getRobotPosition() != null) {
+        updateCameraIMU(seedMeasurement.getRobotPosition().getRotation());
+      }
+      return seedMeasurement;
+    } 
+    else { // TRACKING MODE
+      // use pigeon yaw for camera IMU
+      updateCameraIMU(gyroRotation);
+      // use MT2
+      VisionMeasurement visionMeasurement = getVisionBotPoseMT2();
+      return visionMeasurement;
+    }
+  }
+
+  public CameraMode getMode() {
+    return cameraMode;
   }
 
   /**
@@ -133,49 +140,21 @@ public class CameraSubsystem extends SubsystemBase {
    *
    * @return combined pose with median vision yaw, or null if unavailable
    */
-  public Pose2d getSeedPoseFromVision() {
+  private VisionMeasurement getSeedPoseFromVision() {
     if (recentVisionYaws.isEmpty()) {
       return null;
     }
 
     double medianYaw = getMedianOfList(recentVisionYaws);
-    LimelightHelpers.SetRobotOrientation("limelight", medianYaw, 0, 0, 0, 0, 0);
-    Pose2d visionPose = getVisionBotPoseOrb().getRobotPosition();
-    if (visionPose == null) {
+    VisionMeasurement MT2 = getVisionBotPoseMT2();
+    Pose2d MT2pose = MT2.getRobotPosition();
+    double MT2timestamp = MT2.getTimestamp();
+    if (MT2pose == null) {
       return null;
     }
-    return new Pose2d(visionPose.getTranslation(), Rotation2d.fromDegrees(medianYaw));
+    return new VisionMeasurement(new Pose2d(MT2pose.getTranslation(), Rotation2d.fromDegrees(medianYaw)),
+    MT2timestamp);
   }
-
-  /**
-   * a method that gets botPoseSource
-   * 
-   * @return which limelight datatable we are using
-   */
-  public String getBotPoseSource() {
-    return botPoseSource;
-  }
-
-  /**
-   * a method that sets which limelight data table we should be using
-   * based on the alliance spit out from driver station
-   * https://docs.limelightvision.io/docs/docs-limelight/apis/complete-networktables-api#apriltag-and-3d-data
-   */
-  /*
-   * public void setBotPoseSource(){
-   * var alliance = DriverStation.getAlliance();
-   * if(alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red){
-   * botPoseSource = "botpose_wpired";
-   * }
-   * else if(alliance.isPresent() && alliance.get() ==
-   * DriverStation.Alliance.Blue){
-   * botPoseSource = "botpose_wpiblue";
-   * }
-   * else{
-   * botPoseSource = "botpose";
-   * }
-   * }
-   */
 
   /**
    * a method that returns the tag id of the current viewed tag
@@ -224,6 +203,13 @@ public class CameraSubsystem extends SubsystemBase {
     }
   }
 
+  public boolean isVisionQualityGood() {
+    int fiducialCount = getLastFiducialCount();
+    double maxAmbiguity = getLastMaxFiducialAmbiguity();
+    return (fiducialCount >= MIN_FIDUCIALS_FOR_VISION
+        && maxAmbiguity <= Constants.TAG_AMBIGUITY_THRESHOLD);
+  }
+
   private void updateFiducialDiagnostics() {
     LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials("limelight");
     lastFiducialCount = rawFiducials == null ? 0 : rawFiducials.length;
@@ -237,6 +223,14 @@ public class CameraSubsystem extends SubsystemBase {
         recentVisionYaws.remove(0);
       }
     }
+  }
+
+  private void updateCameraIMU(Rotation2d yaw){
+    LimelightHelpers.SetRobotOrientation("limelight", yaw.getDegrees(), 0, 0, 0, 0, 0);
+  }
+
+  public void clearRecentVisionYaws(){
+    recentVisionYaws.clear();
   }
 
   /**
@@ -290,6 +284,24 @@ public class CameraSubsystem extends SubsystemBase {
     return LimelightHelpers.toPose2D(botpose);
   }
 
+  public void setMode(CameraMode newMode) {
+    if (cameraMode == newMode){
+            // already in this mode
+            return;
+    } 
+    // going to SEEDING 
+    if (newMode == CameraMode.SEEDING) {
+      LimelightHelpers.SetIMUMode("limelight", 1); // set limelight IMU to seeding mode
+      clearRecentVisionYaws();
+    } 
+    // going to TRACKING
+    else if (newMode == CameraMode.TRACKING) {
+      LimelightHelpers.SetIMUMode("limelight", 4);
+      LimelightHelpers.SetIMUAssistAlpha("limelight", Constants.IMUassistAlpha);
+    } 
+    this.cameraMode = newMode;
+  }
+
   /**
    * Translates the given Limelight pose to the WPI Blue coordinate system.
    *
@@ -310,6 +322,6 @@ public class CameraSubsystem extends SubsystemBase {
    */
   @Override
   public void periodic() {
-    setBotPoseSource();
+    // nothing in here. drivetrainSubsystem should call getLatestVisionMeasurement in its periodic
   }
 }

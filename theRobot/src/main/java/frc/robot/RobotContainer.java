@@ -20,6 +20,8 @@ import frc.robot.control.ManualInputInterfaces;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
+import frc.robot.subsystems.IntakeRollerSubsystem;
+import frc.robot.subsystems.IntakeWristSubsystem;
 import frc.robot.control.AutonomousChooser;
 import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
@@ -54,6 +56,9 @@ public class RobotContainer {
     // init the kicker subsystem
     this.initializeKickerSubsystem();
 
+    // init the spindexer subsystem
+    this.initializeSpindexerSubsystem();
+    
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
 
@@ -63,6 +68,9 @@ public class RobotContainer {
     // init the shot logger (after drivetrain, shooter and hood are initialized)
     // Disabled for now
     // this.initializeShotLogger();
+
+    // init the intake subsystems (wrist + roller)
+    this.initializeIntakeSubsystems();
 
     // init the input system
     this.initializeManualInputInterfaces();
@@ -235,6 +243,43 @@ public class RobotContainer {
       System.out.println("SUCCESS: initializeKicker");
     } else {
       System.out.println("FAIL: initializeKicker");
+    }
+  }
+
+    /**
+   * A method to init the spindexer subsystem
+   */
+  private void initializeSpindexerSubsystem() {
+    if (InstalledHardware.spindexerInstalled) {
+      subsystems.setSpindexerSpinnerSubsystem(
+          new SpindexerSpinner(Constants.spindexerTalonFXCanID, Constants.spindexerSensorLaserCanID));
+      System.out.println("SUCCESS: initializeSpindexer");
+    } else {
+      System.out.println("FAIL: initializeSpindexer");
+    }
+  }
+
+  /**
+   * A method to init the intake subsystems (wrist + roller)
+   */
+  private void initializeIntakeSubsystems() {
+    try {
+      if (InstalledHardware.intakeWristMotorInstalled || InstalledHardware.intakeWristEncoderInstalled) {
+        subsystems.setIntakeWristSubsystem(
+            new IntakeWristSubsystem(Constants.intakeWristMotorCanID, Constants.intakeWristEncoderCanID));
+        DataLogManager.log("SUCCESS: initializeIntakeWristSubsystem");
+      } else {
+        DataLogManager.log("FAIL: initializeIntakeWristSubsystem");
+      }
+
+      if (InstalledHardware.intakeRollerInstalled) {
+        subsystems.setIntakeRollerSubsystem(new IntakeRollerSubsystem(Constants.intakeRollerCanId));
+        DataLogManager.log("SUCCESS: initializeIntakeRollerSubsystem");
+      } else {
+        DataLogManager.log("FAIL: initializeIntakeRollerSubsystem");
+      }
+    } catch (Exception ex) {
+      DataLogManager.log("FAIL: initializeIntakeSubsystems - " + ex.toString());
     }
   }
 

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.0733897643008479,
-        "y": 5.975465969279661
+        "x": 2.493756708407871,
+        "y": 1.21479427549195
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.5010612670164254,
-        "y": 5.6108572458460975
+        "x": 3.3050268336314845,
+        "y": 0.792933810375671
       },
       "isLocked": false,
-      "linkedName": "Depot"
+      "linkedName": "InABit"
     },
     {
       "anchor": {
-        "x": 1.4967622974537043,
-        "y": 3.975228804976852
+        "x": 3.596627387152778,
+        "y": 0.5571825086805553
       },
       "prevControl": {
-        "x": 1.9866506442241643,
-        "y": 4.289071476373794
+        "x": 3.110322003577817,
+        "y": 0.825384615384616
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "TopClimb"
+      "linkedName": "BotTrench"
     }
   ],
   "rotationTargets": [],
@@ -41,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": 0.0
+    "velocity": 2.0,
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

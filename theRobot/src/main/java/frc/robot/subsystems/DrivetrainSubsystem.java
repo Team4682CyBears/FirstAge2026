@@ -17,9 +17,9 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.config.RobotConfig;
 
+import frc.robot.control.CameraMode;
 import frc.robot.control.Constants;
 import frc.robot.control.InstalledHardware;
-import frc.robot.generated.LimelightHelpers;
 import frc.robot.generated.TardiTunerConstants;
 import frc.robot.generated.Telemetry;
 import frc.robot.control.SwerveDriveMode;
@@ -40,6 +40,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -51,8 +52,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private CameraSubsystem cameraSubsystem;
 
   private boolean useVision = true;
-
-  private boolean lessThanAMeter = false;
 
   private boolean displayOdometryDiagnostics = true;
 
@@ -87,8 +86,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private Matrix<N3, N1> visionStdDev = MatBuilder.fill(Nat.N3(), Nat.N1(), new double[] { 0.7, 0.7, 100 });
   private Matrix<N3, N1> odometryStdDev = MatBuilder.fill(Nat.N3(), Nat.N1(), new double[] { .1, .1, 0.01 });
 
-  private static final int MIN_FIDUCIALS_FOR_VISION = 1;
-
   private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
   private ChassisSpeeds previousChassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
   private double speedReductionFactor = 1.0;
@@ -96,8 +93,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private SwerveDriveMode swerveDriveMode = SwerveDriveMode.FIELD_CENTRIC_DRIVING;
 
   private SwerveYawMode swerveYawMode = SwerveYawMode.JOYSTICK;
-
-  private Translation2d shootingAimTarget = null;
 
   private SwerveDrivetrain<TalonFX, TalonFX, CANcoder> drivetrain = InstalledHardware.bareDrivetrainInstalled
       ? new BareTunerConstants.TunerSwerveDrivetrain(BareTunerConstants.DrivetrainConstants, 0,
@@ -122,16 +117,15 @@ public class DrivetrainSubsystem extends SubsystemBase {
   /* Keep track if we've ever applied the operator perspective before or not */
   private boolean m_hasAppliedOperatorPerspective = false;
 
+  private Pose2d simPosition = new Pose2d();
   /* Keep track if we are currently seeding the camera */
   private boolean isSeedingCamera = false;
-
-  private double autoYawVelocityRadiansPerSecond = 0.0;
 
   /**
    * Constructor for this DrivetrainSubsystem
    */
   public DrivetrainSubsystem(SubsystemCollection subsystems) {
-    if (InstalledHardware.limelightInstalled) {
+    if (subsystems.isCameraSubsystemAvailable()) {
       cameraSubsystem = subsystems.getCameraSubsystem();
     }
 
@@ -204,11 +198,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       this.previousChassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(previousChassisSpeeds, getGyroscopeRotation());
     }
     this.swerveDriveMode = SwerveDriveMode.FIELD_CENTRIC_SHOOTING;
-    ChassisSpeeds newChassisSpeeds = new ChassisSpeeds(
-        updatedChassisSpeeds.vxMetersPerSecond,
-        updatedChassisSpeeds.vyMetersPerSecond,
-        getAutoYawVelocityRadiansPerSecond());
-    this.chassisSpeeds = newChassisSpeeds;
+    this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(updatedChassisSpeeds);
   }
 
   /**
@@ -237,8 +227,25 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * 
    * @return chassis speeds
    */
-  public ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeedsRobotCentric() {
+    if (RobotBase.isSimulation()) {
+      if (swerveDriveMode == SwerveDriveMode.ROBOT_CENTRIC_DRIVING) {
+        return chassisSpeeds;
+      }
+      else {
+        return ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds, getGyroscopeRotation());
+      }
+    } 
     return drivetrain.getState().Speeds;
+  }
+
+  /**
+   * returns chassis speeds (field relative)
+   * 
+   * @return chassis speeds
+   */
+  public ChassisSpeeds getChassisSpeedsFieldCentric() {
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeedsRobotCentric(), getGyroscopeRotation());
   }
 
   /**
@@ -262,7 +269,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public void setUseVision(boolean shouldUseVision) {
     this.useVision = shouldUseVision;
   }
-
+  
   /**
    * Enable or disable the camera seeding mode.  When seeding is active the
    * drivetrain periodically forces the limelight into its "seeding" IMU mode
@@ -303,6 +310,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @return A Rotation2d that describes the current orentation of the robot.
    */
   public Rotation2d getGyroscopeRotation() {
+    if (RobotBase.isSimulation()) {
+      return simPosition.getRotation();
+    }
     return drivetrain.getState().Pose.getRotation();
   }
 
@@ -312,7 +322,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @return the current auto yaw velocity in radians per second.
    */
   public double getAutoYawVelocityRadiansPerSecond() {
-    return this.autoYawVelocityRadiansPerSecond;
+    return shooterAimer.getAutoYawVelocityRadiansPerSecond();
   }
 
   /**
@@ -322,20 +332,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
    */
   public Pose2d getRobotPosition() {
     return drivetrain.getState().Pose;
-  }
-
-  /**
-   * @param targetX meters
-   * @param targetY meters
-   * @return desired field relative Rotation2d for the robot to face the target
-   */
-  public Rotation2d getYawToFaceTarget(Translation2d targetTranslation) {
-    Pose2d botPos = getRobotPosition();
-    double dx = targetTranslation.getX() - botPos.getX();
-    double dy = targetTranslation.getY() - botPos.getY();
-
-    double angleRad = Math.atan2(dy, dx);
-    return Rotation2d.fromRadians(angleRad);
   }
 
   /**
@@ -374,7 +370,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * occurs during testing.
      */
     if (DriverStation.isDisabled() || isSeedingCamera) {
-      LimelightHelpers.SetIMUMode("limelight", 1); // set limelight IMU to seeding mode
+      updateVisionMeasurements(CameraMode.SEEDING);
 
       if (!m_hasAppliedOperatorPerspective) {
         DriverStation.getAlliance().ifPresent(allianceColor -> {
@@ -385,14 +381,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
           m_hasAppliedOperatorPerspective = true;
         });
       }
-      // When disabled countinually set the botpose to what the vision says
-      this.seedRobotPositionFromVision();
     } else {
-      LimelightHelpers.SetIMUMode("limelight", 4);
-      LimelightHelpers.SetIMUAssistAlpha("limelight", Constants.IMUassistAlpha);
+      updateVisionMeasurements(CameraMode.TRACKING);
     }
 
-    updateVisionMeasurements();
+    if (swerveYawMode == SwerveYawMode.AUTO) {
+      shooterAimer.calculate(); // update all the shooterAimer parameters
+      this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
+    }
 
     if (swerveDriveMode == SwerveDriveMode.IMMOVABLE_STANCE && chassisSpeedsAreZero()) {
       // only change to ImmovableStance if chassis is not moving.
@@ -405,8 +401,11 @@ public class DrivetrainSubsystem extends SubsystemBase {
       ChassisSpeeds reducedChassisSpeeds = new ChassisSpeeds(
           chassisSpeeds.vxMetersPerSecond * this.speedReductionFactor,
           chassisSpeeds.vyMetersPerSecond * this.speedReductionFactor,
-          // different speed reduction factor for rotation
-          chassisSpeeds.omegaRadiansPerSecond * Math.min(1.0, this.speedReductionFactor * 1.25));
+          chassisSpeeds.omegaRadiansPerSecond);
+
+      if (swerveYawMode == SwerveYawMode.AUTO) {
+        reducedChassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(reducedChassisSpeeds);
+      }
 
       // apply acceleration control
       // TODO should test this at practice feild
@@ -422,50 +421,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // do not apply acceleration limis or speed limits.
       // assumes this is used by a trajectory follower that already imposes those
       // constraints.
+      if (swerveYawMode == SwerveYawMode.AUTO) {
+        this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
+      }
       drivetrain.setControl(robotCentricDriveController
           .withVelocityX(chassisSpeeds.vxMetersPerSecond)
           .withVelocityY(chassisSpeeds.vyMetersPerSecond)
           .withRotationalRate(chassisSpeeds.omegaRadiansPerSecond));
     }
-    if (swerveYawMode == SwerveYawMode.AUTO) {
-      setAutoYawVelocityRadiansPerSecond();
-    }
 
     displayDiagnostics();
-  }
-
-  /**
-   * Set an aiming target (field-relative) for use while in AUTO yaw mode. Use
-   * null to clear.
-   *
-   * @param target field-relative translation for the aim target (meters). If
-   *               null the drivetrain will revert to the default hub position
-   *               behavior.
-   */
-  public void setShootingAimTarget(Translation2d target) {
-    this.shootingAimTarget = target;
-  }
-
-  /**
-   * Clear any manual shooting aim target so the drivetrain uses the default
-   * hub position.
-   */
-  public void clearShootingAimTarget() {
-    this.shootingAimTarget = null;
-  }
-
-  /**
-   * Compute and set the current auto yaw velocity (radians/sec) using the
-   * physical shooter offsets and shooter yaw offset from Constants. This
-   * centralizes the auto-yaw math so callers only need to invoke this method.
-   */
-  private void setAutoYawVelocityRadiansPerSecond() {
-    if (this.shooterAimer != null) {
-      this.autoYawVelocityRadiansPerSecond = shooterAimer.computeAutoYawVelocityRadiansPerSecond(shootingAimTarget);
-    } else {
-      // No aimer - clear auto yaw (drivetrain shouldn't attempt automatic yaw)
-      this.autoYawVelocityRadiansPerSecond = 0.0;
-    }
   }
 
   /**
@@ -474,6 +439,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @param updatedPosition - the new position of the robot
    */
   public void setRobotPosition(Pose2d updatedPosition) {
+    if (RobotBase.isSimulation()) {
+      this.simPosition = updatedPosition;
+    }
     drivetrain.resetPose(updatedPosition);
   }
 
@@ -520,26 +488,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   }
 
   /**
-   * Updates the robot's position based on vision data from the camera subsystem.
-   * Take the median of multiple vision-based yaws from botPose
-   * Seed that yaw into the camera.
-   * Read the botPoseOrb
-   * Use the combination of botPoseOrb translation with median rotation to set
-   * robot position
-   * this should only be called when robot is stationary (i.e. when disabled or
-   * otherwise not moving)
-   */
-  public void seedRobotPositionFromVision() {
-    if (cameraSubsystem == null) {
-      return;
-    }
-    Pose2d seededPose = cameraSubsystem.getSeedPoseFromVision();
-    if (seededPose != null) {
-      this.setRobotPosition(seededPose);
-    }
-  }
-
-  /**
    * A method that updates the robot position with a vision measurement
    * 
    * @param visionMeasurement the most recent vision measurement provided by
@@ -549,39 +497,37 @@ public class DrivetrainSubsystem extends SubsystemBase {
     // for now ignore all vision measurements that are null or contained robot
     // position is null
     if (visionMeasurement != null && useVision) {
-      int fiducialCount = cameraSubsystem != null ? cameraSubsystem.getLastFiducialCount() : 0;
-      double maxAmbiguity = cameraSubsystem != null ? cameraSubsystem.getLastMaxFiducialAmbiguity() : 0.0;
-      if (fiducialCount < MIN_FIDUCIALS_FOR_VISION
-          || maxAmbiguity > Constants.TAG_AMBIGUITY_THRESHOLD) {
+      if (!cameraSubsystem.isVisionQualityGood()) {
         return;
       }
       Pose2d visionComputedMeasurement = visionMeasurement.getRobotPosition();
       if (visionComputedMeasurement != null) {
         // we want to reject vision measurements that are more than 1 meter away in case
         // vison gives a bad read
-        lessThanAMeter = visionComputedMeasurement.getTranslation()
-            .getDistance(getRobotPosition().getTranslation()) <= 1;
-        if (lessThanAMeter) {
-          drivetrain.addVisionMeasurement(visionComputedMeasurement, visionMeasurement.getTimestamp());
-        }
+        drivetrain.addVisionMeasurement(visionComputedMeasurement, visionMeasurement.getTimestamp());
       }
     }
   }
 
-  private void updateVisionMeasurements() {
+  private void updateVisionMeasurements(CameraMode cameraMode) {
     if (!InstalledHardware.limelightInstalled || cameraSubsystem == null) {
       return;
     }
-
-    VisionMeasurement visionMeasurement = cameraSubsystem.getLatestVisionMeasurement(getGyroscopeRotation());
-    if (visionMeasurement == null) {
-      return;
-    }
-
-    // Only add the measurement once when enabled. (Avoid double-calling
-    // addVisionMeasurement.)
-    if (DriverStation.isEnabled()) {
-      this.addVisionMeasurement(visionMeasurement);
+    if (cameraMode == CameraMode.SEEDING) {
+      cameraSubsystem.setMode(CameraMode.SEEDING);
+      // When disabled countinually set the botpose to what the vision says
+      VisionMeasurement seedMeasurement = cameraSubsystem.getLatestVisionMeasurement(getGyroscopeRotation());
+      if (seedMeasurement != null && seedMeasurement.getRobotPosition() != null) {
+        this.setRobotPosition(seedMeasurement.getRobotPosition());
+      }
+    } 
+    else {
+      cameraSubsystem.setMode(CameraMode.TRACKING);
+      // When enabled, fuse the vision measurement with the odometry
+      VisionMeasurement visionMeasurement = cameraSubsystem.getLatestVisionMeasurement(getGyroscopeRotation());
+      if (visionMeasurement != null && visionMeasurement.getRobotPosition() != null) {
+        this.addVisionMeasurement(visionMeasurement);
+      }
     }
   }
 
@@ -672,14 +618,13 @@ public class DrivetrainSubsystem extends SubsystemBase {
   private void displayDiagnostics() {
     if (displayOdometryDiagnostics) {
       if (cameraSubsystem != null) {
-        VisionMeasurement visionBotPose = cameraSubsystem.getVisionBotPoseOrb();
+        VisionMeasurement visionBotPose = cameraSubsystem.getVisionBotPoseMT2();
         if (visionBotPose.getRobotPosition() != null) {
           SmartDashboard.putNumber("vision x", visionBotPose.getRobotPosition().getX());
           SmartDashboard.putNumber("vision y", visionBotPose.getRobotPosition().getY());
           SmartDashboard.putNumber("vision theta", visionBotPose.getRobotPosition().getRotation().getDegrees());
           SmartDashboard.putNumber("vision timestamp", visionBotPose.getTimestamp());
           SmartDashboard.putNumber("robot timestamp", Timer.getFPGATimestamp());
-          SmartDashboard.putBoolean("VisionWithinAMeter", lessThanAMeter);
         }
         SmartDashboard.putNumber("VisionFiducialCount", cameraSubsystem.getLastFiducialCount());
         SmartDashboard.putNumber("VisionMaxFiducialAmbiguity", cameraSubsystem.getLastMaxFiducialAmbiguity());
@@ -690,6 +635,9 @@ public class DrivetrainSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("RobotFieldYCoordinateMeters", drivetrain.getState().Pose.getY());
 
       SmartDashboard.putBoolean("UseVision", useVision);
+      if (swerveYawMode == SwerveYawMode.AUTO) {
+        SmartDashboard.putNumber("AutoYawVelocity", getAutoYawVelocityRadiansPerSecond());
+      }
     }
   }
 }

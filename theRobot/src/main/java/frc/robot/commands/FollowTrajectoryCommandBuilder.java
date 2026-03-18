@@ -50,7 +50,7 @@ public class FollowTrajectoryCommandBuilder {
                 new FollowPathCommand(
                         traj,
                         drivetrain::getRobotPosition, // Pose supplier
-                        drivetrain::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                        drivetrain::getChassisSpeedsRobotCentric, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                         (speeds, feedforwards) -> drivetrain.driveRobotCentric(speeds), // Method that will drive the
                                                                                         // robot given ROBOT RELATIVE
                                                                                         // ChassisSpeeds.
