@@ -51,11 +51,6 @@ public class AutoAimShuttlingCommand extends Command {
   }
 
   public void execute() {
-    // set to shuttle target
-    aimer.setDesiredTarget(getShuttleTarget());
-
-
-
     double ext = aimer.getHoodExtension();
     hood.setExtendoPosition(ext);
     double shooterRpm = aimer.getShooterRPM();
