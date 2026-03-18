@@ -50,14 +50,23 @@ public final class Constants {
     // Field Constants (These are in field-position, not FMAP coordinates)
 
     // Total field dimensions in meters
-   public static final double FIELD_LENGTH = 16.540988; // 651.22 inches
-   public static final double FIELD_WIDTH = 8.069326;   // 317.69 inches
+    public static final double FIELD_LENGTH_X = 16.540988; // 651.22 inches
+    public static final double FIELD_WIDTH_Y = 8.069326;   // 317.69 inches
 
-   // Blue Hub is 182.11 inches from the alliance wall
-   public static final Translation2d blueHubPosition = new Translation2d(4.625594, FIELD_WIDTH / 2.0);
+    // Blue Hub is 182.11 inches from the alliance wall
+    public static final Translation2d blueHubPosition = new Translation2d(4.625594, FIELD_WIDTH_Y / 2.0);
 
-   // Red Hub is mirrored (Field length - Blue X)
-   public static final Translation2d redHubPosition = new Translation2d(FIELD_LENGTH - blueHubPosition.getX(), FIELD_WIDTH / 2.0);
+    // Red Hub is mirrored (Field length - Blue X)
+    public static final Translation2d redHubPosition = new Translation2d(FIELD_LENGTH_X - blueHubPosition.getX(), FIELD_WIDTH_Y / 2.0);
+
+    // meters
+    public static final double shuttleOffsetFromWall = 1.5;
+
+    // left and right are relative to (0,0) facing other end of the field
+    public static final Translation2d blueLeftShuttlePosition = new Translation2d(shuttleOffsetFromWall, shuttleOffsetFromWall);
+    public static final Translation2d blueRightShuttlePosition = new Translation2d(shuttleOffsetFromWall, FIELD_WIDTH_Y - shuttleOffsetFromWall);
+    public static final Translation2d redLeftShuttlePosition = new Translation2d(FIELD_LENGTH_X - shuttleOffsetFromWall, shuttleOffsetFromWall);
+    public static final Translation2d redRightShuttlePosition = new Translation2d(FIELD_LENGTH_X - shuttleOffsetFromWall, FIELD_WIDTH_Y - shuttleOffsetFromWall);
 
     // *****************************************************************
     // Physical Shooter Offsets
@@ -65,7 +74,7 @@ public final class Constants {
     public static final double shooterYOffsetFromCenterOfRobot = -.1397; // in meters, positive is to the left
     public static final Translation2d shooterOffsetFromCenterOfRobot = new Translation2d(
             shooterXOffsetFromCenterOfRobot, shooterYOffsetFromCenterOfRobot);
-    public static final double shooterYawOffsetDegrees = 60.0; // in degrees
+    public static final Rotation2d shooterYawOffset = Rotation2d.fromDegrees(-60.0); 
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
     public static final double DegreesPerRevolution = 360.0;
@@ -129,7 +138,7 @@ public final class Constants {
 
     // ********************************************************************
     // Misc Constants
-    public static final double PROJECTILE_TIME_OF_FLIGHT_SECONDS = 1.43;
+    public static final double DEFAULT_PROJECTILE_TIME_OF_FLIGHT_SECONDS = 1.25;
 
     // ********************************************************************
     // CAN IDs
@@ -145,6 +154,7 @@ public final class Constants {
     public static final double SHOOTER_MAX_RPM = 6500.0;
     public static final double SHOOTER_PONDER_RPM = 1000.0;
     public static final double SHOOTER_CLOSE_RPM = 3000.0;
+    public static final double SHOOTER_RPM_OFFSET = 200;
 
     // ********************************************************************
     // Kicker Constants
@@ -166,11 +176,14 @@ public final class Constants {
     public static final double hoodMinPositionRotations = 0.0;
     public static final double hoodMaxPositionRotations = 0.635; 
 
+    public static final double HOOD_CLOSE_EXTENDO_POSITION = 0.12;
+
     /// Intake Constants
     public static final int intakeWristMotorCanID = 17;
     public static final int intakeWristEncoderCanID = 32;
 
-    public static final double intakeWristEncoderAbsoluteOffset = 0.61411; 
+    public static final double intakeWristEncoderAbsoluteOffset = -0.17789;
+
     public static final double intakeWristTolerance = 0.05;
     public static final double intakeWristStartingPositionRotations = 0.586;
     public static final double intakeWristDefensivePositionRotations = 0.511;

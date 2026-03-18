@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.common.IntakeDirection;
 import frc.robot.commands.*;
 
 public class ManualInputInterfaces {
@@ -37,6 +37,15 @@ public class ManualInputInterfaces {
      */
     public ManualInputInterfaces(SubsystemCollection currentCollection) {
         subsystemCollection = currentCollection;
+    }
+
+    /**
+     * A method to return the driver controller for rumble needs
+     * 
+     * @return
+     */
+    public final XboxController getDriverController() {
+        return driverControllerForRumbleOnly;
     }
 
     /**
@@ -211,22 +220,24 @@ public class ManualInputInterfaces {
                                     "driverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
 
-            this.driverController.y().whileTrue(new AutoAimMovingCommand(subsystemCollection,
-                    subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+        if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+            && this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()
+            && this.subsystemCollection.isHoodSubsystemAvailable()
+            && this.subsystemCollection.isShooterSubsystemAvailable()
+            && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
+        this.driverController.y().whileTrue(new AutoAimMovingCommand(subsystemCollection,
+            subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+        }
         }
 
-        if (InstalledHardware.kickerInstalled) {
-            this.driverController.rightBumper()
-                    .whileTrue(new KickerCommand(this.subsystemCollection.getKickerSubsystem()));
-        }
-
-        if (InstalledHardware.spindexerInstalled) {
+    if (this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()) {
             this.driverController.leftBumper().whileTrue(new SpindexerCommand(
                     this.subsystemCollection.getSpindexerSpinnerSubsystem(), false));
         }
 
-        if (InstalledHardware.kickerInstalled && InstalledHardware.spindexerInstalled
-                && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
+    if (this.subsystemCollection.isKickerSubsystemAvailable()
+        && this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()
+        && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
             this.driverController.rightTrigger().whileTrue(new KickerSpindexerAgitateCommand(
                     this.subsystemCollection.getKickerSubsystem(),
                     this.subsystemCollection.getSpindexerSpinnerSubsystem(),
@@ -240,6 +251,19 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getIntakeWristSubsystem(),
                     this.subsystemCollection.getIntakeRollerSubsystem()));
         }
+
+        if (this.subsystemCollection.isShooterSubsystemAvailable()
+                && this.subsystemCollection.isHoodSubsystemAvailable()) {
+            this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
+        }
+    if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+        && this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()
+        && this.subsystemCollection.isHoodSubsystemAvailable()
+        && this.subsystemCollection.isShooterSubsystemAvailable()
+        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
+        this.driverController.a().whileTrue(new AutoAimShuttlingCommand(subsystemCollection,
+            subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+    }
     }
 
     /**
@@ -258,42 +282,60 @@ public class ManualInputInterfaces {
             // POV up/down now only adjust the shooter aimer offset; RPM control
             // has been removed from the co-driver controller.
             this.coDriverController.povUp().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(0.0, 0.10);
+                            .applyTargetAdjustment(0.1, 0.0);
                 }
             }));
             this.coDriverController.povDown().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(0.0, -0.10);
+                            .applyTargetAdjustment(-0.1, 0.0);
                 }
             }));
             this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(-0.10, 0.0);
+                            .applyTargetAdjustment(0.10, -0.10);
                 }
             }));
             this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(0.10, 0.0);
+                            .applyTargetAdjustment(0.0, 0.1);
                 }
             }));
 
             this.coDriverController.start().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer().resetTargetAdjustment();
                 }
             }));
 
-            // if the left y stick has a magnitude greater than 0.1, run the command.
-            this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).whileTrue(new IntakeWristManualCommand(
-                    this.subsystemCollection.getIntakeWristSubsystem(), () -> this.coDriverController.getLeftY()));
-            // when y is pressed, toggle the intake roller manual command
-            this.coDriverController.y()
-                    .toggleOnTrue(new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem()));
+        if (this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
+        // if the left y stick has a magnitude greater than 0.1, run the command.
+        this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).and(this.coDriverController.b())
+            .whileTrue(new IntakeWristManualCommand(
+                this.subsystemCollection.getIntakeWristSubsystem(),
+                () -> -this.coDriverController.getLeftY()));
+        }
+
+        if (this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
+        // when y is pressed, toggle the intake roller manual command
+        this.coDriverController.y()
+            .toggleOnTrue(
+        new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(),
+            IntakeDirection.INTAKE));
+        this.coDriverController.a()
+            .toggleOnTrue(
+        new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(),
+            IntakeDirection.OUTTAKE));
+        }
         }
     }
 }

@@ -21,6 +21,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
+import frc.robot.control.InstalledHardware;
 import frc.robot.common.TofSensorLaser;
 
 /* 
@@ -54,7 +55,9 @@ public class SpindexerSpinner extends SubsystemBase {
      */
     public SpindexerSpinner(int motorCanID, int sensorCanID) {
         spindexerTalonFX = new TalonFX(motorCanID);
-        spindexerToF = new TofSensorLaser(sensorCanID, Constants.kickerBallDetectionRangeInches);
+        if (InstalledHardware.spindexerSensorInstalled){
+            spindexerToF = new TofSensorLaser(sensorCanID, Constants.kickerBallDetectionRangeInches);
+        }
         configureMotor();
     }
 
@@ -109,8 +112,8 @@ public class SpindexerSpinner extends SubsystemBase {
     public void periodic() {
         if (targetRPS == 0.0) {
             stop();
-        } else if (!continuousMode && spindexerToF.isDetected()) {
-            // stop the motor, but don't set target RPM to 0
+        } else if (InstalledHardware.spindexerSensorInstalled && !continuousMode && spindexerToF.isDetected()) {
+             // stop the motor, but don't set target RPM to 0
             spindexerTalonFX.stopMotor();
         } else {
             motorController.withVelocity(targetRPS * Constants.spindexerGearRatio);
@@ -118,7 +121,9 @@ public class SpindexerSpinner extends SubsystemBase {
         }
 
         SmartDashboard.putNumber("Spindexer Real RPM", getRPM());
-        spindexerToF.publishTelemetery();
+        if (InstalledHardware.spindexerSensorInstalled){
+            spindexerToF.publishTelemetery();
+        }
     }
 
     /*

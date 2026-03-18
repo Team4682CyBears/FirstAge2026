@@ -23,31 +23,27 @@ import frc.robot.subsystems.ShooterSubsystem;
 public class ShooterManualCommand extends Command {
     private ShooterSubsystem shooter;
     private HoodSubsystem hood;
-    private KickerSubsystem kicker;
     private DrivetrainSubsystem drivetrain;
 
     public ShooterManualCommand(SubsystemCollection subsystemCollection) {
         shooter = subsystemCollection.getShooterSubsystem();
         hood = subsystemCollection.getHoodSubsystem();
-        kicker = subsystemCollection.getKickerSubsystem();
         drivetrain = subsystemCollection.getDriveTrainSubsystem();
 
-        addRequirements(shooter, hood, kicker);
+        addRequirements(shooter, hood);
     }
 
 
     @Override
     public void execute() {
         shooter.runRPM(Constants.SHOOTER_CLOSE_RPM);
-        kicker.runRPM(Constants.KICKER_RPM);
-        hood.setExtendoPosition(0.0);
+        hood.setExtendoPosition(Constants.HOOD_CLOSE_EXTENDO_POSITION);
         drivetrain.setSwerveYawMode(SwerveYawMode.JOYSTICK);
     }
 
     @Override
     public void end(boolean interrupted) {
         this.shooter.stop();
-        this.kicker.stop();
     }
 
     @Override
