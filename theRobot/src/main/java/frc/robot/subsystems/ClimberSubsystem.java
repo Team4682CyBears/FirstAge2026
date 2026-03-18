@@ -15,11 +15,12 @@ import com.revrobotics.REVLibError;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.FeedForwardConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -28,8 +29,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.HardwareConstants;
 
 public class ClimberSubsystem extends SubsystemBase {
-    private final SparkFlex LeadMotor;
-    private final SparkFlex FollowMotor;
+    private final SparkMax LeadMotor;
+    private final SparkMax FollowMotor;
     private final DigitalInput hallEffectSensor;
     private boolean lastHallEffectState = false;
 
@@ -52,8 +53,8 @@ public class ClimberSubsystem extends SubsystemBase {
      * @param DIOPortID   The RoboRIO DIO port for the Hall Effect sensor.
      */
     public ClimberSubsystem(int LeadCanID, int FollowCanID, int DIOPortID) {
-        this.LeadMotor = new SparkFlex(LeadCanID, MotorType.kBrushless);
-        this.FollowMotor = new SparkFlex(FollowCanID, MotorType.kBrushless);
+        this.LeadMotor = new SparkMax(LeadCanID, MotorType.kBrushless);
+        this.FollowMotor = new SparkMax(FollowCanID, MotorType.kBrushless);
         this.PIDController = this.LeadMotor.getClosedLoopController();
         this.hallEffectSensor = new DigitalInput(DIOPortID);
 
@@ -98,6 +99,15 @@ public class ClimberSubsystem extends SubsystemBase {
     }
 
     /**
+     * Commands the climber to move to a specific height. The input is clamped 
+     * between the minimum and maximum physical limits.
+     * @param targetInches The target height in inches relative to the floor.
+     */
+    public void runVelocity(double inchesPerSecond) {
+        PIDController.setSetpoint(inchesPerSecond, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
+    }
+
+    /**
      * Determines if the climber is near its target height and has stopped moving.
      * @param targetInches The desired height in inches.
      * @return True if within both position and velocity tolerances.
@@ -115,6 +125,11 @@ public class ClimberSubsystem extends SubsystemBase {
     public void periodic() {
         boolean currentDetected = isDetected();
         double velocity = getVelocity();
+
+        SmartDashboard.putBoolean("Climber Sensor Detected", currentDetected);
+
+        SmartDashboard.putNumber("Climber Position Inches", getPosition());
+        SmartDashboard.putNumber("Climber Velocity Inches Per Second", getVelocity());
 
         // if we are going up and we previously detected it and now we don't, zero the sensor
         if (velocity > 0.1 && (lastHallEffectState && !currentDetected)) {
@@ -144,12 +159,12 @@ public class ClimberSubsystem extends SubsystemBase {
 
     private void checkError(REVLibError error, int id) {
         if (error != REVLibError.kOk) {
-            System.out.println("SparkFlex ID " + id + " failed config: " + error);
+            System.out.println("SparkMax ID " + id + " failed config: " + error);
         }
     }
 
     private void configureMotors() {
-        SparkFlexConfig leadConfig = new SparkFlexConfig();
+        SparkMaxConfig leadConfig = new SparkMaxConfig();
         double positionConversion = 1.0 / ROTATIONS_PER_INCH;
         
         leadConfig.idleMode(IdleMode.kBrake); 
@@ -170,7 +185,7 @@ public class ClimberSubsystem extends SubsystemBase {
         REVLibError error = LeadMotor.configure(leadConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         checkError(error, LeadMotor.getDeviceId());
 
-        SparkFlexConfig followConfig = new SparkFlexConfig();
+        SparkMaxConfig followConfig = new SparkMaxConfig();
         followConfig.idleMode(IdleMode.kBrake);
         followConfig.follow(LeadMotor); 
         followConfig.inverted(false);

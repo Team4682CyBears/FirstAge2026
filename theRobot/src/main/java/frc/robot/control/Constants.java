@@ -186,6 +186,8 @@ public final class Constants {
     
     public static final int climberLeadMotorCanID = 25;
     public static final int climberFollowMotorCanID = 26;
+    public static final int climberHallEffectSensorPort = 0;
+
     /// Intake Constants
     public static final int intakeWristMotorCanID = 17;
     public static final int intakeWristEncoderCanID = 32;

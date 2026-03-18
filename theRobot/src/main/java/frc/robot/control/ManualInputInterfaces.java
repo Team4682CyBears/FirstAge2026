@@ -317,13 +317,16 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer().resetTargetAdjustment();
                 }
             }));
-            this.coDriverController.b()
-                    .onTrue(new ClimberPositionCommand(this.subsystemCollection.getClimberSubsystem(),
-                            () -> SmartDashboard.getNumber("Go to climber position", 1.0)));
+            if (this.subsystemCollection.isClimberSubsystemAvailable()) {
+                this.coDriverController.a()
+                        .onTrue(new ClimberPositionCommand(this.subsystemCollection.getClimberSubsystem(),
+                                () -> SmartDashboard.getNumber("Go to climber position", 1.0)));
+                this.coDriverController.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.1).and(this.coDriverController.b()).whileTrue(new ClimberVelocityCommand(this.subsystemCollection.getClimberSubsystem(), () -> this.coDriverController.getRightY()));
+            }
             // unsure what this should go to
             if (this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
                 // if the left y stick has a magnitude greater than 0.1, run the command.
-                this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).and(this.coDriverController.b())
+                this.coDriverController.axisMagnitudeGreaterThan(XboxController.Axis.kLeftY.value, 0.1).and(this.coDriverController.b())
                         .whileTrue(new IntakeWristManualCommand(
                                 this.subsystemCollection.getIntakeWristSubsystem(),
                                 () -> -this.coDriverController.getLeftY()));
@@ -335,10 +338,6 @@ public class ManualInputInterfaces {
                         .toggleOnTrue(
                                 new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(),
                                         IntakeDirection.INTAKE));
-                this.coDriverController.a()
-                        .toggleOnTrue(
-                                new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(),
-                                        IntakeDirection.OUTTAKE));
             }
         }
     }

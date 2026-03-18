@@ -20,8 +20,6 @@ import frc.robot.control.ManualInputInterfaces;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
-import frc.robot.subsystems.IntakeRollerSubsystem;
-import frc.robot.subsystems.IntakeWristSubsystem;
 import frc.robot.control.AutonomousChooser;
 import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
@@ -58,6 +56,9 @@ public class RobotContainer {
 
     // init the spindexer subsystem
     this.initializeSpindexerSubsystem();
+
+    // init the climber subsystem
+    this.initializeClimberSubsystem();
     
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
@@ -253,6 +254,19 @@ public class RobotContainer {
     if (InstalledHardware.spindexerInstalled) {
       subsystems.setSpindexerSpinnerSubsystem(
           new SpindexerSpinner(Constants.spindexerTalonFXCanID, Constants.spindexerSensorLaserCanID));
+      System.out.println("SUCCESS: initializeSpindexer");
+    } else {
+      System.out.println("FAIL: initializeSpindexer");
+    }
+  }
+
+  /**
+   * A method to init the spindexer subsystem
+   */
+  private void initializeClimberSubsystem() {
+    if (InstalledHardware.climberInstalled) {
+      subsystems.setClimberSubsystem(
+          new ClimberSubsystem(Constants.climberLeadMotorCanID, Constants.climberFollowMotorCanID, Constants.climberHallEffectSensorPort));
       System.out.println("SUCCESS: initializeSpindexer");
     } else {
       System.out.println("FAIL: initializeSpindexer");
