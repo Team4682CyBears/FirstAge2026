@@ -26,7 +26,6 @@ import frc.robot.common.VisionMeasurement;
 import frc.robot.control.CameraMode;
 import frc.robot.control.Constants;
 import frc.robot.generated.LimelightHelpers;
-import frc.robot.common.DistanceMeasurement;
 
 /**
  * A class to encapsulate the camera subsystem
@@ -41,13 +40,20 @@ public class CameraSubsystem extends SubsystemBase {
   private final int noTagInSightId = -1;
   private static final int MIN_FIDUCIALS_FOR_VISION = 1;
 
-  private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+  private final String leftLimelightName = Constants.limelightLeftName;
+  private final String rightLimelightName = Constants.limelightRightName;
+
+  private NetworkTable leftTable = NetworkTableInstance.getDefault().getTable(leftLimelightName);
+  private NetworkTable rightTable = NetworkTableInstance.getDefault().getTable(rightLimelightName);
 
   private final ArrayList<Double> recentVisionYaws = new ArrayList<Double>();
   private final int recentVisionYawsMaxSize = 15;
   private int lastFiducialCount = 0;
   private double lastMaxFiducialAmbiguity = 0.0;
   private double lastHeartbeat = -1.0;
+  private double lastHeartbeatLeft = -1.0;
+  private double lastHeartbeatRight = -1.0;
+  private String lastPreferredLimelight = null;
 
   private CameraMode cameraMode = CameraMode.TRACKING;
 
@@ -65,16 +71,9 @@ public class CameraSubsystem extends SubsystemBase {
    * @return a vision measurement of the MT1 bot pose in field space
    */
   public VisionMeasurement getVisionBotPoseMT1() {
-    // Use LimelightHelpers to get a PoseEstimate (includes timestamp + latency handling)
-    VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
-    // As of 2024, we only use wpiblue
-    LimelightHelpers.PoseEstimate pe = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-    if (pe != null && pe.pose != null) {
-      // LimelightHelpers timestampSeconds is server-time (seconds since epoch), convert to FPGA time reference
-      double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
-      visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
-    }
-    return visionMeasurement;
+    LimelightHelpers.PoseEstimate left = getPoseEstimateMT1(leftLimelightName);
+    LimelightHelpers.PoseEstimate right = getPoseEstimateMT1(rightLimelightName);
+    return toVisionMeasurement(selectBestPoseEstimate(left, right));
   }
 
   /**
@@ -85,14 +84,9 @@ public class CameraSubsystem extends SubsystemBase {
    * @return a vision measurement of the MT2 bot pose in field space
    */
   public VisionMeasurement getVisionBotPoseMT2() {
-    VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
-    // As of 2024, we only use wpiblue
-    LimelightHelpers.PoseEstimate pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-    if (pe != null && pe.pose != null) {
-      double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
-      visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
-    }
-    return visionMeasurement;
+    LimelightHelpers.PoseEstimate left = getPoseEstimateMT2(leftLimelightName);
+    LimelightHelpers.PoseEstimate right = getPoseEstimateMT2(rightLimelightName);
+    return toVisionMeasurement(selectBestPoseEstimate(left, right));
   }
 
   /**
@@ -105,16 +99,23 @@ public class CameraSubsystem extends SubsystemBase {
    */
   public VisionMeasurement getLatestVisionMeasurement(Rotation2d gyroRotation) {
     // if there isn't a new measurement, don't update anything
-    double heartbeat = LimelightHelpers.getHeartbeat("limelight");
-    if (heartbeat == lastHeartbeat) {
+    boolean leftNewFrame = updateHeartbeat(leftLimelightName);
+    boolean rightNewFrame = updateHeartbeat(rightLimelightName);
+    if (!leftNewFrame && !rightNewFrame) {
       return null;
     }
-    lastHeartbeat = heartbeat;
+    lastHeartbeat = Math.max(lastHeartbeatLeft, lastHeartbeatRight);
     updateFiducialDiagnostics();
+    updatePreferredLimelightLEDs();
 
     if (cameraMode == CameraMode.SEEDING) {
-      // use MT1 for yaws
-      updateRecentVisionYaws(getVisionBotPoseMT1());
+      // use MT1 for yaws from any new frame
+      if (leftNewFrame) {
+        updateRecentVisionYaws(getVisionBotPoseMT1(leftLimelightName));
+      }
+      if (rightNewFrame) {
+        updateRecentVisionYaws(getVisionBotPoseMT1(rightLimelightName));
+      }
       // seed measurement uses MT2 position and recent Yaws (averaged from MT1)
       VisionMeasurement seedMeasurement = getSeedPoseFromVision();
       if (seedMeasurement != null && seedMeasurement.getRobotPosition() != null) {
@@ -125,14 +126,158 @@ public class CameraSubsystem extends SubsystemBase {
     else { // TRACKING MODE
       // use pigeon yaw for camera IMU
       updateCameraIMU(gyroRotation);
-      // use MT2
-      VisionMeasurement visionMeasurement = getVisionBotPoseMT2();
+      // use MT2 from the cameras that updated this frame
+      VisionMeasurement visionMeasurement = getBestVisionMeasurementMT2(leftNewFrame, rightNewFrame);
       return visionMeasurement;
     }
   }
 
   public CameraMode getMode() {
     return cameraMode;
+  }
+
+  private VisionMeasurement getVisionBotPoseMT1(String limelightName) {
+    return toVisionMeasurement(getPoseEstimateMT1(limelightName));
+  }
+
+  private LimelightHelpers.PoseEstimate getPoseEstimateMT1(String limelightName) {
+    return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
+  }
+
+  private LimelightHelpers.PoseEstimate getPoseEstimateMT2(String limelightName) {
+    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+  }
+
+  private VisionMeasurement getBestVisionMeasurementMT2(boolean leftNewFrame, boolean rightNewFrame) {
+    LimelightHelpers.PoseEstimate left = leftNewFrame ? getPoseEstimateMT2(leftLimelightName) : null;
+    LimelightHelpers.PoseEstimate right = rightNewFrame ? getPoseEstimateMT2(rightLimelightName) : null;
+    return toVisionMeasurement(selectBestPoseEstimate(left, right));
+  }
+
+  private VisionMeasurement toVisionMeasurement(LimelightHelpers.PoseEstimate poseEstimate) {
+    if (poseEstimate != null && poseEstimate.pose != null) {
+      double fpgaTime = Utils.fpgaToCurrentTime(poseEstimate.timestampSeconds);
+      return new VisionMeasurement(poseEstimate.pose, fpgaTime);
+    }
+    return new VisionMeasurement(null, 0.0);
+  }
+
+  private LimelightHelpers.PoseEstimate selectBestPoseEstimate(
+      LimelightHelpers.PoseEstimate left,
+      LimelightHelpers.PoseEstimate right) {
+    if (left == null) {
+      return right;
+    }
+    if (right == null) {
+      return left;
+    }
+    int leftCount = left.tagCount;
+    int rightCount = right.tagCount;
+    double leftAmbiguity = getMaxRawFiducialAmbiguity(left.rawFiducials);
+    double rightAmbiguity = getMaxRawFiducialAmbiguity(right.rawFiducials);
+
+    if (leftCount != rightCount) {
+      return leftCount > rightCount ? left : right;
+    }
+    if (leftCount == 0 && rightCount == 0) {
+      return left;
+    }
+    if (leftAmbiguity != rightAmbiguity) {
+      return leftAmbiguity < rightAmbiguity ? left : right;
+    }
+    return left.timestampSeconds >= right.timestampSeconds ? left : right;
+  }
+
+  private boolean updateHeartbeat(String limelightName) {
+    double heartbeat = LimelightHelpers.getHeartbeat(limelightName);
+    if (limelightName.equals(leftLimelightName)) {
+      boolean hasNewFrame = heartbeat != lastHeartbeatLeft;
+      lastHeartbeatLeft = heartbeat;
+      return hasNewFrame;
+    }
+    boolean hasNewFrame = heartbeat != lastHeartbeatRight;
+    lastHeartbeatRight = heartbeat;
+    return hasNewFrame;
+  }
+
+  private int getFiducialCount(String limelightName) {
+    LimelightHelpers.RawFiducial[] raw = LimelightHelpers.getRawFiducials(limelightName);
+    return raw == null ? 0 : raw.length;
+  }
+
+  private double getMaxRawFiducialAmbiguity(String limelightName) {
+    return getMaxRawFiducialAmbiguity(LimelightHelpers.getRawFiducials(limelightName));
+  }
+
+  private double getMaxRawFiducialAmbiguity(LimelightHelpers.RawFiducial[] raw) {
+    if (raw == null || raw.length == 0) {
+      return 0.0;
+    }
+    double max = 0.0;
+    for (LimelightHelpers.RawFiducial r : raw) {
+      if (r != null && r.ambiguity > max) {
+        max = r.ambiguity;
+      }
+    }
+    return max;
+  }
+
+  private double getBestAmbiguity(int leftCount, double leftAmb, int rightCount, double rightAmb) {
+    if (leftCount == 0 && rightCount == 0) {
+      return 0.0;
+    }
+    if (leftCount == 0) {
+      return rightAmb;
+    }
+    if (rightCount == 0) {
+      return leftAmb;
+    }
+    return Math.min(leftAmb, rightAmb);
+  }
+
+  private boolean isVisionQualityGoodFor(String limelightName) {
+    int fiducialCount = getFiducialCount(limelightName);
+    double maxAmbiguity = getMaxRawFiducialAmbiguity(limelightName);
+    return (fiducialCount >= MIN_FIDUCIALS_FOR_VISION
+        && maxAmbiguity <= Constants.TAG_AMBIGUITY_THRESHOLD);
+  }
+
+  private double getTagId(String limelightName) {
+    NetworkTable table = limelightName.equals(leftLimelightName) ? leftTable : rightTable;
+    return table.getEntry("tid").getDouble(noTagInSightId);
+  }
+
+  private String selectBestLimelightName() {
+    int leftCount = getFiducialCount(leftLimelightName);
+    int rightCount = getFiducialCount(rightLimelightName);
+    double leftAmb = getMaxRawFiducialAmbiguity(leftLimelightName);
+    double rightAmb = getMaxRawFiducialAmbiguity(rightLimelightName);
+
+    if (leftCount == 0 && rightCount == 0) {
+      return null;
+    }
+    if (leftCount != rightCount) {
+      return leftCount > rightCount ? leftLimelightName : rightLimelightName;
+    }
+    if (leftAmb != rightAmb) {
+      return leftAmb < rightAmb ? leftLimelightName : rightLimelightName;
+    }
+    return leftLimelightName;
+  }
+
+  private Pose2d getVisionBotPoseInTargetSpace(String limelightName) {
+    if (limelightName == null) {
+      return null;
+    }
+    double tagId = getTagId(limelightName);
+    if (tagId == noTagInSightId) {
+      return null;
+    }
+    double[] botpose = LimelightHelpers.getBotPose_TargetSpace(limelightName);
+    if (botpose == null || botpose.length == 0) {
+      return null;
+    }
+    return LimelightHelpers.toPose2D(botpose);
   }
 
   /**
@@ -162,7 +307,19 @@ public class CameraSubsystem extends SubsystemBase {
    * @return double of the current in view tag id
    */
   public double getTagId() {
-    return table.getEntry("tid").getDouble(0);
+    double leftTag = getTagId(leftLimelightName);
+    double rightTag = getTagId(rightLimelightName);
+    String bestLimelight = selectBestLimelightName();
+    if (bestLimelight != null && bestLimelight.equals(leftLimelightName) && leftTag != noTagInSightId) {
+      return leftTag;
+    }
+    if (bestLimelight != null && bestLimelight.equals(rightLimelightName) && rightTag != noTagInSightId) {
+      return rightTag;
+    }
+    if (leftTag != noTagInSightId) {
+      return leftTag;
+    }
+    return rightTag;
   }
 
   public int getLastFiducialCount() {
@@ -184,36 +341,45 @@ public class CameraSubsystem extends SubsystemBase {
    * @return maximum ambiguity (double)
    */
   public double getMaxRawFiducialAmbiguity() {
-    try {
-      LimelightHelpers.RawFiducial[] raw = LimelightHelpers.getRawFiducials("limelight");
-      if (raw == null || raw.length == 0) {
-        return 0.0;
-      }
-      double max = 0.0;
-      for (LimelightHelpers.RawFiducial r : raw) {
-        if (r != null) {
-          if (r.ambiguity > max) {
-            max = r.ambiguity;
-          }
-        }
-      }
-      return max;
-    } catch (Exception e) {
-      return 0.0;
-    }
+    int leftCount = getFiducialCount(leftLimelightName);
+    int rightCount = getFiducialCount(rightLimelightName);
+    double leftAmb = getMaxRawFiducialAmbiguity(leftLimelightName);
+    double rightAmb = getMaxRawFiducialAmbiguity(rightLimelightName);
+    return getBestAmbiguity(leftCount, leftAmb, rightCount, rightAmb);
   }
 
   public boolean isVisionQualityGood() {
-    int fiducialCount = getLastFiducialCount();
-    double maxAmbiguity = getLastMaxFiducialAmbiguity();
-    return (fiducialCount >= MIN_FIDUCIALS_FOR_VISION
-        && maxAmbiguity <= Constants.TAG_AMBIGUITY_THRESHOLD);
+    return isVisionQualityGoodFor(leftLimelightName) || isVisionQualityGoodFor(rightLimelightName);
   }
 
   private void updateFiducialDiagnostics() {
-    LimelightHelpers.RawFiducial[] rawFiducials = LimelightHelpers.getRawFiducials("limelight");
-    lastFiducialCount = rawFiducials == null ? 0 : rawFiducials.length;
-    lastMaxFiducialAmbiguity = getMaxRawFiducialAmbiguity();
+    int leftCount = getFiducialCount(leftLimelightName);
+    int rightCount = getFiducialCount(rightLimelightName);
+    double leftAmb = getMaxRawFiducialAmbiguity(leftLimelightName);
+    double rightAmb = getMaxRawFiducialAmbiguity(rightLimelightName);
+    lastFiducialCount = Math.max(leftCount, rightCount);
+    lastMaxFiducialAmbiguity = getBestAmbiguity(leftCount, leftAmb, rightCount, rightAmb);
+  }
+
+  private void updatePreferredLimelightLEDs() {
+    String preferred = selectBestLimelightName();
+    if (preferred == null || preferred.equals(lastPreferredLimelight)) {
+      return;
+    }
+
+    boolean hasTargets = getFiducialCount(leftLimelightName) > 0 || getFiducialCount(rightLimelightName) > 0;
+    if (!hasTargets) {
+      LimelightHelpers.setLEDMode_PipelineControl(leftLimelightName);
+      LimelightHelpers.setLEDMode_PipelineControl(rightLimelightName);
+    } else if (preferred.equals(leftLimelightName)) {
+      LimelightHelpers.setLEDMode_ForceOn(leftLimelightName);
+      LimelightHelpers.setLEDMode_ForceOff(rightLimelightName);
+    } else {
+      LimelightHelpers.setLEDMode_ForceOff(leftLimelightName);
+      LimelightHelpers.setLEDMode_ForceOn(rightLimelightName);
+    }
+
+    lastPreferredLimelight = preferred;
   }
 
   private void updateRecentVisionYaws(VisionMeasurement visionMeasurement) {
@@ -226,7 +392,8 @@ public class CameraSubsystem extends SubsystemBase {
   }
 
   private void updateCameraIMU(Rotation2d yaw){
-    LimelightHelpers.SetRobotOrientation("limelight", yaw.getDegrees(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation(leftLimelightName, yaw.getDegrees(), 0, 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation(rightLimelightName, yaw.getDegrees(), 0, 0, 0, 0, 0);
   }
 
   public void clearRecentVisionYaws(){
@@ -246,42 +413,13 @@ public class CameraSubsystem extends SubsystemBase {
   }
 
   /**
-   * a method that returns the robots distance from one of the given tags
-   * 
-   * @param blueTId
-   * @param redTId
-   * @return a ditance measuremtn of the distance, with false if the tag is
-   *         invalid
-   */
-  public DistanceMeasurement getDistanceFromTag(double blueTId, double redTId) {
-    DistanceMeasurement measurement = new DistanceMeasurement(false, 0.0);
-    Pose2d botPoseIntargetSpace = getVisionBotPoseInTargetSpace();
-    if ((getTagId() == blueTId || getTagId() == redTId) && botPoseIntargetSpace != null) {
-      measurement.setIsValid(true);
-
-      double xDistance = botPoseIntargetSpace.getTranslation().getX();
-      double yDistance = botPoseIntargetSpace.getTranslation().getY();
-      double totalDistance = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-      measurement.setDistanceMeteres(totalDistance);
-    }
-    return measurement;
-  }
-
-  /**
    * a method that returns a pose2d of the robot pose in target space.
    * pose portion of the vision measurement is null if there is no valid
    * measurement.
    */
   public Pose2d getVisionBotPoseInTargetSpace() {
-    double tagId = table.getEntry("tid").getDouble(noTagInSightId);
-    if (tagId == noTagInSightId) {
-      return null;
-    }
-    double[] botpose = LimelightHelpers.getBotPose_TargetSpace("limelight");
-    if (botpose == null || botpose.length == 0) {
-      return null;
-    }
-    return LimelightHelpers.toPose2D(botpose);
+    String limelightName = selectBestLimelightName();
+    return getVisionBotPoseInTargetSpace(limelightName);
   }
 
   public void setMode(CameraMode newMode) {
@@ -291,13 +429,16 @@ public class CameraSubsystem extends SubsystemBase {
     } 
     // going to SEEDING 
     if (newMode == CameraMode.SEEDING) {
-      LimelightHelpers.SetIMUMode("limelight", 1); // set limelight IMU to seeding mode
+      LimelightHelpers.SetIMUMode(leftLimelightName, 1); // set limelight IMU to seeding mode
+      LimelightHelpers.SetIMUMode(rightLimelightName, 1);
       clearRecentVisionYaws();
     } 
     // going to TRACKING
     else if (newMode == CameraMode.TRACKING) {
-      LimelightHelpers.SetIMUMode("limelight", 4);
-      LimelightHelpers.SetIMUAssistAlpha("limelight", Constants.IMUassistAlpha);
+      LimelightHelpers.SetIMUMode(leftLimelightName, 4);
+      LimelightHelpers.SetIMUMode(rightLimelightName, 4);
+      LimelightHelpers.SetIMUAssistAlpha(leftLimelightName, Constants.IMUassistAlpha);
+      LimelightHelpers.SetIMUAssistAlpha(rightLimelightName, Constants.IMUassistAlpha);
     } 
     this.cameraMode = newMode;
   }

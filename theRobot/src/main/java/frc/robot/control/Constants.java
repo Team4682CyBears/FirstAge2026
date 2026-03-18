@@ -116,6 +116,9 @@ public final class Constants {
     public static final boolean useFusedVisionInAuto = false;
     public static final double autoUseFusedVisionDuration = 15.0;
 
+    public static final String limelightLeftName = "limelight-left";
+    public static final String limelightRightName = "limelight-right";
+
     public static final double limelightToWPIBlueXOffest = 8.75;
     public static final double limelightToWPIBlueYOffset = 4.0;
 
