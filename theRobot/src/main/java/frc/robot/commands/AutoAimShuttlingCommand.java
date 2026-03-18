@@ -82,7 +82,7 @@ public class AutoAimShuttlingCommand extends Command {
   private Translation2d getShuttleTarget() {
     Pose2d robotPosition = drivetrain.getRobotPosition();
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    boolean isLeftSide = robotPosition.getX() < Constants.FIELD_LENGTH / 2.0;
+    boolean isLeftSide = robotPosition.getX() < Constants.FIELD_LENGTH_X / 2.0;
 
     if (alliance == Alliance.Blue) {
       return isLeftSide ? Constants.blueLeftShuttlePosition : Constants.blueRightShuttlePosition;
