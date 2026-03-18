@@ -21,36 +21,36 @@ package frc.robot.control;
  */
 public class InstalledHardware {
     // Basic Hardware
-    public static boolean powerDistributionPanelInstalled = true;
+    public static final boolean powerDistributionPanelInstalled = true;
 
     // Onboard Hardware - Orentation/Navigation Hardware
-    public static boolean wifiRadioInstalled = true;
-    public static boolean limelightInstalled = true;
+    public static final boolean wifiRadioInstalled = true;
+    public static final boolean limelightInstalled = true;
 
     // External Input Hardware
-    public static boolean driverXboxControllerInstalled = true;
-    public static boolean coDriverXboxControllerInstalled = true;
+    public static final boolean driverXboxControllerInstalled = true;
+    public static final boolean coDriverXboxControllerInstalled = true;
 
     // DriveTrain Related Hardware
-    public static boolean drivetrainInstalled = true;
-    public static boolean bareDrivetrainInstalled = true;
+    public static final boolean drivetrainInstalled = true;
+    public static final boolean bareDrivetrainInstalled = true;
 
     // Shooter related hardware
-    public static boolean shooterInstalled = true;
-    public static boolean hoodMotorInstalled = true;
-    public static boolean hoodEncoderInstalled = true;
+    public static final boolean shooterInstalled = false;
+    public static final boolean hoodMotorInstalled = false;
+    public static final boolean hoodEncoderInstalled = false;
 
     // Spindexer
-    public static boolean spindexerInstalled = true;
-    public static boolean spindexerSensorInstalled = false;
+    public static final boolean spindexerInstalled = false;
+    public static final boolean spindexerSensorInstalled = false;
     
     // Kicker
-    public static boolean kickerInstalled = true;
+    public static final boolean kickerInstalled = false;
 
     // Intake wrist encoder
-    public static boolean intakeWristEncoderInstalled = true;
-    public static boolean intakeWristMotorInstalled = true;
-    public static boolean intakeRollerInstalled = true;
+    public static final boolean intakeWristEncoderInstalled = false;
+    public static final boolean intakeWristMotorInstalled = false;
+    public static final boolean intakeRollerInstalled = false;
 
     // TOF Sensor Hardware
     // Important! You must disable any TOF sensor that is not installed!!
@@ -58,5 +58,5 @@ public class InstalledHardware {
     // the other TOF sensors that are installed will not work.
 
     // LED Hardware
-    public static boolean LEDSInstalled = false;
+    public static final boolean LEDSInstalled = false;
 }

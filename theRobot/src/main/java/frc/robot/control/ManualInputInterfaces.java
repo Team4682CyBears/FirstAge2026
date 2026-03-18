@@ -219,17 +219,24 @@ public class ManualInputInterfaces {
                                     "driverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
 
-            this.driverController.y().whileTrue(new AutoAimMovingCommand(subsystemCollection,
-                    subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+        if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+            && this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()
+            && this.subsystemCollection.isHoodSubsystemAvailable()
+            && this.subsystemCollection.isShooterSubsystemAvailable()
+            && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
+        this.driverController.y().whileTrue(new AutoAimMovingCommand(subsystemCollection,
+            subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+        }
         }
 
-        if (InstalledHardware.spindexerInstalled) {
+    if (this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()) {
             this.driverController.leftBumper().whileTrue(new SpindexerCommand(
                     this.subsystemCollection.getSpindexerSpinnerSubsystem(), false));
         }
 
-        if (InstalledHardware.kickerInstalled && InstalledHardware.spindexerInstalled
-                && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
+    if (this.subsystemCollection.isKickerSubsystemAvailable()
+        && this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()
+        && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
             this.driverController.rightTrigger().whileTrue(new KickerSpindexerAgitateCommand(
                     this.subsystemCollection.getKickerSubsystem(),
                     this.subsystemCollection.getSpindexerSpinnerSubsystem(),
@@ -244,9 +251,18 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getIntakeRollerSubsystem()));
         }
 
-        this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
+        if (this.subsystemCollection.isShooterSubsystemAvailable()
+                && this.subsystemCollection.isHoodSubsystemAvailable()) {
+            this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
+        }
+    if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+        && this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()
+        && this.subsystemCollection.isHoodSubsystemAvailable()
+        && this.subsystemCollection.isShooterSubsystemAvailable()
+        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
         this.driverController.a().whileTrue(new AutoAimShuttlingCommand(subsystemCollection,
-                    subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+            subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+    }
     }
 
     /**
@@ -265,32 +281,37 @@ public class ManualInputInterfaces {
             // POV up/down now only adjust the shooter aimer offset; RPM control
             // has been removed from the co-driver controller.
             this.coDriverController.povUp().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
                             .applyTargetAdjustment(0.1, 0.0);
                 }
             }));
             this.coDriverController.povDown().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
                             .applyTargetAdjustment(-0.1, 0.0);
                 }
             }));
             this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
                             .applyTargetAdjustment(0.10, -0.10);
                 }
             }));
             this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
                             .applyTargetAdjustment(0.0, 0.1);
                 }
             }));
 
             this.coDriverController.start().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
+                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer().resetTargetAdjustment();
                 }
             }));
