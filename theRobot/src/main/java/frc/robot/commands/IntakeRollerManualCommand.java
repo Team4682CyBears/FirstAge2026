@@ -13,23 +13,23 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeRollerSubsystem;
+import frc.robot.common.IntakeDirection;
 
 public class IntakeRollerManualCommand extends Command {
     private final IntakeRollerSubsystem intakeRollerSubsystem;
-    // 1 = intake, -1 = outtake
-    private final boolean shouldIntake;
+    private final IntakeDirection intakeDirection;
 
-    public IntakeRollerManualCommand(IntakeRollerSubsystem intakeRollerSubsystem, boolean shouldIntake) {
+    public IntakeRollerManualCommand(IntakeRollerSubsystem intakeRollerSubsystem, IntakeDirection intakeDirection) {
         this.intakeRollerSubsystem = intakeRollerSubsystem;
-        this.shouldIntake = shouldIntake;
+        this.intakeDirection = intakeDirection;
         addRequirements(intakeRollerSubsystem);
     }
 
     @Override
     public void execute() {
-        double direction = shouldIntake ? 1 : -1;
+        double directionFactor = intakeDirection == IntakeDirection.INTAKE ? 1 : -1;
         double rpm = SmartDashboard.getNumber("Intake RPM", 5000);
-        intakeRollerSubsystem.runRPM(rpm * direction);
+        intakeRollerSubsystem.runRPM(rpm * directionFactor);
     }
 
     @Override

@@ -403,7 +403,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
           chassisSpeeds.vyMetersPerSecond * this.speedReductionFactor,
           chassisSpeeds.omegaRadiansPerSecond);
 
-      // THIS IS NOT NEEDED because the chassis speeds are set above. 
       if (swerveYawMode == SwerveYawMode.AUTO) {
         reducedChassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(reducedChassisSpeeds);
       }
