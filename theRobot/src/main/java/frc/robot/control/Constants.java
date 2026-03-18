@@ -81,7 +81,8 @@ public final class Constants {
     public static final double turretGearRatio = 1.0; // TODO update with real gear ratio
     public static final double turretMinAngleDegrees = 0.0;
     public static final double turretMaxAngleDegrees = 270.0;
-    public static final double turretPositionKp = 12.0;
+    public static final double turretManualShootAngleDegrees = 90.0; // TODO set desired fixed angle
+    public static final double turretPositionKp = 12.0; //TODO tune all of these
     public static final double turretPositionKi = 0.0;
     public static final double turretPositionKd = 0.4;
     // *****************************************************************

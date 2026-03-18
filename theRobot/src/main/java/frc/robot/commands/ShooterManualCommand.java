@@ -18,6 +18,7 @@ import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.control.Constants;
 
 public class ShooterManualCommand extends Command {
     private ShooterSubsystem shooter;
@@ -40,15 +41,20 @@ public class ShooterManualCommand extends Command {
     }
 
     @Override
+    public void initialize() {
+        if (turret != null) {
+            turret.setTurretAimMode(TurretAimMode.JOYSTICK);
+            turret.setTurretAngleRadians(Math.toRadians(Constants.turretManualShootAngleDegrees));
+        }
+    }
+
+    @Override
     public void execute() {
         if (aimer != null) {
             shooter.runRPM(aimer.getMinShooterSpeedRPM());
             kicker.runRPM(aimer.getMinKickerSpeedRPM());
         }
         hood.setExtendoPosition(0.0);
-        if (turret != null) {
-            turret.setTurretAimMode(TurretAimMode.JOYSTICK);
-        }
     }
 
     @Override
