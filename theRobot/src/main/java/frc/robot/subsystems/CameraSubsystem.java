@@ -41,7 +41,6 @@ public class CameraSubsystem extends SubsystemBase {
   private final int recentVisionYawsMaxSize = 15;
   private int lastFiducialCount = 0;
   private double lastMaxFiducialAmbiguity = 0.0;
-  private double lastHeartbeat = -1.0;
   private double lastHeartbeatLeft = -1.0;
   private double lastHeartbeatRight = -1.0;
   private String lastPreferredLimelight = null;
@@ -81,8 +80,6 @@ public class CameraSubsystem extends SubsystemBase {
     if (!leftNewFrame && !rightNewFrame) {
       return null;
     }
-    
-    lastHeartbeat = Math.max(lastHeartbeatLeft, lastHeartbeatRight);
 
     LimelightHelpers.PoseEstimate leftEstimate = null;
     LimelightHelpers.PoseEstimate rightEstimate = null;
@@ -225,7 +222,6 @@ public class CameraSubsystem extends SubsystemBase {
 
   public int getLastFiducialCount() { return lastFiducialCount; }
   public double getLastMaxFiducialAmbiguity() { return lastMaxFiducialAmbiguity; }
-  public double getLastHeartbeat() { return lastHeartbeat; }
 
   public boolean isVisionQualityGood() {
     return lastFiducialCount >= MIN_FIDUCIALS_FOR_VISION

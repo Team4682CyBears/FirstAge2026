@@ -628,7 +628,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
         }
         SmartDashboard.putNumber("VisionFiducialCount", cameraSubsystem.getLastFiducialCount());
         SmartDashboard.putNumber("VisionMaxFiducialAmbiguity", cameraSubsystem.getLastMaxFiducialAmbiguity());
-        SmartDashboard.putNumber("VisionHeartbeat", cameraSubsystem.getLastHeartbeat());
       }
       SmartDashboard.putNumber("RobotFieldHeadingDegrees", drivetrain.getState().Pose.getRotation().getDegrees());
       SmartDashboard.putNumber("RobotFieldXCoordinateMeters", drivetrain.getState().Pose.getX());
