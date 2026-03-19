@@ -32,7 +32,7 @@ public class ShooterManualCommand extends Command {
         hood = subsystemCollection.getHoodSubsystem();
         kicker = subsystemCollection.getKickerSubsystem();
     turret = subsystemCollection.getTurretSubsystem();
-    this.aimer = turret != null ? turret.getShooterAimer() : null;
+    this.aimer = subsystemCollection.getShooterAimer();
 
         addRequirements(shooter, hood, kicker);
         if (turret != null) {

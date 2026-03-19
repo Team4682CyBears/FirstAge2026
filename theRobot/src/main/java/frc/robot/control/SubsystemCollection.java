@@ -42,6 +42,7 @@ public class SubsystemCollection {
     private ShotLogger shotLogger = null;
     private SpindexerSpinner spindexer = null;
     private TurretSubsystem turretSubsystem = null;
+    private ShooterAimer shooterAimer = null;
 
     /**
      * Default constructor
@@ -215,5 +216,17 @@ public class SubsystemCollection {
 
     public boolean isTurretSubsystemAvailable() {
         return turretSubsystem != null;
+    }
+
+    public ShooterAimer getShooterAimer() {
+        return shooterAimer;
+    }
+
+    public void setShooterAimer(ShooterAimer shooterAimer) {
+        this.shooterAimer = shooterAimer;
+    }
+
+    public boolean isShooterAimerAvailable() {
+        return shooterAimer != null;
     }
 }

@@ -158,7 +158,7 @@ public class AutonomousChooser {
                     "AutoAimOn",
                     new AutoAimMovingCommand(
                             subsystems,
-                subsystems.getTurretSubsystem().getShooterAimer()).withTimeout(5.0));
+                subsystems.getShooterAimer()).withTimeout(5.0));
         }
 
         if (subsystems.isSpinnerSpindexerSubsystemAvaible()

@@ -268,11 +268,8 @@ public class ManualInputInterfaces {
     }
 
     private ShooterAimer getActiveShooterAimer() {
-        if (this.subsystemCollection.isTurretSubsystemAvailable()) {
-            return this.subsystemCollection.getTurretSubsystem().getShooterAimer();
-        }
-        if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
-            return this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer();
+        if (this.subsystemCollection.isShooterAimerAvailable()) {
+            return this.subsystemCollection.getShooterAimer();
         }
         return null;
     }

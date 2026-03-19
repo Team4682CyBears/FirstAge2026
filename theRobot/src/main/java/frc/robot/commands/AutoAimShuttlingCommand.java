@@ -53,6 +53,10 @@ public class AutoAimShuttlingCommand extends Command {
   }
 
   public void execute() {
+    aimer.calculate();
+    if (InstalledHardware.useTurretForAiming && turret != null) {
+      turret.setTargetAngleRadians(aimer.getDesiredTurretAngleRadians());
+    }
     double ext = aimer.getHoodExtension();
     hood.setExtendoPosition(ext);
     double shooterRpm = aimer.getShooterRPM();

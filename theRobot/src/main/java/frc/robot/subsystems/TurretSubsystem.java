@@ -25,18 +25,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
 import frc.robot.control.HardwareConstants;
 import frc.robot.control.InstalledHardware;
-import frc.robot.control.ShooterAimer;
 import frc.robot.control.TurretAimMode;
 
 /**
- * Controls turret angle and applies aiming targets from {@link ShooterAimer}.
+ * Controls turret angle and applies externally provided targets.
  */
 public class TurretSubsystem extends SubsystemBase {
     private final TalonFX turretMotor;
     private final DigitalInput turretSensor;
     private boolean lastSensorDetected = false;
-
-    private ShooterAimer shooterAimer;
 
     private final PositionVoltage positionController = new PositionVoltage(0.0);
 
@@ -70,20 +67,6 @@ public class TurretSubsystem extends SubsystemBase {
             lastSensorDetected = turretSensor.get();
         }
         configureMotor();
-    }
-
-    /**
-     * Attach the shooter aimer used to compute desired turret angles.
-     */
-    public void setShooterAimer(ShooterAimer aimer) {
-        this.shooterAimer = aimer;
-    }
-
-    /**
-     * Returns the currently assigned shooter aimer.
-     */
-    public ShooterAimer getShooterAimer() {
-        return shooterAimer;
     }
 
     /**
@@ -131,18 +114,12 @@ public class TurretSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         updateTurretZeroFromSensor();
-        if (InstalledHardware.useTurretForAiming && turretAimMode == TurretAimMode.AUTO && shooterAimer != null) {
-            shooterAimer.calculate();
-            setTargetAngleRadians(shooterAimer.getDesiredTurretAngleRadians());
-        }
-
-    double targetTurretRotations = (targetTurretAngle.getRadians() - turretZeroOffset.getRadians())
-        / (2.0 * Math.PI);
+    double targetTurretRotations = targetTurretAngle.minus(turretZeroOffset).getRotations();
         positionController.withPosition(targetTurretRotations);
         turretMotor.setControl(positionController);
 
         SmartDashboard.putNumber("TurretAngleDegrees", getAngleRadians().getDegrees());
-    SmartDashboard.putNumber("TurretTargetDegrees", targetTurretAngle.getDegrees());
+        SmartDashboard.putNumber("TurretTargetDegrees", targetTurretAngle.getDegrees());
     }
 
     private double getTurretMechanismAngleRadians() {
@@ -190,8 +167,8 @@ public class TurretSubsystem extends SubsystemBase {
 
         talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = maxTurretAngle.getRadians() / (2.0 * Math.PI);
-    talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = minTurretAngle.getRadians() / (2.0 * Math.PI);
+    talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = maxTurretAngle.getRotations();
+    talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = minTurretAngle.getRotations();
 
         StatusCode response = turretMotor.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {

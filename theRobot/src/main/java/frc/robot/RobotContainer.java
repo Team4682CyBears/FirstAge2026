@@ -312,7 +312,8 @@ public class RobotContainer {
     if (subsystems.isDriveTrainSubsystemAvailable() && subsystems.isHoodSubsystemAvailable()
         && subsystems.isShooterSubsystemAvailable() && subsystems.isTurretSubsystemAvailable()) {
       ShooterAimer aimer = new ShooterAimer(subsystems.getDriveTrainSubsystem(), subsystems);
-      subsystems.getTurretSubsystem().setShooterAimer(aimer);
+      subsystems.setShooterAimer(aimer);
+      subsystems.getDriveTrainSubsystem().setShooterAimer(aimer);
       DataLogManager.log("SUCCESS: initializeShooterAimer");
     } else {
       DataLogManager.log("FAIL: initializeShooterAimer");
