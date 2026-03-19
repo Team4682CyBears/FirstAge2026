@@ -39,7 +39,7 @@ public class RobotContainer {
 
   boolean spinnerEnabled = true;
   boolean useCTRE = false;
-  boolean usePWF = false;
+  boolean usePWF = true;
   boolean useLaser = true;
 
 
