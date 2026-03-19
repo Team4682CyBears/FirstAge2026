@@ -81,8 +81,10 @@ public class CameraSubsystem extends SubsystemBase {
       return null;
     }
 
-    LimelightHelpers.PoseEstimate leftEstimate = null;
-    LimelightHelpers.PoseEstimate rightEstimate = null;
+  LimelightHelpers.PoseEstimate leftEstimate = null;
+  LimelightHelpers.PoseEstimate rightEstimate = null;
+  VisionMeasurement leftMeasurement = null;
+  VisionMeasurement rightMeasurement = null;
 
     if (cameraMode == CameraMode.SEEDING) {
       leftEstimate = leftNewFrame ? getPoseEstimateMT1(leftLimelightName) : null;
@@ -90,6 +92,13 @@ public class CameraSubsystem extends SubsystemBase {
     } else {
       leftEstimate = leftNewFrame ? getPoseEstimateMT2(leftLimelightName) : null;
       rightEstimate = rightNewFrame ? getPoseEstimateMT2(rightLimelightName) : null;
+    }
+
+    if (leftEstimate != null) {
+      leftMeasurement = toVisionMeasurement(leftEstimate);
+    }
+    if (rightEstimate != null) {
+      rightMeasurement = toVisionMeasurement(rightEstimate);
     }
 
     int leftCount = leftEstimate != null ? leftEstimate.tagCount : 0;
@@ -102,8 +111,8 @@ public class CameraSubsystem extends SubsystemBase {
 
     if (cameraMode == CameraMode.SEEDING) {
       // use MT1 for yaws from any new frame
-      if (leftEstimate != null) updateRecentVisionYaws(toVisionMeasurement(leftEstimate));
-      if (rightEstimate != null) updateRecentVisionYaws(toVisionMeasurement(rightEstimate));
+      if (leftMeasurement != null) updateRecentVisionYaws(leftMeasurement);
+      if (rightMeasurement != null) updateRecentVisionYaws(rightMeasurement);
       
       // seed measurement uses MT2 position and recent Yaws (averaged from MT1)
       VisionMeasurement seedMeasurement = getSeedPoseFromVision();
