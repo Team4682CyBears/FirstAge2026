@@ -33,8 +33,6 @@ class ShootStationaryTest {
     subsystemCollection = new SubsystemCollection();
     drivetrain = new DrivetrainSubsystem(subsystemCollection);
     shooterAimer = new ShooterAimer(drivetrain, subsystemCollection);
-    // set target
-    shooterAimer.setDesiredTarget(Constants.blueHubPosition);
     shooterAimer.calculate();
   }
 

@@ -2,39 +2,31 @@
 // Bishop Blanchet Robotics
 // Home of the Cybears
 // FRC - Rebuilt - 2026
-// File: AutoAimShuttlingCommand.java
-// Intent: Command to automatically shuttle balls
+// File: AutoAimCommand.java
+// Intent: Command to automatically aim using the ShooterAimer
 // ************************************************************
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.HoodSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
+import frc.robot.control.InstalledHardware;
 import frc.robot.control.ShooterAimer;
 import frc.robot.control.SubsystemCollection;
-import frc.robot.control.InstalledHardware;
 import frc.robot.control.SwerveYawMode;
-import frc.robot.control.TurretAimMode;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.subsystems.HoodSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
-public class AutoAimShuttlingCommand extends Command {
+public class AutoAimCommand extends Command {
   private final SubsystemCollection subsystems;
   private final HoodSubsystem hood;
   private final ShooterSubsystem shooter;
   private final ShooterAimer aimer;
-  private final TurretSubsystem turret;
-
-
-  //
-  public AutoAimShuttlingCommand(SubsystemCollection subsystemCollection,
-      ShooterAimer aimer) {
+  public AutoAimCommand(SubsystemCollection subsystemCollection, ShooterAimer aimer) {
     this.subsystems = subsystemCollection;
     this.hood = subsystemCollection.getHoodSubsystem();
     this.shooter = subsystemCollection.getShooterSubsystem();
     this.aimer = aimer;
-    this.turret = subsystemCollection.getTurretSubsystem();
     // We are not declaring drivetrain subsystem as a requirement because it is only
     // setting the swerve yaw mode
     addRequirements(hood, shooter);
@@ -47,16 +39,10 @@ public class AutoAimShuttlingCommand extends Command {
       subsystems.getDriveTrainSubsystem().setSwerveYawMode(
           InstalledHardware.useTurretForAiming ? SwerveYawMode.JOYSTICK : SwerveYawMode.AUTO);
     }
-    if (!InstalledHardware.useTurretForAiming && turret != null) {
-      turret.setAimMode(TurretAimMode.MANUAL);
-    }
   }
 
   public void execute() {
     aimer.calculate();
-    if (InstalledHardware.useTurretForAiming && turret != null) {
-      turret.setTargetAngleRadians(aimer.getDesiredTurretAngleRadians());
-    }
     double ext = aimer.getHoodExtension();
     hood.setExtendoPosition(ext);
     double shooterRpm = aimer.getShooterRPM();
@@ -72,9 +58,6 @@ public class AutoAimShuttlingCommand extends Command {
     hood.retract();
     if (subsystems.isDriveTrainSubsystemAvailable()) {
       subsystems.getDriveTrainSubsystem().setSwerveYawMode(SwerveYawMode.JOYSTICK);
-    }
-    if (turret != null && InstalledHardware.useTurretForAiming) {
-      turret.setAimMode(TurretAimMode.AUTO);
     }
   }
 

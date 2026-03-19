@@ -47,8 +47,6 @@ class ShootOnTheFlyTest {
     // delay 100ms to allow enable to take effect
     Timer.delay(0.100);
 
-    // set target
-    shooterAimer.setDesiredTarget(shooterAimer.getHubPositionFromAlliance());
     drivetrain.setSwerveYawMode(SwerveYawMode.AUTO);
   }
 
@@ -84,7 +82,7 @@ class ShootOnTheFlyTest {
     Translation2d expectedTarget = Constants.blueHubPosition.plus(
         new Translation2d(-vx * tof, -vy * tof));
 
-    Translation2d actualTarget = shooterAimer.computePredictedTarget(); 
+  Translation2d actualTarget = shooterAimer.computePredictedTarget(Constants.blueHubPosition); 
     //TODO debug why this is different than getPredictedTarget
     System.out.println("original target " + Constants.blueHubPosition);
     System.out.println("expected target " + expectedTarget);

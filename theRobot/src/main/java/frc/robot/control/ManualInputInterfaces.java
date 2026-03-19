@@ -225,13 +225,9 @@ public class ManualInputInterfaces {
                     && this.subsystemCollection.isHoodSubsystemAvailable()
                     && this.subsystemCollection.isShooterSubsystemAvailable()
                     && shooterAimer != null) {
-                this.driverController.y().whileTrue(new AutoAimMovingCommand(subsystemCollection, shooterAimer));
+        this.driverController.y().whileTrue(
+            new AutoAimCommand(subsystemCollection, shooterAimer));
             }
-        }
-
-    if (this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()) {
-            this.driverController.leftBumper().whileTrue(new SpindexerCommand(
-                    this.subsystemCollection.getSpindexerSpinnerSubsystem(), false));
         }
 
     if (this.subsystemCollection.isKickerSubsystemAvailable()
@@ -257,14 +253,6 @@ public class ManualInputInterfaces {
             this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
         }
 
-        ShooterAimer shooterAimerForShuttle = getActiveShooterAimer();
-        if (this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()
-                && this.subsystemCollection.isHoodSubsystemAvailable()
-                && this.subsystemCollection.isShooterSubsystemAvailable()
-                && shooterAimerForShuttle != null) {
-            this.driverController.a()
-                    .whileTrue(new AutoAimShuttlingCommand(subsystemCollection, shooterAimerForShuttle));
-        }
     }
 
     private ShooterAimer getActiveShooterAimer() {
@@ -287,39 +275,6 @@ public class ManualInputInterfaces {
                             new ButtonPressCommand(
                                     "coDriverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
-            // POV up/down now only adjust the shooter aimer offset; RPM control
-            // has been removed from the co-driver controller.
-            this.coDriverController.povUp().onTrue(new InstantCommand(() -> {
-                ShooterAimer shooterAimer = getActiveShooterAimer();
-                if (shooterAimer != null) {
-                    shooterAimer.applyTargetAdjustment(0.1, 0.0);
-                }
-            }));
-            this.coDriverController.povDown().onTrue(new InstantCommand(() -> {
-                ShooterAimer shooterAimer = getActiveShooterAimer();
-                if (shooterAimer != null) {
-                    shooterAimer.applyTargetAdjustment(-0.1, 0.0);
-                }
-            }));
-            this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
-                ShooterAimer shooterAimer = getActiveShooterAimer();
-                if (shooterAimer != null) {
-                    shooterAimer.applyTargetAdjustment(0.10, -0.10);
-                }
-            }));
-            this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
-                ShooterAimer shooterAimer = getActiveShooterAimer();
-                if (shooterAimer != null) {
-                    shooterAimer.applyTargetAdjustment(0.0, 0.1);
-                }
-            }));
-
-            this.coDriverController.start().onTrue(new InstantCommand(() -> {
-                ShooterAimer shooterAimer = getActiveShooterAimer();
-                if (shooterAimer != null) {
-                    shooterAimer.resetTargetAdjustment();
-                }
-            }));
 
         if (this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
         // if the left y stick has a magnitude greater than 0.1, run the command.

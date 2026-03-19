@@ -352,6 +352,9 @@ public class RobotContainer {
    * A method to late binding of default commands
    */
   private void lateBindDefaultCommands() {
+    if (subsystems.isTurretSubsystemAvailable()) {
+      subsystems.getTurretSubsystem().setDefaultCommand(new TurretDefaultCommand(subsystems));
+    }
   }
 
   private static double deadband(double value, double deadband) {

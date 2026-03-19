@@ -33,10 +33,6 @@ public class ShooterAimer {
   protected boolean displayDiagnostics = false;
 
   private Translation2d desiredTarget = null;
-  private Translation2d defaultTarget = null;
-  // True until a command explicitly sets a target; allows auto default target selection.
-  private boolean useDefaultTarget = true;
-  private Translation2d targetAdjustment = new Translation2d(0.0, 0.0);
   private Translation2d predictedTarget = null;
   private double distance = 0.0;
   private double shooterRPM = 0.0;
@@ -95,24 +91,15 @@ public class ShooterAimer {
   }
 
   /**
-   * Apply a small operator adjustment (meters) to aiming target (via d-pad).
-   */
-  public void applyTargetAdjustment(double dxMeters, double dyMeters) {
-    targetAdjustment = targetAdjustment.plus(new Translation2d(dxMeters, dyMeters));
-  }
-
-  /**
    * Calculates all the settings related to shooting
    * predicted target, distance, hood angle, shooter speed, auto yaw angle, yaw velocities,
    * and kicker speed
    * Intended to be called every tick when auto aiming is in use
    */
   public void calculate(){
-    defaultTarget = getDefaultAimTarget();
-    Translation2d activeTarget = useDefaultTarget || desiredTarget == null ? defaultTarget : desiredTarget;
-    if (activeTarget != null){
-      desiredTarget = activeTarget;
-      predictedTarget = computePredictedTarget();
+    desiredTarget = getAimTarget();
+    if (desiredTarget != null){
+      predictedTarget = computePredictedTarget(desiredTarget);
       autoYaw = computeYawToFaceTarget();
       autoYawVelocity = computeAutoYawVelocityRadiansPerSecond();
       distance = computeDistanceToPredictedTarget();
@@ -136,7 +123,6 @@ public class ShooterAimer {
    */
   public void clearShootingAimTarget() {
     desiredTarget = null;
-    defaultTarget = null;
     predictedTarget = null;
     shooterRPM = 0.0;
     kickerRPM = 0.0;
@@ -144,7 +130,6 @@ public class ShooterAimer {
     autoYaw = new Rotation2d();
     autoYawVelocity = 0.0;
     predictedTimeOfFlight = Constants.DEFAULT_PROJECTILE_TIME_OF_FLIGHT_SECONDS;
-    useDefaultTarget = true;
   }
 
 
@@ -298,33 +283,10 @@ public class ShooterAimer {
   }
 
   /**
-   * ressets the targetAdjustment back to 0,0
+   * Aim target chosen based on alliance and field position.
+   * When on our half, aim at the hub; otherwise aim at the shuttle target.
    */
-  public void resetTargetAdjustment() {
-    targetAdjustment = new Translation2d(0.0, 0.0);
-  }
-
-  /**
-   * sets the desired target
-   * 
-   * @param target
-   */
-  public void setDesiredTarget(Translation2d target) {
-    this.desiredTarget = target;
-    useDefaultTarget = false;
-  }
-
-  /**
-   * Sets a default target that may be overridden by explicit commands.
-   */
-  public void setDefaultDesiredTarget(Translation2d target) {
-    this.defaultTarget = target;
-  }
-
-  /**
-   * Default aim target chosen based on alliance and field position.
-   */
-  private Translation2d getDefaultAimTarget() {
+  private Translation2d getAimTarget() {
     Pose2d robotPose = drivetrain.getRobotPosition();
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
     boolean onOurHalf = alliance == Alliance.Blue
@@ -362,7 +324,6 @@ public class ShooterAimer {
   /**
    * Computes an auto-yaw velocity to command the drivetrain when aiming at a
    * target.
-   * If aimTarget is null, defaults to alliance hub.
    */
   private double computeAutoYawVelocityRadiansPerSecond() { //USED
     double robotYawRadians = drivetrain.getRobotPosition().getRotation().getRadians();
@@ -387,13 +348,12 @@ public class ShooterAimer {
   }
 
   /**
-   * Compute the predicted target accounting for targetAdjustments, velocities,
-   * and time of flight
-   * 
+   * Compute the predicted target accounting for velocities and time of flight.
+   *
    * @return the predicted target
    */
-  protected Translation2d computePredictedTarget() { //USED
-    if (desiredTarget == null) {
+  protected Translation2d computePredictedTarget(Translation2d target) { //USED
+    if (target == null) {
       return null;
     }
 
@@ -420,7 +380,7 @@ public class ShooterAimer {
     // NOTE: This function is called before the timeOfFlight is updated, 
     // It uses the timeOfFlight from the last tick because otherwise, 
     // this would be a circular dependency. 
-    Translation2d predicted = desiredTarget.minus(fieldSpeedsTranslation.times(predictedTimeOfFlight)).plus(targetAdjustment);
+    Translation2d predicted = target.minus(fieldSpeedsTranslation.times(predictedTimeOfFlight));
     return predicted;
   }
 
