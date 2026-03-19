@@ -48,7 +48,7 @@ public class AutoAimMovingCommand extends Command {
           InstalledHardware.useTurretForAiming ? SwerveYawMode.JOYSTICK : SwerveYawMode.AUTO);
     }
     if (!InstalledHardware.useTurretForAiming && turret != null) {
-      turret.setTurretAimMode(TurretAimMode.JOYSTICK);
+      turret.setAimMode(TurretAimMode.MANUAL);
     }
   }
 
@@ -72,7 +72,7 @@ public class AutoAimMovingCommand extends Command {
       subsystems.getDriveTrainSubsystem().setSwerveYawMode(SwerveYawMode.JOYSTICK);
     }
     if (turret != null && InstalledHardware.useTurretForAiming) {
-      turret.setTurretAimMode(TurretAimMode.AUTO);
+      turret.setAimMode(TurretAimMode.AUTO);
     }
   }
 

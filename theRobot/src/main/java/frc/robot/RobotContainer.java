@@ -63,7 +63,7 @@ public class RobotContainer {
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
 
-  // init the turret subsystem (requires drivetrain)
+  // init the turret subsystem
   this.initializeTurretSubsystem();
 
     // init the shooter aimer (needs drivetrain, shooter and hood)
@@ -311,8 +311,7 @@ public class RobotContainer {
   private void initializeShooterAimer() {
     if (subsystems.isDriveTrainSubsystemAvailable() && subsystems.isHoodSubsystemAvailable()
         && subsystems.isShooterSubsystemAvailable() && subsystems.isTurretSubsystemAvailable()) {
-      ShooterAimer aimer = new ShooterAimer(subsystems.getDriveTrainSubsystem(),
-          subsystems.getTurretSubsystem(), subsystems);
+      ShooterAimer aimer = new ShooterAimer(subsystems.getDriveTrainSubsystem(), subsystems);
       subsystems.getTurretSubsystem().setShooterAimer(aimer);
       DataLogManager.log("SUCCESS: initializeShooterAimer");
     } else {
@@ -324,9 +323,9 @@ public class RobotContainer {
    * A method to init the turret subsystem
    */
   private void initializeTurretSubsystem() {
-    if (InstalledHardware.turretInstalled && subsystems.isDriveTrainSubsystemAvailable()) {
+    if (InstalledHardware.turretInstalled) {
       subsystems.setTurretSubsystem(
-          new TurretSubsystem(Constants.turretMotorCanId, subsystems.getDriveTrainSubsystem()));
+          new TurretSubsystem(Constants.turretMotorCanId));
       DataLogManager.log("SUCCESS: initializeTurretSubsystem");
     } else {
       DataLogManager.log("FAIL: initializeTurretSubsystem");

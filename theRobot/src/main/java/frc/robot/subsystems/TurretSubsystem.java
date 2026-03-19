@@ -18,9 +18,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
@@ -28,117 +27,147 @@ import frc.robot.control.HardwareConstants;
 import frc.robot.control.InstalledHardware;
 import frc.robot.control.ShooterAimer;
 import frc.robot.control.TurretAimMode;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
+/**
+ * Controls turret angle and applies aiming targets from {@link ShooterAimer}.
+ */
 public class TurretSubsystem extends SubsystemBase {
     private final TalonFX turretMotor;
-    private final DrivetrainSubsystem drivetrain;
+    private final DigitalInput turretSensor;
+    private boolean lastSensorDetected = false;
 
     private ShooterAimer shooterAimer;
 
     private final PositionVoltage positionController = new PositionVoltage(0.0);
 
     private TurretAimMode turretAimMode = TurretAimMode.AUTO;
-    private double targetTurretAngleRadians = 0.0;
+    private Rotation2d targetTurretAngle = new Rotation2d();
 
-    private final double minTurretAngleRadians = Math.toRadians(Constants.turretMinAngleDegrees);
-    private final double maxTurretAngleRadians = Math.toRadians(Constants.turretMaxAngleDegrees);
+    private final Rotation2d minTurretAngle = Constants.turretMinAngleDegrees;
+    private final Rotation2d maxTurretAngle = Constants.turretMaxAngleDegrees;
+    private final Rotation2d turretZeroOffset = Constants.turretZeroOffsetDegrees;
+
+    // TODO tune with robot-on-carpet data
+    private static final double turretPositionKp = 12.0;
+    private static final double turretPositionKi = 0.0;
+    private static final double turretPositionKd = 0.4;
 
     // TODO tune with robot-on-carpet data
     private final Slot0Configs slot0Configs = new Slot0Configs()
-            .withKP(Constants.turretPositionKp)
-            .withKI(Constants.turretPositionKi)
-            .withKD(Constants.turretPositionKd);
+            .withKP(turretPositionKp)
+            .withKI(turretPositionKi)
+            .withKD(turretPositionKd);
 
-    public TurretSubsystem(int turretCanId, DrivetrainSubsystem drivetrain) {
+    /**
+     * Create a turret subsystem with a motor a sensor.
+     */
+    public TurretSubsystem(int turretCanId) {
         this.turretMotor = new TalonFX(turretCanId);
-        this.drivetrain = drivetrain;
+        this.turretSensor = InstalledHardware.turretSensorInstalled
+        ? new DigitalInput(Constants.turretSensorChannel)
+                : null;
+        if (turretSensor != null) {
+            lastSensorDetected = turretSensor.get();
+        }
         configureMotor();
-        zeroTurret();
     }
 
+    /**
+     * Attach the shooter aimer used to compute desired turret angles.
+     */
     public void setShooterAimer(ShooterAimer aimer) {
         this.shooterAimer = aimer;
     }
 
+    /**
+     * Returns the currently assigned shooter aimer.
+     */
     public ShooterAimer getShooterAimer() {
         return shooterAimer;
     }
 
-    public void setTurretAimMode(TurretAimMode mode) {
-        if (mode == TurretAimMode.JOYSTICK) {
-            targetTurretAngleRadians = getTurretAngleRadians();
+    /**
+     * Set the current aim mode. Manual mode holds the current turret angle.
+     */
+    public void setAimMode(TurretAimMode mode) {
+        if (mode == TurretAimMode.MANUAL) {
+            targetTurretAngle = getAngleRadians();
         }
         turretAimMode = mode;
     }
 
-    public TurretAimMode getTurretAimMode() {
+    /**
+     * Get the current aim mode.
+     */
+    public TurretAimMode getAimMode() {
         return turretAimMode;
     }
 
-    public void setTurretAngleRadians(double turretAngleRadians) {
-        targetTurretAngleRadians = MathUtil.clamp(turretAngleRadians, minTurretAngleRadians, maxTurretAngleRadians);
+    /**
+     * Set the desired turret angle (radians) relative to the robot.
+     */
+    public void setTargetAngleRadians(double turretAngleRadians) {
+        double clampedRadians = MathUtil.clamp(turretAngleRadians, minTurretAngle.getRadians(),
+                maxTurretAngle.getRadians());
+        targetTurretAngle = Rotation2d.fromRadians(clampedRadians);
     }
 
-    public double getTurretAngleRadians() {
-        double turretRotations = turretMotor.getPosition().getValueAsDouble();
-        return turretRotations * 2.0 * Math.PI;
+    /**
+     * Get the current turret angle (radians) relative to the robot.
+     */
+    public Rotation2d getAngleRadians() {
+        return Rotation2d.fromRadians(
+                MathUtil.angleModulus(getTurretMechanismAngleRadians() + turretZeroOffset.getRadians()));
     }
 
-    public Rotation2d getTurretFieldRotation() {
-        return drivetrain.getGyroscopeRotation().plus(Rotation2d.fromRadians(getTurretAngleRadians()));
-    }
-
+    /**
+     * Reset turret encoder position to match the zero offset.
+     */
     public void zeroTurret() {
         turretMotor.setPosition(0.0);
-        targetTurretAngleRadians = 0.0;
+        targetTurretAngle = Rotation2d.fromRadians(MathUtil.angleModulus(turretZeroOffset.getRadians()));
     }
 
     @Override
     public void periodic() {
+        updateTurretZeroFromSensor();
         if (InstalledHardware.useTurretForAiming && turretAimMode == TurretAimMode.AUTO && shooterAimer != null) {
-            Translation2d defaultTarget = getDefaultAimTarget();
-            shooterAimer.setDefaultDesiredTarget(defaultTarget);
             shooterAimer.calculate();
-            double desiredTurretAngle = computeDesiredTurretAngleRadians();
-            setTurretAngleRadians(desiredTurretAngle);
+            setTargetAngleRadians(shooterAimer.getDesiredTurretAngleRadians());
         }
 
-        double targetTurretRotations = targetTurretAngleRadians / (2.0 * Math.PI);
+    double targetTurretRotations = (targetTurretAngle.getRadians() - turretZeroOffset.getRadians())
+        / (2.0 * Math.PI);
         positionController.withPosition(targetTurretRotations);
         turretMotor.setControl(positionController);
 
-        SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getTurretAngleRadians()));
-        SmartDashboard.putNumber("TurretTargetDegrees", Math.toDegrees(targetTurretAngleRadians));
+        SmartDashboard.putNumber("TurretAngleDegrees", getAngleRadians().getDegrees());
+    SmartDashboard.putNumber("TurretTargetDegrees", targetTurretAngle.getDegrees());
     }
 
-    private double computeDesiredTurretAngleRadians() {
-        double robotYawRadians = drivetrain.getGyroscopeRotation().getRadians();
-        double desiredFieldYawRadians = shooterAimer.getAutoYaw().getRadians();
-        
-        double desiredRelativeRadians = desiredFieldYawRadians - robotYawRadians;
-        desiredRelativeRadians = MathUtil.angleModulus(desiredRelativeRadians);
-        return MathUtil.clamp(desiredRelativeRadians, minTurretAngleRadians, maxTurretAngleRadians);
+    private double getTurretMechanismAngleRadians() {
+        Rotation2d turretRotations = Rotation2d.fromRotations(turretMotor.getPosition().getValueAsDouble());
+        return turretRotations.getRadians() * Constants.turretAngleSign;
     }
 
-    private Translation2d getDefaultAimTarget() {
-        Pose2d robotPose = drivetrain.getRobotPosition();
-        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    boolean onOurHalf = alliance == Alliance.Blue
-        ? robotPose.getX() <= Constants.FIELD_LENGTH_X / 2.0
-        : robotPose.getX() >= Constants.FIELD_LENGTH_X / 2.0;
-
-        if (onOurHalf) {
-            return shooterAimer.getHubPositionFromAlliance();
+    private void updateTurretZeroFromSensor() {
+        if (turretSensor == null) {
+            return;
         }
 
-    boolean isLeftSide = robotPose.getY() >= Constants.FIELD_WIDTH_Y / 2.0;
-        
-        if (alliance == Alliance.Blue) {
-            return isLeftSide ? Constants.blueLeftShuttlePosition : Constants.blueRightShuttlePosition;
+        boolean detected = turretSensor.get();
+        if (detected != lastSensorDetected) {
+            double velocity = turretMotor.getVelocity().getValueAsDouble();
+            boolean movingUp = velocity > 0.0;
+            boolean movingDown = velocity < 0.0;
+
+            if ((movingDown && detected) || (movingUp && !detected)) {
+                turretMotor.setPosition(Constants.turretSensorPosition.getRotations());
+                targetTurretAngle = Constants.turretSensorPosition;
+            }
         }
-        return isLeftSide ? Constants.redLeftShuttlePosition : Constants.redRightShuttlePosition;
+
+        lastSensorDetected = detected;
     }
 
     private void configureMotor() {
@@ -161,8 +190,8 @@ public class TurretSubsystem extends SubsystemBase {
 
         talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = maxTurretAngleRadians / (2.0 * Math.PI);
-        talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = minTurretAngleRadians / (2.0 * Math.PI);
+    talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = maxTurretAngle.getRadians() / (2.0 * Math.PI);
+    talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = minTurretAngle.getRadians() / (2.0 * Math.PI);
 
         StatusCode response = turretMotor.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {

@@ -20,13 +20,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.common.LookupTableDouble;
 import frc.robot.subsystems.DrivetrainSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class ShooterAimer {
   private final DrivetrainSubsystem drivetrain;
-  private final TurretSubsystem turret;
   private final SubsystemCollection subsystemCollection;
 
   // NOTE protected flags and methods below exposed for unit testing purposes
@@ -35,6 +33,8 @@ public class ShooterAimer {
   protected boolean displayDiagnostics = false;
 
   private Translation2d desiredTarget = null;
+  private Translation2d defaultTarget = null;
+  // True until a command explicitly sets a target; allows auto default target selection.
   private boolean useDefaultTarget = true;
   private Translation2d targetAdjustment = new Translation2d(0.0, 0.0);
   private Translation2d predictedTarget = null;
@@ -89,9 +89,8 @@ public class ShooterAimer {
    * shooterRPM, kickerRPM, autoYaw angle, autoYaw velocity, hoodExtension
    * requires drivetrain to call calculate() method in periodic when in auto-yaw mode. 
    */
-  public ShooterAimer(DrivetrainSubsystem drivetrain, TurretSubsystem turret, SubsystemCollection subsystemCollection) {
+  public ShooterAimer(DrivetrainSubsystem drivetrain, SubsystemCollection subsystemCollection) {
     this.drivetrain = drivetrain;
-    this.turret = turret;
     this.subsystemCollection = subsystemCollection;
   }
 
@@ -109,7 +108,10 @@ public class ShooterAimer {
    * Intended to be called every tick when auto aiming is in use
    */
   public void calculate(){
-    if (desiredTarget != null){
+    defaultTarget = getDefaultAimTarget();
+    Translation2d activeTarget = useDefaultTarget || desiredTarget == null ? defaultTarget : desiredTarget;
+    if (activeTarget != null){
+      desiredTarget = activeTarget;
       predictedTarget = computePredictedTarget();
       autoYaw = computeYawToFaceTarget();
       autoYawVelocity = computeAutoYawVelocityRadiansPerSecond();
@@ -134,6 +136,7 @@ public class ShooterAimer {
    */
   public void clearShootingAimTarget() {
     desiredTarget = null;
+    defaultTarget = null;
     predictedTarget = null;
     shooterRPM = 0.0;
     kickerRPM = 0.0;
@@ -171,6 +174,15 @@ public class ShooterAimer {
    */
   public Rotation2d getAutoYaw(){
     return autoYaw;
+  }
+
+  /**
+   * Desired turret angle (radians) relative to the robot's forward direction.
+   */
+  public double getDesiredTurretAngleRadians() {
+    double robotYawRadians = drivetrain.getGyroscopeRotation().getRadians();
+    double desiredFieldYawRadians = autoYaw.getRadians();
+    return MathUtil.angleModulus(desiredFieldYawRadians - robotYawRadians);
   }
 
   /**
@@ -306,9 +318,29 @@ public class ShooterAimer {
    * Sets a default target that may be overridden by explicit commands.
    */
   public void setDefaultDesiredTarget(Translation2d target) {
-    if (useDefaultTarget) {
-      this.desiredTarget = target;
+    this.defaultTarget = target;
+  }
+
+  /**
+   * Default aim target chosen based on alliance and field position.
+   */
+  private Translation2d getDefaultAimTarget() {
+    Pose2d robotPose = drivetrain.getRobotPosition();
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    boolean onOurHalf = alliance == Alliance.Blue
+        ? robotPose.getX() <= Constants.FIELD_LENGTH_X / 2.0
+        : robotPose.getX() >= Constants.FIELD_LENGTH_X / 2.0;
+
+    if (onOurHalf) {
+      return getHubPositionFromAlliance();
     }
+
+    boolean isLeftSide = robotPose.getY() >= Constants.FIELD_WIDTH_Y / 2.0;
+
+    if (alliance == Alliance.Blue) {
+      return isLeftSide ? Constants.blueLeftShuttlePosition : Constants.blueRightShuttlePosition;
+    }
+    return isLeftSide ? Constants.redLeftShuttlePosition : Constants.redRightShuttlePosition;
   }
 
   /**
@@ -414,14 +446,8 @@ public class ShooterAimer {
    * pulse.
    */
   protected double hoodExtensionForDistance(double distanceMeters) { //USED
-    if (distanceMeters <= hoodExtensionLookupTable.getMinInput()) {
-      return hoodExtensionLookupTable.getMinOutput();
-    }
-    if (distanceMeters >= hoodExtensionLookupTable.getMaxInput()) {
-      return Constants.hoodMaxPositionRotations;
-    }
     double ext = hoodExtensionLookupTable.queryTable(distanceMeters);
-    return MathUtil.clamp(ext, hoodExtensionLookupTable.getMinOutput(), Constants.hoodMaxPositionRotations);
+    return MathUtil.clamp(ext, Constants.hoodMinPositionRotations, Constants.hoodMaxPositionRotations);
   }
 
   /**
@@ -442,14 +468,8 @@ public class ShooterAimer {
    * @return shooter RPM
    */
   protected double shooterRpmForDistance(double distanceMeters) { //USED
-    if (distanceMeters <= shooterRpmLookupTable.getMinInput()) {
-      return shooterRpmLookupTable.getMinOutput();
-    }
-    if (distanceMeters >= shooterRpmLookupTable.getMaxInput()) {
-      return shooterRpmLookupTable.getMaxOutput();
-    }
-    return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), shooterRpmLookupTable.getMinOutput(),
-        shooterRpmLookupTable.getMaxOutput());
+    return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), Constants.SHOOTER_MIN_RPM,
+        Constants.SHOOTER_MAX_RPM);
   }
 
   private double tofForDistance(double distanceMeters) { //USED
@@ -457,8 +477,8 @@ public class ShooterAimer {
   }
 
   private Rotation2d getCurrentYawRotation() {
-    if (InstalledHardware.useTurretForAiming && turret != null) {
-      return turret.getTurretFieldRotation();
+    if (InstalledHardware.useTurretForAiming && subsystemCollection.getTurretSubsystem() != null) {
+      return drivetrain.getGyroscopeRotation().plus(subsystemCollection.getTurretSubsystem().getAngleRadians());
     }
     return drivetrain.getGyroscopeRotation();
   }

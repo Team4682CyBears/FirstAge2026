@@ -43,8 +43,8 @@ public class ShooterManualCommand extends Command {
     @Override
     public void initialize() {
         if (turret != null) {
-            turret.setTurretAimMode(TurretAimMode.JOYSTICK);
-            turret.setTurretAngleRadians(Math.toRadians(Constants.turretManualShootAngleDegrees));
+            turret.setAimMode(TurretAimMode.MANUAL);
+            turret.setTargetAngleRadians(Constants.turretManualShootAngleDegrees.getRadians());
         }
     }
 
@@ -68,7 +68,7 @@ public class ShooterManualCommand extends Command {
             aimer.clearShootingAimTarget();
         }
         if (turret != null) {
-            turret.setTurretAimMode(TurretAimMode.AUTO);
+            turret.setAimMode(TurretAimMode.AUTO);
         }
     }
 

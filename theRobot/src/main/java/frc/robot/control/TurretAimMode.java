@@ -11,6 +11,6 @@
 package frc.robot.control;
 
 public enum TurretAimMode {
-    JOYSTICK,
+    MANUAL,
     AUTO
 }

@@ -77,14 +77,18 @@ public final class Constants {
     public static final Rotation2d shooterYawOffset = Rotation2d.fromDegrees(-60.0); 
     // *****************************************************************
     // Turret Constants
-    public static final int turretMotorCanId = 33; // TODO update with final CAN ID
-    public static final double turretGearRatio = 1.0; // TODO update with real gear ratio
-    public static final double turretMinAngleDegrees = 0.0;
-    public static final double turretMaxAngleDegrees = 270.0;
-    public static final double turretManualShootAngleDegrees = 90.0; // TODO set desired fixed angle
-    public static final double turretPositionKp = 12.0; //TODO tune all of these
-    public static final double turretPositionKi = 0.0;
-    public static final double turretPositionKd = 0.4;
+    public static final int turretMotorCanId = 23;
+    public static final double turretGearRatio = 5.0;
+
+    public static final Rotation2d turretZeroOffsetDegrees = Rotation2d.fromDegrees(0.0); // TODO set with real offset
+    // Set to -1.0 if turret encoder sign is opposite CCW-positive robot yaw.
+    public static final double turretAngleSign = 1.0;
+    // Turret mechanism angle when the index sensor is triggered.
+    public static final Rotation2d turretSensorPosition = Rotation2d.fromDegrees(0.0);
+    public static final int turretSensorChannel = 1;
+    public static final Rotation2d turretMinAngleDegrees = Rotation2d.fromDegrees(0.0);
+    public static final Rotation2d turretMaxAngleDegrees = Rotation2d.fromDegrees(270.0);
+    public static final Rotation2d turretManualShootAngleDegrees = Rotation2d.fromDegrees(90.0); // TODO set desired fixed angle
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
     public static final double DegreesPerRevolution = 360.0;

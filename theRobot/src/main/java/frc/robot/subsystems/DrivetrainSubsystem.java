@@ -403,8 +403,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
           chassisSpeeds.vyMetersPerSecond * this.speedReductionFactor,
           chassisSpeeds.omegaRadiansPerSecond);
 
-  // THIS IS NOT NEEDED because the chassis speeds are set above.
-  if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
+      if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
         reducedChassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(reducedChassisSpeeds);
       }
 
@@ -636,7 +635,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("RobotFieldYCoordinateMeters", drivetrain.getState().Pose.getY());
 
       SmartDashboard.putBoolean("UseVision", useVision);
-      if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
+      if (swerveYawMode == SwerveYawMode.AUTO) {
         SmartDashboard.putNumber("AutoYawVelocity", getAutoYawVelocityRadiansPerSecond());
       }
     }

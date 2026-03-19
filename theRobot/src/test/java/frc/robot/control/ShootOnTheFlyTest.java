@@ -38,7 +38,7 @@ class ShootOnTheFlyTest {
     subsystemCollection = new SubsystemCollection();
     subsystemCollection.setCameraSubsystem(null);
     drivetrain = new DrivetrainSubsystem(subsystemCollection);
-  shooterAimer = new ShooterAimer(drivetrain, null, subsystemCollection);
+  shooterAimer = new ShooterAimer(drivetrain, subsystemCollection);
   drivetrain.setShooterAimer(shooterAimer);
     // enable driver station and set alliance
     DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
