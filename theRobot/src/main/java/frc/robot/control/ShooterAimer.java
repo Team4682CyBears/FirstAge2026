@@ -98,6 +98,9 @@ public class ShooterAimer {
    */
   public void calculate(){
     desiredTarget = getAimTarget();
+    if (desiredTarget == null) {
+      desiredTarget = getHubPositionFromAlliance();
+    }
     if (desiredTarget != null){
       predictedTarget = computePredictedTarget(desiredTarget);
       autoYaw = computeYawToFaceTarget();

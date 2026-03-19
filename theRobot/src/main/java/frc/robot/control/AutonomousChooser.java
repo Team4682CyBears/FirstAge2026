@@ -90,7 +90,8 @@ public class AutonomousChooser {
     }
 
     private Command getJustShoot(SubsystemCollection subsystems) {
-        if (InstalledHardware.shooterInstalled && InstalledHardware.hoodMotorInstalled && InstalledHardware.hoodEncoderInstalled) {
+        if (InstalledHardware.shooterInstalled && InstalledHardware.hoodMotorInstalled
+                && InstalledHardware.hoodEncoderInstalled) {
             Command aim = new ShooterManualCommand(
                     subsystems).withTimeout(5.0);
             Command shoot = new SequentialCommandGroup(
@@ -151,14 +152,14 @@ public class AutonomousChooser {
         if (subsystems.isDriveTrainSubsystemAvailable()
                 && subsystems.isDriveTrainPowerSubsystemAvailable()
                 && subsystems.isHoodSubsystemAvailable()
-        && subsystems.isShooterSubsystemAvailable()
-        && subsystems.isTurretSubsystemAvailable()) {
+                && subsystems.isShooterSubsystemAvailable()
+                && subsystems.isTurretSubsystemAvailable()) {
 
             NamedCommands.registerCommand(
                     "AutoAimOn",
-            new AutoAimCommand(
-                subsystems,
-        subsystems.getShooterAimer()).withTimeout(5.0));
+                    new AutoAimCommand(
+                            subsystems,
+                            subsystems.getShooterAimer()).withTimeout(5.0));
         }
 
         if (subsystems.isSpinnerSpindexerSubsystemAvaible()
