@@ -13,6 +13,7 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -33,9 +34,10 @@ import frc.robot.control.TurretAimMode;
 public class TurretSubsystem extends SubsystemBase {
     private final TalonFX turretMotor;
     private final DigitalInput turretSensor;
-    private boolean lastSensorDetected = false;
+    private boolean hasZeroed = false;
 
     private final PositionVoltage positionController = new PositionVoltage(0.0);
+    private final VoltageOut voltageOutController = new VoltageOut(0.0);
 
     private TurretAimMode turretAimMode = TurretAimMode.AUTO;
     private Rotation2d targetTurretAngle = new Rotation2d();
@@ -63,9 +65,7 @@ public class TurretSubsystem extends SubsystemBase {
         this.turretSensor = InstalledHardware.turretSensorInstalled
         ? new DigitalInput(Constants.turretSensorChannel)
                 : null;
-        if (turretSensor != null) {
-            lastSensorDetected = turretSensor.get();
-        }
+        hasZeroed = turretSensor == null;
         configureMotor();
     }
 
@@ -113,8 +113,21 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        updateTurretZeroFromSensor();
-    double targetTurretRotations = targetTurretAngle.minus(turretZeroOffset).getRotations();
+        if (!hasZeroed) {
+            if (turretSensor == null) {
+                hasZeroed = true;
+            } else if (turretSensor.get()) {
+                turretMotor.setPosition(Constants.turretSensorPosition.getRotations());
+                targetTurretAngle = Constants.turretSensorPosition;
+                stop();
+                hasZeroed = true;
+            } else {
+                runVoltage(Constants.turretZeroingVoltage);
+            }
+            return;
+        }
+
+        double targetTurretRotations = targetTurretAngle.minus(turretZeroOffset).getRotations();
         positionController.withPosition(targetTurretRotations);
         turretMotor.setControl(positionController);
 
@@ -127,24 +140,20 @@ public class TurretSubsystem extends SubsystemBase {
         return turretRotations.getRadians() * Constants.turretAngleSign;
     }
 
-    private void updateTurretZeroFromSensor() {
-        if (turretSensor == null) {
-            return;
-        }
+    public boolean isLimitSwitchAvailable() {
+        return turretSensor != null;
+    }
 
-        boolean detected = turretSensor.get();
-        if (detected != lastSensorDetected) {
-            double velocity = turretMotor.getVelocity().getValueAsDouble();
-            boolean movingUp = velocity > 0.0;
-            boolean movingDown = velocity < 0.0;
+    public boolean isLimitSwitchTriggered() {
+        return turretSensor != null && turretSensor.get();
+    }
 
-            if ((movingDown && detected) || (movingUp && !detected)) {
-                turretMotor.setPosition(Constants.turretSensorPosition.getRotations());
-                targetTurretAngle = Constants.turretSensorPosition;
-            }
-        }
+    public void runVoltage(double volts) {
+        turretMotor.setControl(voltageOutController.withOutput(volts));
+    }
 
-        lastSensorDetected = detected;
+    public void stop() {
+        turretMotor.setControl(voltageOutController.withOutput(0.0));
     }
 
     private void configureMotor() {

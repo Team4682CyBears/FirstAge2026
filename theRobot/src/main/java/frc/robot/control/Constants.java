@@ -83,12 +83,13 @@ public final class Constants {
     public static final Rotation2d turretZeroOffsetDegrees = Rotation2d.fromDegrees(0.0); // TODO set with real offset
     // Set to -1.0 if turret encoder sign is opposite CCW-positive robot yaw.
     public static final double turretAngleSign = 1.0;
-    // Turret mechanism angle when the index sensor is triggered.
+    // Turret mechanism angle when the limit switch is triggered.
     public static final Rotation2d turretSensorPosition = Rotation2d.fromDegrees(0.0);
     public static final int turretSensorChannel = 1;
     public static final Rotation2d turretMinAngleDegrees = Rotation2d.fromDegrees(0.0);
     public static final Rotation2d turretMaxAngleDegrees = Rotation2d.fromDegrees(270.0);
     public static final Rotation2d turretManualShootAngleDegrees = Rotation2d.fromDegrees(90.0); // TODO set desired fixed angle
+    public static final double turretZeroingVoltage = 1.0; // TODO tune for a steady homing speed
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
     public static final double DegreesPerRevolution = 360.0;
