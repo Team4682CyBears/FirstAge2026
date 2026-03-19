@@ -283,17 +283,21 @@ public class ShooterAimer {
   }
 
   /**
-   * Aim target chosen based on alliance and field position.
-   * When on our half, aim at the hub; otherwise aim at the shuttle target.
+   * Aim target chosen based on alliance and hub X position.
+   * Score when we are at/inside the hub X (blue: <= hub X, red: >= hub X);
+   * otherwise aim at the shuttle target.
    */
   private Translation2d getAimTarget() {
     Pose2d robotPose = drivetrain.getRobotPosition();
     Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    boolean onOurHalf = alliance == Alliance.Blue
-        ? robotPose.getX() <= Constants.FIELD_LENGTH_X / 2.0
-        : robotPose.getX() >= Constants.FIELD_LENGTH_X / 2.0;
+    double hubX = alliance == Alliance.Blue
+        ? Constants.blueHubPosition.getX()
+        : Constants.redHubPosition.getX();
+    boolean canScoreFromHere = alliance == Alliance.Blue
+        ? robotPose.getX() <= hubX
+        : robotPose.getX() >= hubX;
 
-    if (onOurHalf) {
+    if (canScoreFromHere) {
       return getHubPositionFromAlliance();
     }
 
