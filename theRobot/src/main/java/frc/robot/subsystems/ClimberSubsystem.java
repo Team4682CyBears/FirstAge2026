@@ -36,13 +36,13 @@ public class ClimberSubsystem extends SubsystemBase {
 
     private final SparkClosedLoopController PIDController;
 
-    private static final double ROTATIONS_PER_INCH = 2.0; // Placeholder
+    private static final double ROTATIONS_PER_INCH = ((25.0 * (34.0 / 24.0)) / 4) / 1.26504553; // gear ratio * calculated constant
     // position of the top of the sensor range
-    private static final double SENSOR_POSITION_ABOVE_FLOOR_INCHES = 1.0; // Mostly Placeholder
-    private static final double MIN_HEIGHT_ABOVE_FLOOR_INCHES = 0.0; // Placeholder
-    private static final double MAX_HEIGHT_INCHES = 25.0; // Placeholder
-    private static final double POSITION_TOLERANCE_INCHES = 0.25; 
-    private static final double VELOCITY_TOLERANCE = 0.1; 
+    private static final double SENSOR_POSITION_ABOVE_FLOOR_INCHES = 22.5; // Mostly Placeholder
+    private static final double MIN_HEIGHT_ABOVE_FLOOR_INCHES = 20.646257400512695; // Placeholder
+    private static final double MAX_HEIGHT_INCHES = 30.0; // Placeholder
+    private static final double POSITION_TOLERANCE_INCHES = 0.25;
+    private static final double VELOCITY_TOLERANCE = 0.1;
 
     private double targetPositionInches = 0.0; 
 
@@ -58,7 +58,8 @@ public class ClimberSubsystem extends SubsystemBase {
         this.PIDController = this.LeadMotor.getClosedLoopController();
         this.hallEffectSensor = new DigitalInput(DIOPortID);
 
-        SmartDashboard.putNumber("Go to climber position", 1.0);
+        SmartDashboard.putNumber("Go to climber position", 28.0);
+        LeadMotor.getEncoder().setPosition(MIN_HEIGHT_ABOVE_FLOOR_INCHES);
 
         configureMotors();
     }
@@ -134,10 +135,12 @@ public class ClimberSubsystem extends SubsystemBase {
         // if we are going up and we previously detected it and now we don't, zero the sensor
         if (velocity > 0.1 && (lastHallEffectState && !currentDetected)) {
             LeadMotor.getEncoder().setPosition(SENSOR_POSITION_ABOVE_FLOOR_INCHES);
+            System.out.println("CLIMBER POSITION RESETTING!!!!!!!!!!!!!!!!!");
         }
         // if we are going down and we previously didn't detected it and now we do, zero the sensor
         else if (velocity < -0.1 && (!lastHallEffectState && currentDetected)) {
             LeadMotor.getEncoder().setPosition(SENSOR_POSITION_ABOVE_FLOOR_INCHES);
+            System.out.println("CLIMBER POSITION RESETTING!!!!!!!!!!!!!!!!!");
         }
         lastHallEffectState = currentDetected;
     }
@@ -170,13 +173,15 @@ public class ClimberSubsystem extends SubsystemBase {
         leadConfig.idleMode(IdleMode.kBrake); 
         leadConfig.smartCurrentLimit(HardwareConstants.shooterSmartCurrentLimitAmps);
         leadConfig.voltageCompensation(HardwareConstants.nominalVoltageCompensationVolts);
+        leadConfig.inverted(true);
+
 
         leadConfig.encoder
             .positionConversionFactor(positionConversion)
             .velocityConversionFactor(positionConversion / 60.0);
 
         leadConfig.closedLoop
-            .p(0.1)
+            .p(0.2)
             .i(0.0)
             .d(0.0)
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
@@ -187,8 +192,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
         SparkMaxConfig followConfig = new SparkMaxConfig();
         followConfig.idleMode(IdleMode.kBrake);
-        followConfig.follow(LeadMotor); 
-        followConfig.inverted(false);
+        followConfig.follow(LeadMotor);
 
         error = FollowMotor.configure(followConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         checkError(error, FollowMotor.getDeviceId());

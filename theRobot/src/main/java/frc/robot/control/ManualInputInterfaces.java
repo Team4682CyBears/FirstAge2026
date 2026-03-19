@@ -320,7 +320,7 @@ public class ManualInputInterfaces {
             if (this.subsystemCollection.isClimberSubsystemAvailable()) {
                 this.coDriverController.a()
                         .onTrue(new ClimberPositionCommand(this.subsystemCollection.getClimberSubsystem(),
-                                () -> SmartDashboard.getNumber("Go to climber position", 1.0)));
+                                () -> SmartDashboard.getNumber("Go to climber position", 28.0)));
                 this.coDriverController.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.1).and(this.coDriverController.b()).whileTrue(new ClimberVelocityCommand(this.subsystemCollection.getClimberSubsystem(), () -> this.coDriverController.getRightY()));
             }
             // unsure what this should go to
