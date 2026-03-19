@@ -26,6 +26,7 @@ public final class Constants {
 
   // CAN Ids for sensors and spinner
   public static final int rangeSensorCTRECanID = 32;
+  
   public static final int rangeSensorPWFCanID = 33;
   public static final int rangeSensorLaserCanID = 34;
   public static final int SPINNER_CAN_ID = 8;
