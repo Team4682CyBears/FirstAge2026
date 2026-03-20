@@ -226,8 +226,9 @@ public class ManualInputInterfaces {
             // new ButtonPressCommand("driverController.y()", "Toggle Swerve Yaw Mode
             // JOYSTICK")));
 
+            if (this.subsystemCollection.isDriveTrainSubsystemAvailable()) {
             this.driverController.y().whileTrue(new AutoAimMovingCommand(subsystemCollection,
-                    subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+                    subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));}
 
             // Single Controller Binds (REMOVE FOR FINAL ROBOT)
             final boolean useSingleControllerBinds = true;
@@ -313,6 +314,8 @@ public class ManualInputInterfaces {
                         .whileTrue(new ShootCommand(this.subsystemCollection.getShooterSubsystem(), () -> {
                             return SmartDashboard.getNumber("Shooter RPM", 0);
                         }));
+                                    this.coDriverController.y().whileTrue(new ShooterManualCommand(this.subsystemCollection));
+
             }
 
             if (InstalledHardware.hoodMotorInstalled) {
@@ -335,7 +338,6 @@ public class ManualInputInterfaces {
                         }));
             }
 
-            this.coDriverController.y().whileTrue(new ShooterManualCommand(this.subsystemCollection));
         }
     }
 }

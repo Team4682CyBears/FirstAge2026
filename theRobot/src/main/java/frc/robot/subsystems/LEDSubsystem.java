@@ -42,15 +42,15 @@ public class LEDSubsystem extends SubsystemBase {
   private LEDState targetLedState = LEDState.Off;
   private Spark blinkin;
 
-  private boolean useBlinkin = true; 
+  private boolean useBlinkin = false; 
 
     public void changeLEDMethod() {
-    if(useBlinkin) {
-      useBlinkin = false;
-    } else {
-      useBlinkin = true;
+      if(useBlinkin) {
+        useBlinkin = false;
+      } else {
+        useBlinkin = true;
+      }
     }
-  }
 
   /**
    * LEDSubsystem
