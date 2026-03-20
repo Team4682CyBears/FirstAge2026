@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.common.IntakeDirection;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.commands.*;
 
 public class ManualInputInterfaces {
@@ -318,11 +319,17 @@ public class ManualInputInterfaces {
                 }
             }));
             if (this.subsystemCollection.isClimberSubsystemAvailable()) {
-                this.coDriverController.a()
+                this.coDriverController.leftBumper()
                         .onTrue(new ClimberPositionCommand(this.subsystemCollection.getClimberSubsystem(),
-                                () -> SmartDashboard.getNumber("Go to climber position", 28.0)));
-                this.coDriverController.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.1).and(this.coDriverController.b()).whileTrue(new ClimberVelocityCommand(this.subsystemCollection.getClimberSubsystem(), () -> this.coDriverController.getRightY()));
+                                () -> ClimberSubsystem.MIN_HEIGHT_ABOVE_FLOOR_INCHES));
+                this.coDriverController.rightBumper()
+                        .onTrue(new ClimberPositionCommand(this.subsystemCollection.getClimberSubsystem(), () -> 28.0));
+                this.coDriverController.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.1)
+                        .and(this.coDriverController.b())
+                        .whileTrue(new ClimberVelocityCommand(this.subsystemCollection.getClimberSubsystem(),
+                                () -> this.coDriverController.getRightY()));
             }
+            
             // unsure what this should go to
             if (this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
                 // if the left y stick has a magnitude greater than 0.1, run the command.

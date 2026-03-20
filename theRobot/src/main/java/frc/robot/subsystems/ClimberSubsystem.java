@@ -19,7 +19,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.FeedForwardConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
@@ -39,12 +38,15 @@ public class ClimberSubsystem extends SubsystemBase {
     private static final double ROTATIONS_PER_INCH = ((25.0 * (34.0 / 24.0)) / 4) / 1.26504553; // gear ratio * calculated constant
     // position of the top of the sensor range
     private static final double SENSOR_POSITION_ABOVE_FLOOR_INCHES = 22.5; // Mostly Placeholder
-    private static final double MIN_HEIGHT_ABOVE_FLOOR_INCHES = 20.646257400512695; // Placeholder
-    private static final double MAX_HEIGHT_INCHES = 30.0; // Placeholder
     private static final double POSITION_TOLERANCE_INCHES = 0.25;
     private static final double VELOCITY_TOLERANCE = 0.1;
+    private boolean hasZeroedYet = false;
+    private boolean isManualMode = false;
 
     private double targetPositionInches = 0.0; 
+
+    public static final double MIN_HEIGHT_ABOVE_FLOOR_INCHES = 21; // Placeholder
+    public static final double MAX_HEIGHT_INCHES = 30.0; // Placeholder
 
     /**
      * Initializes the climber hardware and configuration.
@@ -133,16 +135,24 @@ public class ClimberSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Climber Velocity Inches Per Second", getVelocity());
 
         // if we are going up and we previously detected it and now we don't, zero the sensor
-        if (velocity > 0.1 && (lastHallEffectState && !currentDetected)) {
+        if ((!this.hasZeroedYet || this.isManualMode) && (lastHallEffectState && !currentDetected)) {
             LeadMotor.getEncoder().setPosition(SENSOR_POSITION_ABOVE_FLOOR_INCHES);
-            System.out.println("CLIMBER POSITION RESETTING!!!!!!!!!!!!!!!!!");
+            hasZeroedYet = true;
         }
         // if we are going down and we previously didn't detected it and now we do, zero the sensor
-        else if (velocity < -0.1 && (!lastHallEffectState && currentDetected)) {
+        else if ((!this.hasZeroedYet || this.isManualMode) && (!lastHallEffectState && currentDetected)) {
             LeadMotor.getEncoder().setPosition(SENSOR_POSITION_ABOVE_FLOOR_INCHES);
-            System.out.println("CLIMBER POSITION RESETTING!!!!!!!!!!!!!!!!!");
+            hasZeroedYet = true;
         }
         lastHallEffectState = currentDetected;
+    }
+
+    public boolean hasZeroed() {
+        return hasZeroedYet;
+    }
+
+    public void setManualMode(boolean manualMode) {
+        this.isManualMode = manualMode;
     }
 
     /**

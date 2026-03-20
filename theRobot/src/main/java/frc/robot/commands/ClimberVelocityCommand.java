@@ -30,13 +30,14 @@ public class ClimberVelocityCommand extends Command {
 
     @Override
     public void execute() {
+        this.climberSubsystem.setManualMode(true);
         double value = joystickSupplier.getAsDouble();
         if (Math.abs(value) < joystickDeadband) {
             climberSubsystem.stop();
         } else if (value > 0) {
-            climberSubsystem.runVoltage(-0.5);
+            climberSubsystem.runVoltage(-1.5);
         } else {
-            climberSubsystem.runVoltage(0.5);
+            climberSubsystem.runVoltage(1.5);
         }
     }
 
