@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants; 
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
+import au.grapplerobotics.interfaces.LaserCanInterface.RegionOfInterest;
 
 import static edu.wpi.first.units.Units.Inches;
 
@@ -43,6 +44,7 @@ public class TofSensorLaser {
         this.canID = canID;
         laserSensor = new LaserCan(canID);
         try {
+            laserSensor.setRegionOfInterest(new LaserCan.RegionOfInterest(7, 7, 1, 1));
             laserSensor.setRangingMode(LaserCan.RangingMode.SHORT);
             laserSensor.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_33MS);
         } catch (ConfigurationFailedException e) {
