@@ -25,8 +25,19 @@ public class TurretDefaultCommand extends Command {
   }
 
   @Override
+  public void initialize() {
+    if (turret != null) {
+      turret.setAimMode(TurretAimMode.AUTO);
+    }
+  }
+
+  @Override
   public void execute() {
     if (!subsystems.isShooterAimerAvailable()) {
+      if (turret != null) {
+        turret.setAimMode(TurretAimMode.MANUAL);
+        turret.setTargetAngleRadians(turret.getAngleRadians().getRadians());
+      }
       return;
     }
 

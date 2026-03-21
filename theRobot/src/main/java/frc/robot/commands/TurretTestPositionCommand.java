@@ -29,4 +29,9 @@ public class TurretTestPositionCommand extends InstantCommand {
     turret.setAimMode(TurretAimMode.MANUAL);
     turret.setTargetAngleRadians(targetRadians);
   }
+
+  @Override
+  public void end(boolean interrupted) {
+    turret.setAimMode(TurretAimMode.AUTO);
+  }
 }
