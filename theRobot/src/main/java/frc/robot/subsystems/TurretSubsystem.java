@@ -35,8 +35,8 @@ public class TurretSubsystem extends SubsystemBase {
     private final TalonFX turretMotor;
     private final DigitalInput turretSensor;
     private boolean hasZeroed = false;
-
-    private final PositionVoltage positionController = new PositionVoltage(0.0);
+    private final PositionVoltage positionController = new PositionVoltage(0.0)
+        .withFeedForward(.2);
     private final VoltageOut voltageOutController = new VoltageOut(0.0);
 
     private TurretAimMode turretAimMode = TurretAimMode.AUTO;
@@ -51,8 +51,7 @@ public class TurretSubsystem extends SubsystemBase {
         .withKP(12.0)
         .withKI(0.0)
         .withKD(0.4)
-        .withKS(.1)
-        .withKV(.15);
+        .withKI(.01);
 
     /**
      * Create a turret subsystem with a motor a sensor.
@@ -110,18 +109,16 @@ public class TurretSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putBoolean("TurretLimitSwitchTriggered", isLimitSwitchTriggered());
         if (!hasZeroed) {
             if (turretSensor == null) {
-                System.out.println("No Sensor!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 hasZeroed = true;
             } else if (isLimitSwitchTriggered()) {
                 turretMotor.setPosition(Constants.turretSensorPosition.getRotations());
                 targetTurretAngleRadians = getTurretAngleRadiansContinuous();
                 stop();
                 hasZeroed = true;
-                System.out.println("Turret zeroing complete.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             } else {
-                System.out.println("Turret zeroing in progress...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 runVoltage(Constants.turretZeroingVoltage);
             }
         } else {
