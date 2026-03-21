@@ -385,9 +385,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
       updateVisionMeasurements(CameraMode.TRACKING);
     }
 
-    if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
+    if (shooterAimer != null) {
       shooterAimer.calculate(); // update all the shooterAimer parameters
-      this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
     }
 
     if (swerveDriveMode == SwerveDriveMode.IMMOVABLE_STANCE && chassisSpeedsAreZero()) {

@@ -33,7 +33,6 @@ public class AutoAimCommand extends Command {
   }
 
   public void initialize() {
-    aimer.clearShootingAimTarget();
     subsystems.getDriveTrainPowerSubsystem().setReducedPowerReductionFactor();
     if (subsystems.isDriveTrainSubsystemAvailable()) {
       subsystems.getDriveTrainSubsystem().setSwerveYawMode(
@@ -42,7 +41,6 @@ public class AutoAimCommand extends Command {
   }
 
   public void execute() {
-    aimer.calculate();
     double ext = aimer.getHoodExtension();
     hood.setExtendoPosition(ext);
     double shooterRpm = aimer.getShooterRPM();

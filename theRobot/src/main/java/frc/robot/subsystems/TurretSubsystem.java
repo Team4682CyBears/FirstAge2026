@@ -47,15 +47,10 @@ public class TurretSubsystem extends SubsystemBase {
     private final Rotation2d turretZeroOffset = Constants.turretZeroOffsetDegrees;
 
     // TODO tune with robot-on-carpet data
-    private static final double turretPositionKp = 12.0;
-    private static final double turretPositionKi = 0.0;
-    private static final double turretPositionKd = 0.4;
-
-    // TODO tune with robot-on-carpet data
     private final Slot0Configs slot0Configs = new Slot0Configs()
-            .withKP(turretPositionKp)
-            .withKI(turretPositionKi)
-            .withKD(turretPositionKd);
+        .withKP(12.0)
+        .withKI(0.0)
+        .withKD(0.4);
 
     /**
      * Create a turret subsystem with a motor a sensor.
@@ -63,7 +58,7 @@ public class TurretSubsystem extends SubsystemBase {
     public TurretSubsystem(int turretCanId) {
         this.turretMotor = new TalonFX(turretCanId);
         this.turretSensor = InstalledHardware.turretSensorInstalled
-        ? new DigitalInput(Constants.turretSensorChannel)
+        ? new DigitalInput(Constants.turretSensorDIOChannel)
                 : null;
         hasZeroed = turretSensor == null;
         configureMotor();
@@ -153,6 +148,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void stop() {
+        targetTurretAngle = getAngleRadians();
         turretMotor.setControl(voltageOutController.withOutput(0.0));
     }
 

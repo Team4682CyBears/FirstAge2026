@@ -82,7 +82,7 @@ class ShootOnTheFlyTest {
     Translation2d expectedTarget = Constants.blueHubPosition.plus(
         new Translation2d(-vx * tof, -vy * tof));
 
-  Translation2d actualTarget = shooterAimer.computePredictedTarget(Constants.blueHubPosition); 
+    Translation2d actualTarget = shooterAimer.getPredictedTarget();
     //TODO debug why this is different than getPredictedTarget
     System.out.println("original target " + Constants.blueHubPosition);
     System.out.println("expected target " + expectedTarget);

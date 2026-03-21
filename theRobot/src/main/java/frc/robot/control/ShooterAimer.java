@@ -39,6 +39,7 @@ public class ShooterAimer {
   private double kickerRPM = 0.0;
   private double hoodExtension = 0.0;
   private Rotation2d autoYaw = new Rotation2d();
+  private Rotation2d desiredTurretAngle = new Rotation2d();
   private double autoYawVelocity = 0.0;
   private double predictedTimeOfFlight = Constants.DEFAULT_PROJECTILE_TIME_OF_FLIGHT_SECONDS;
 
@@ -102,8 +103,14 @@ public class ShooterAimer {
       desiredTarget = getHubPositionFromAlliance();
     }
     if (desiredTarget != null){
-      predictedTarget = computePredictedTarget(desiredTarget);
+      predictedTarget = computePredictedTarget();
+      distance = computeDistanceToPredictedTarget();
+      predictedTimeOfFlight = tofForDistance(distance);
+
+      predictedTarget = computePredictedTarget();
       autoYaw = computeYawToFaceTarget();
+      Rotation2d robotYaw = drivetrain.getGyroscopeRotation();
+      desiredTurretAngle = autoYaw.minus(robotYaw);
       autoYawVelocity = computeAutoYawVelocityRadiansPerSecond();
       distance = computeDistanceToPredictedTarget();
       shooterRPM = shooterRpmForDistance(distance);
@@ -131,6 +138,7 @@ public class ShooterAimer {
     kickerRPM = 0.0;
     hoodExtension = 0.0;
     autoYaw = new Rotation2d();
+    desiredTurretAngle = new Rotation2d();
     autoYawVelocity = 0.0;
     predictedTimeOfFlight = Constants.DEFAULT_PROJECTILE_TIME_OF_FLIGHT_SECONDS;
   }
@@ -168,9 +176,7 @@ public class ShooterAimer {
    * Desired turret angle (radians) relative to the robot's forward direction.
    */
   public double getDesiredTurretAngleRadians() {
-    double robotYawRadians = drivetrain.getGyroscopeRotation().getRadians();
-    double desiredFieldYawRadians = autoYaw.getRadians();
-    return MathUtil.angleModulus(desiredFieldYawRadians - robotYawRadians);
+    return desiredTurretAngle.getRadians();
   }
 
   /**
@@ -304,7 +310,11 @@ public class ShooterAimer {
       return getHubPositionFromAlliance();
     }
 
-    boolean isLeftSide = robotPose.getY() >= Constants.FIELD_WIDTH_Y / 2.0;
+  // Field coordinates are in the WPILib global frame (origin at blue driver
+  // station, +X toward red, +Y toward the left side of the blue driver station).
+  // This means "left" here is always relative to the blue driver station view.
+  // We still select red/blue targets based on alliance below.
+  boolean isLeftSide = robotPose.getY() >= Constants.FIELD_WIDTH_Y / 2.0;
 
     if (alliance == Alliance.Blue) {
       return isLeftSide ? Constants.blueLeftShuttlePosition : Constants.blueRightShuttlePosition;
@@ -359,8 +369,8 @@ public class ShooterAimer {
    *
    * @return the predicted target
    */
-  protected Translation2d computePredictedTarget(Translation2d target) { //USED
-    if (target == null) {
+  protected Translation2d computePredictedTarget() { //USED
+    if (desiredTarget == null) {
       return null;
     }
 
@@ -387,7 +397,7 @@ public class ShooterAimer {
     // NOTE: This function is called before the timeOfFlight is updated, 
     // It uses the timeOfFlight from the last tick because otherwise, 
     // this would be a circular dependency. 
-    Translation2d predicted = target.minus(fieldSpeedsTranslation.times(predictedTimeOfFlight));
+    Translation2d predicted = desiredTarget.minus(fieldSpeedsTranslation.times(predictedTimeOfFlight));
     return predicted;
   }
 

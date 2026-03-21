@@ -11,7 +11,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.control.ShooterAimer;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.control.TurretAimMode;
 import frc.robot.subsystems.HoodSubsystem;
@@ -23,13 +22,11 @@ public class ShooterManualCommand extends Command {
     private ShooterSubsystem shooter;
     private HoodSubsystem hood;
     private TurretSubsystem turret;
-    private ShooterAimer aimer;
 
     public ShooterManualCommand(SubsystemCollection subsystemCollection) {
         shooter = subsystemCollection.getShooterSubsystem();
         hood = subsystemCollection.getHoodSubsystem();
-    turret = subsystemCollection.getTurretSubsystem();
-    this.aimer = subsystemCollection.getShooterAimer();
+        turret = subsystemCollection.getTurretSubsystem();
 
         addRequirements(shooter, hood);
         if (turret != null) {
@@ -47,20 +44,13 @@ public class ShooterManualCommand extends Command {
 
     @Override
     public void execute() {
-        if (aimer != null) {
-            shooter.runRPM(aimer.getMinShooterSpeedRPM());
-        } else {
-            shooter.runRPM(Constants.SHOOTER_CLOSE_RPM);
-        }
+        shooter.runRPM(Constants.SHOOTER_CLOSE_RPM);
         hood.setExtendoPosition(Constants.HOOD_CLOSE_EXTENDO_POSITION);
     }
 
     @Override
     public void end(boolean interrupted) {
         this.shooter.stop();
-        if (aimer != null) {
-            aimer.clearShootingAimTarget();
-        }
         if (turret != null) {
             turret.setAimMode(TurretAimMode.AUTO);
         }
