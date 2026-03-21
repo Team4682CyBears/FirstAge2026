@@ -18,6 +18,8 @@ import frc.robot.common.TestTrajectories;
 import frc.robot.control.InstalledHardware;
 import frc.robot.control.ManualInputInterfaces;
 import frc.robot.control.SubsystemCollection;
+import frc.robot.subsystems.IntakeRollerSubsystem;
+import frc.robot.subsystems.IntakeWristSubsystem;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 import frc.robot.control.AutonomousChooser;
