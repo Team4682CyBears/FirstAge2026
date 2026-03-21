@@ -35,14 +35,17 @@ public class ClimberPositionCommand extends Command {
      */
     @Override
     public void execute() {
-        this.climberSubsystem.setManualMode(true);
+        this.climberSubsystem.setManualMode(false);
         // if we have not zeroed, we should move up until we do, so we can get to a
         // known position. If we have zeroed, we can go to the target position.
         if (this.climberSubsystem.hasZeroed()) {
             this.climberSubsystem.goToPosition(targetHeightSupplier.getAsDouble());
+            //this.climberSubsystem.stop();
         } else {
-            this.climberSubsystem.runVoltage(1.5);
+            this.climberSubsystem.runVoltage(3.0);
         }
+
+
     }
 
     /**
@@ -52,6 +55,6 @@ public class ClimberPositionCommand extends Command {
      */
     @Override
     public boolean isFinished() {
-        return this.climberSubsystem.isClimberWithinTolerance(this.climberSubsystem.getTargetPosition());
+        return this.climberSubsystem.isClimberWithinTolerance();
     }
 }

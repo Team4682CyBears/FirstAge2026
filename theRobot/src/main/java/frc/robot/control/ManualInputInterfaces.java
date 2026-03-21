@@ -258,14 +258,14 @@ public class ManualInputInterfaces {
                 && this.subsystemCollection.isHoodSubsystemAvailable()) {
             this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
         }
-    if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
-        && this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()
-        && this.subsystemCollection.isHoodSubsystemAvailable()
-        && this.subsystemCollection.isShooterSubsystemAvailable()
-        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
-        this.driverController.a().whileTrue(new AutoAimShuttlingCommand(subsystemCollection,
-            subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
-    }
+        if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+            && this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()
+            && this.subsystemCollection.isHoodSubsystemAvailable()
+            && this.subsystemCollection.isShooterSubsystemAvailable()
+            && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
+            this.driverController.a().whileTrue(new AutoAimShuttlingCommand(subsystemCollection,
+                subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+        }
     }
 
     /**

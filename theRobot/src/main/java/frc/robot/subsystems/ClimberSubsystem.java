@@ -43,10 +43,10 @@ public class ClimberSubsystem extends SubsystemBase {
     private boolean hasZeroedYet = false;
     private boolean isManualMode = false;
 
-    private double targetPositionInches = 0.0; 
+    private double targetPositionInches = 0.0;
 
-    public static final double MIN_HEIGHT_ABOVE_FLOOR_INCHES = 21; // Placeholder
-    public static final double MAX_HEIGHT_INCHES = 30.0; // Placeholder
+    public static final double MIN_HEIGHT_ABOVE_FLOOR_INCHES = 20.75; // Placeholder
+    public static final double MAX_HEIGHT_INCHES = 28.0; // Placeholder
 
     /**
      * Initializes the climber hardware and configuration.
@@ -130,21 +130,26 @@ public class ClimberSubsystem extends SubsystemBase {
         double velocity = getVelocity();
 
         SmartDashboard.putBoolean("Climber Sensor Detected", currentDetected);
-
         SmartDashboard.putNumber("Climber Position Inches", getPosition());
         SmartDashboard.putNumber("Climber Velocity Inches Per Second", getVelocity());
 
         // if we are going up and we previously detected it and now we don't, zero the sensor
-        if ((!this.hasZeroedYet || this.isManualMode) && (lastHallEffectState && !currentDetected)) {
+        if ((!this.hasZeroedYet || this.isManualMode) && velocity > 0 && (lastHallEffectState && !currentDetected)) {
             LeadMotor.getEncoder().setPosition(SENSOR_POSITION_ABOVE_FLOOR_INCHES);
             hasZeroedYet = true;
+            System.out.println("Climber zeroed going up");
         }
         // if we are going down and we previously didn't detected it and now we do, zero the sensor
-        else if ((!this.hasZeroedYet || this.isManualMode) && (!lastHallEffectState && currentDetected)) {
+        else if ((!this.hasZeroedYet || this.isManualMode) && velocity < 0 && (!lastHallEffectState && currentDetected)) {
             LeadMotor.getEncoder().setPosition(SENSOR_POSITION_ABOVE_FLOOR_INCHES);
             hasZeroedYet = true;
+            System.out.println("Climber zeroed going down");
         }
         lastHallEffectState = currentDetected;
+
+        if (isClimberWithinTolerance()) {
+            LeadMotor.stopMotor();
+        }
     }
 
     public boolean hasZeroed() {

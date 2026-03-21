@@ -35,9 +35,9 @@ public class ClimberVelocityCommand extends Command {
         if (Math.abs(value) < joystickDeadband) {
             climberSubsystem.stop();
         } else if (value > 0) {
-            climberSubsystem.runVoltage(-1.5);
+            climberSubsystem.runVoltage(-0.5);
         } else {
-            climberSubsystem.runVoltage(1.5);
+            climberSubsystem.runVoltage(0.5);
         }
     }
 
