@@ -385,9 +385,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
       updateVisionMeasurements(CameraMode.TRACKING);
     }
 
-    if (swerveYawMode == SwerveYawMode.AUTO) {
+    if (shooterAimer != null) {
       shooterAimer.calculate(); // update all the shooterAimer parameters
-      this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
     }
 
     if (swerveDriveMode == SwerveDriveMode.IMMOVABLE_STANCE && chassisSpeedsAreZero()) {
@@ -403,7 +402,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
           chassisSpeeds.vyMetersPerSecond * this.speedReductionFactor,
           chassisSpeeds.omegaRadiansPerSecond);
 
-      if (swerveYawMode == SwerveYawMode.AUTO) {
+      if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
         reducedChassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(reducedChassisSpeeds);
       }
 
@@ -421,7 +420,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // do not apply acceleration limis or speed limits.
       // assumes this is used by a trajectory follower that already imposes those
       // constraints.
-      if (swerveYawMode == SwerveYawMode.AUTO) {
+      if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
         this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
       }
       drivetrain.setControl(robotCentricDriveController
