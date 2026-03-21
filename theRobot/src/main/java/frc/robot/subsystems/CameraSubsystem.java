@@ -184,7 +184,6 @@ public class CameraSubsystem extends SubsystemBase {
    */
   public double getTagId() {
     var tagSeen = table.getEntry("tid").getDouble(0);
-    System.out.println("Tag seen ID: " + tagSeen);
     return tagSeen;
   }
 
