@@ -50,7 +50,9 @@ public class TurretSubsystem extends SubsystemBase {
     private final Slot0Configs slot0Configs = new Slot0Configs()
         .withKP(12.0)
         .withKI(0.0)
-        .withKD(0.4);
+        .withKD(0.4)
+        .withKS(.1)
+        .withKV(.15);
 
     /**
      * Create a turret subsystem with a motor a sensor.
@@ -110,17 +112,19 @@ public class TurretSubsystem extends SubsystemBase {
     public void periodic() {
         if (!hasZeroed) {
             if (turretSensor == null) {
+                System.out.println("No Sensor!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 hasZeroed = true;
-            } else if (turretSensor.get()) {
+            } else if (isLimitSwitchTriggered()) {
                 turretMotor.setPosition(Constants.turretSensorPosition.getRotations());
                 targetTurretAngle = Constants.turretSensorPosition;
                 stop();
                 hasZeroed = true;
+                System.out.println("Turret zeroing complete.!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             } else {
+                System.out.println("Turret zeroing in progress...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 runVoltage(Constants.turretZeroingVoltage);
             }
-            return;
-        }
+        } else {
 
         double targetTurretRotations = targetTurretAngle.minus(turretZeroOffset).getRotations();
         positionController.withPosition(targetTurretRotations);
@@ -128,6 +132,7 @@ public class TurretSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("TurretAngleDegrees", getAngleRadians().getDegrees());
         SmartDashboard.putNumber("TurretTargetDegrees", targetTurretAngle.getDegrees());
+        }
     }
 
     private double getTurretMechanismAngleRadians() {
@@ -140,7 +145,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public boolean isLimitSwitchTriggered() {
-        return turretSensor != null && turretSensor.get();
+        return turretSensor != null && !turretSensor.get();
     }
 
     public void runVoltage(double volts) {
@@ -170,10 +175,10 @@ public class TurretSubsystem extends SubsystemBase {
 
         talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = maxTurretAngle.getRotations();
-    talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = minTurretAngle.getRotations();
+        //talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        //talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    //talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = maxTurretAngle.getRotations();
+    //talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = minTurretAngle.getRotations();
 
         StatusCode response = turretMotor.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {

@@ -263,7 +263,7 @@ public class ManualInputInterfaces {
         this.driverController.povDown().onTrue(
             new TurretTestPositionCommand(turret, Math.toRadians(270)));
         this.driverController.povLeft().onTrue(
-            new TurretTestPositionCommand(turret, Math.toRadians(360)));
+            new TurretTestPositionCommand(turret, Math.toRadians(0)));
     }
 
     }

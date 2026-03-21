@@ -78,18 +78,18 @@ public final class Constants {
     // *****************************************************************
     // Turret Constants
     public static final int turretMotorCanId = 23;
-    public static final double turretGearRatio = 5.0;
+    public static final double turretGearRatio = 136.0/24.0;
 
     public static final Rotation2d turretZeroOffsetDegrees = Rotation2d.fromDegrees(0.0); // TODO set with real offset
     // Set to -1.0 if turret encoder sign is opposite CCW-positive robot yaw.
     public static final double turretAngleSign = 1.0;
     // Turret mechanism angle when the limit switch is triggered.
     public static final Rotation2d turretSensorPosition = Rotation2d.fromDegrees(0.0);
-    public static final int turretSensorChannel = 1;
+    public static final int turretSensorDIOChannel = 1;
     public static final Rotation2d turretMinAngleDegrees = Rotation2d.fromDegrees(0.0);
-    public static final Rotation2d turretMaxAngleDegrees = Rotation2d.fromDegrees(270.0);
+    public static final Rotation2d turretMaxAngleDegrees = Rotation2d.fromDegrees(355.0);
     public static final Rotation2d turretManualShootAngleDegrees = Rotation2d.fromDegrees(90.0); // TODO set desired fixed angle
-    public static final double turretZeroingVoltage = 1.0; // TODO tune for a steady homing speed
+    public static final double turretZeroingVoltage = -.3; // TODO tune for a steady homing speed
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
     public static final double DegreesPerRevolution = 360.0;
@@ -116,7 +116,7 @@ public final class Constants {
     // input device constants
     public static final int portDriverController = 0;
     public static final int portCoDriverController = 1;
-    public static final int climberLimSwtichChannel = 1;
+    public static final int climberLimSwtichChannel = 0;
 
     // ******************************************************************
     // led constants
