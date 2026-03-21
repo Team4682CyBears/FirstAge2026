@@ -39,7 +39,7 @@ public class ClimberSubsystem extends SubsystemBase {
     // position of the top of the sensor range
     private static final double SENSOR_POSITION_ABOVE_FLOOR_INCHES = 22.5; // Mostly Placeholder
     private static final double POSITION_TOLERANCE_INCHES = 0.25;
-    private static final double VELOCITY_TOLERANCE = 0.1;
+    private static final double VELOCITY_TOLERANCE_INCHES = 0.1; //inches per second
     private boolean hasZeroedYet = false;
     private boolean isManualMode = false;
 
@@ -96,10 +96,11 @@ public class ClimberSubsystem extends SubsystemBase {
      * @param targetInches The target height in inches relative to the floor.
      */
     public void goToPosition(double targetInches) {
-        targetPositionInches = targetInches;
         double clampedPosition = MathUtil.clamp(targetInches, MIN_HEIGHT_ABOVE_FLOOR_INCHES, MAX_HEIGHT_INCHES);
+        targetPositionInches = clampedPosition;
         PIDController.setSetpoint(clampedPosition, com.revrobotics.spark.SparkBase.ControlType.kPosition);
     }
+    
 
     /**
      * Commands the climber to move to a specific height. The input is clamped 
@@ -112,12 +113,11 @@ public class ClimberSubsystem extends SubsystemBase {
 
     /**
      * Determines if the climber is near its target height and has stopped moving.
-     * @param targetInches The desired height in inches.
      * @return True if within both position and velocity tolerances.
      */
-    public boolean isClimberWithinTolerance(double targetInches) {
-        return (Math.abs(getPosition() - targetInches) < POSITION_TOLERANCE_INCHES) 
-            && (Math.abs(getVelocity()) < VELOCITY_TOLERANCE);
+    public boolean isClimberWithinTolerance() {
+        return (Math.abs(getPosition() - targetPositionInches) < POSITION_TOLERANCE_INCHES) 
+            && (Math.abs(getVelocity()) < VELOCITY_TOLERANCE_INCHES);
     }
 
     /**
