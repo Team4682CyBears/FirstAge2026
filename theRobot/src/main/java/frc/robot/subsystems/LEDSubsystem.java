@@ -177,6 +177,18 @@ public class LEDSubsystem extends SubsystemBase {
     this.setLedStringColor(0, 200, 0);
   }
 
+  private void Purple(){
+    this.setLedStringColor(102, 0, 204);
+  }
+
+  private void WhiteBlink(){
+    if (this.currentBlinkState) {
+        this.setLedStringColor(255, 255, 255);
+    } else {
+       this.setLedStringColor(0, 0, 0);
+    } 
+   }
+
   // Turns off leds
   private void offState() {
     this.setLedStringColor(0, 0, 0);

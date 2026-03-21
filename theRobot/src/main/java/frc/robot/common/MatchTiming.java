@@ -63,23 +63,31 @@ public class MatchTiming {
     }
 
     /**Returns how much time is left in the shift as a double 
-     * returns 72 if in auto and returns 4682 if in endgame
+     * returns 4682 if in endgame or auto and it it returns 2026
+     * 5 seconds before you switch out of auto or 5 seconds before you 
+     * switch into endgame
      * I can improve on how it handles those "edge" cases as
      * I learn better what we want the final implementation to do
     */
-    public double timeLeftInShift(){
+    public static double timeLeftInShift(){
         
         double matchTime = DriverStation.getMatchTime();
 
         if(matchTime < 30){
-            return 72;
+            if(matchTime > 25){
+                return 2026;
+            }
+            return 4682;
             /**this could defintiely be done better but it is 
               * basically just to tell you that you are in auto and not 
               * something else because the time will never be over 25 otherwise
             **/
-        }else if(matchTime < 130){
+        }else if(matchTime < 125){
             double remainder = (matchTime - 30)%25;
             return remainder;
+        
+        }else if(matchTime < 130){
+            return 2026;
         }else{
             return 4682;
             /** same idea as above */

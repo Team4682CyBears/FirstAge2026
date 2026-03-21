@@ -14,14 +14,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.common.LEDState;
+import frc.robot.common.MatchTiming;
 import frc.robot.common.TestTrajectories;
 import frc.robot.control.InstalledHardware;
 import frc.robot.control.ManualInputInterfaces;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
-import frc.robot.subsystems.IntakeRollerSubsystem;
-import frc.robot.subsystems.IntakeWristSubsystem;
 import frc.robot.control.AutonomousChooser;
 import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
@@ -77,6 +76,8 @@ public class RobotContainer {
 
     // do late binding of default commands
     this.lateBindDefaultCommands();
+
+    this.initializeMatchLED();
 
     if (subsystems.isDriveTrainSubsystemAvailable()) {
       AutonomousChooser.configureAutoBuilder(subsystems);
@@ -298,6 +299,16 @@ public class RobotContainer {
     } else {
       DataLogManager.log("FAIL: initializeManualInputInterfaces");
     }
+  }
+
+  private void initializeMatchLED(){
+    double time = MatchTiming.timeLeftInShift();
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Green, () -> time < 15);
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Yellow, () -> time < 20 && time >= 15);
+    subsystems.getLedSubsystem().registerStateAction(LEDState.RedBlink, () -> time <= 25 && time >= 20);
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Purple, () -> time == 4682);
+    subsystems.getLedSubsystem().registerStateAction(LEDState.WhiteBlink, () -> time == 2026);
+
   }
 
   /**
