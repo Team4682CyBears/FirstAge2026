@@ -36,7 +36,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final DigitalInput turretSensor;
     private boolean hasZeroed = false;
     private final PositionVoltage positionController = new PositionVoltage(0.0)
-        .withFeedForward(.2);
+        .withFeedForward(.3);
     private final VoltageOut voltageOutController = new VoltageOut(0.0);
 
     private TurretAimMode turretAimMode = TurretAimMode.AUTO;
