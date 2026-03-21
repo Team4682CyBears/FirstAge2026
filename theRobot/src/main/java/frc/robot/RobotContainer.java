@@ -20,8 +20,6 @@ import frc.robot.control.ManualInputInterfaces;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
-import frc.robot.subsystems.IntakeRollerSubsystem;
-import frc.robot.subsystems.IntakeWristSubsystem;
 import frc.robot.control.AutonomousChooser;
 import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
@@ -220,6 +218,11 @@ public class RobotContainer {
     } else {
       System.out.println("FAIL: initializeShooter");
     }
+    subsystems.getShooterSubsystem().setDefaultCommand(
+      new ShootCommand(
+        subsystems.getShooterSubsystem(),
+        () -> Constants.SHOOTER_CLOSE_RPM
+      ));
   }
 
   /**
