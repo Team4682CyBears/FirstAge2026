@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.common.IntakeDirection;
 import frc.robot.commands.*;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class ManualInputInterfaces {
 
@@ -252,6 +253,18 @@ public class ManualInputInterfaces {
                 && this.subsystemCollection.isKickerSubsystemAvailable()) {
             this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
         }
+
+    if (this.subsystemCollection.isTurretSubsystemAvailable()) {
+        TurretSubsystem turret = this.subsystemCollection.getTurretSubsystem();
+        this.driverController.povUp().onTrue(
+            new TurretTestPositionCommand(turret, Math.toRadians(90)));
+        this.driverController.povRight().onTrue(
+            new TurretTestPositionCommand(turret, Math.toRadians(180)));
+        this.driverController.povDown().onTrue(
+            new TurretTestPositionCommand(turret, Math.toRadians(270)));
+        this.driverController.povLeft().onTrue(
+            new TurretTestPositionCommand(turret, Math.toRadians(360)));
+    }
 
     }
 
