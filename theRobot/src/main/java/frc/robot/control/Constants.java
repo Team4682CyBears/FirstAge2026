@@ -174,9 +174,19 @@ public final class Constants {
     public static final double hoodEncoderAbsoluteOffset = 0.7220;
     public static final double hoodExtendoTolerance = 0.01;
     public static final double hoodMinPositionRotations = 0.0;
-    public static final double hoodMaxPositionRotations = 0.635; 
-
+    public static final double hoodMaxPositionRotations = 0.635;
+    // Distances corresponding to min and max hood positions
+    public static final double HOOD_MIN_DISTANCE_METERS = 1.0;
+    public static final double HOOD_MAX_DISTANCE_METERS = 8.27;
     public static final double HOOD_CLOSE_EXTENDO_POSITION = 0.12;
+
+
+    /// ******************************
+    /// Climber Constants
+    
+    public static final int climberLeadMotorCanID = 25;
+    public static final int climberFollowMotorCanID = 26;
+    public static final int climberHallEffectSensorPort = 0;
 
     /// Intake Constants
     public static final int intakeWristMotorCanID = 17;

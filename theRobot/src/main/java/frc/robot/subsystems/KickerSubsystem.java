@@ -96,6 +96,8 @@ public class KickerSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Kicker Real RPM", getRPM());
     }
 
+    
+
     /*
      * configures motor
      */
