@@ -22,6 +22,7 @@ import frc.robot.common.LookupTableDouble;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.control.Constants;
 
 public class ShooterAimer {
   private final DrivetrainSubsystem drivetrain;
@@ -455,7 +456,7 @@ public class ShooterAimer {
 
   private Rotation2d getCurrentYawRotation() {
     if (InstalledHardware.useTurretForAiming && subsystemCollection.getTurretSubsystem() != null) {
-      return drivetrain.getGyroscopeRotation().plus(subsystemCollection.getTurretSubsystem().getAngleRadians());
+      return drivetrain.getGyroscopeRotation().plus(subsystemCollection.getTurretSubsystem().getAngleRotation2d());
     }
     return drivetrain.getGyroscopeRotation();
   }

@@ -74,13 +74,13 @@ public final class Constants {
     public static final double shooterYOffsetFromCenterOfRobot = -.1397; // in meters, positive is to the left
     public static final Translation2d shooterOffsetFromCenterOfRobot = new Translation2d(
             shooterXOffsetFromCenterOfRobot, shooterYOffsetFromCenterOfRobot);
-    public static final Rotation2d shooterYawOffset = Rotation2d.fromDegrees(-60.0); 
+    public static final Rotation2d shooterYawOffset = Rotation2d.fromDegrees(35.0); 
     // *****************************************************************
     // Turret Constants
     public static final int turretMotorCanId = 23;
     public static final double turretGearRatio = 136.0/24.0;
 
-    public static final Rotation2d turretZeroOffsetDegrees = Rotation2d.fromDegrees(0.0); // TODO set with real offset
+    public static final Rotation2d turretZeroOffsetDegrees = Rotation2d.fromDegrees(120.0); // TODO set with real offset
     // Set to -1.0 if turret encoder sign is opposite CCW-positive robot yaw.
     public static final double turretAngleSign = 1.0;
     // Turret mechanism angle when the limit switch is triggered.
@@ -89,7 +89,7 @@ public final class Constants {
     public static final double turretMinAngleDegrees = 0.0;
     public static final double turretMaxAngleDegrees = 355.0;
     public static final Rotation2d turretManualShootAngleDegrees = Rotation2d.fromDegrees(90.0); // TODO set desired fixed angle
-    public static final double turretZeroingVoltage = -.3; // TODO tune for a steady homing speed
+    public static final double turretZeroingVoltage = -.8; // TODO tune for a steady homing speed
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
     public static final double DegreesPerRevolution = 360.0;
