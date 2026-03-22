@@ -43,7 +43,7 @@ public class ShooterSubsystem extends SubsystemBase {
         this.PIDController = this.LeadMotor.getClosedLoopController();
         configureMotors();
     }
-        
+
     /*
      * Run the shooter at the target voltage
      */
