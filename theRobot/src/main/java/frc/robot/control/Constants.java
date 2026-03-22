@@ -80,7 +80,7 @@ public final class Constants {
     public static final int turretMotorCanId = 23;
     public static final double turretGearRatio = 136.0/24.0;
 
-    public static final Rotation2d turretZeroOffsetDegrees = Rotation2d.fromDegrees(120.0); // TODO set with real offset
+    public static final Rotation2d turretZeroOffsetDegrees = Rotation2d.fromDegrees(113.0 + 2.726); // TODO set with real offset
     // Set to -1.0 if turret encoder sign is opposite CCW-positive robot yaw.
     public static final double turretAngleSign = 1.0;
     // Turret mechanism angle when the limit switch is triggered.
@@ -169,7 +169,7 @@ public final class Constants {
     public static final double SHOOTER_MAX_RPM = 6500.0;
     public static final double SHOOTER_PONDER_RPM = 1000.0;
     public static final double SHOOTER_CLOSE_RPM = 3000.0;
-    public static final double SHOOTER_RPM_OFFSET = 200;
+    public static final double SHOOTER_RPM_OFFSET = 0.0;
 
     // ********************************************************************
     // Kicker Constants

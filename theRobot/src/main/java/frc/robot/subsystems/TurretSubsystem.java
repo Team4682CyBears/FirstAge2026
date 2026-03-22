@@ -121,7 +121,7 @@ public class TurretSubsystem extends SubsystemBase {
         } else {
 
         double adjustedTurretRotations = MathUtil.clamp((MathUtil.angleModulus(targetTurretAngleRadians + turretZeroOffset.getRadians()) + Math.PI)
-                / (2.0 * Math.PI * Constants.turretAngleSign), minTurretAngleRadians, maxTurretAngleRadians);
+               , minTurretAngleRadians, maxTurretAngleRadians) / (2.0 * Math.PI * Constants.turretAngleSign);
         positionController.withPosition(adjustedTurretRotations);
         turretMotor.setControl(positionController);
 
