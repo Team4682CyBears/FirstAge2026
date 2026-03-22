@@ -175,6 +175,7 @@ public final class Constants {
     public static final double hoodExtendoTolerance = 0.01;
     public static final double hoodMinPositionRotations = 0.0;
     public static final double hoodMaxPositionRotations = 0.635;
+
     public static final double HOOD_CLOSE_EXTENDO_POSITION = 0.12;
 
 
@@ -183,7 +184,7 @@ public final class Constants {
     
     public static final int climberLeadMotorCanID = 25;
     public static final int climberFollowMotorCanID = 26;
-    public static final int climberHallEffectSensorPort = 0;
+    public static final int climberHallEffectSensorDIOPort = 0;
 
     /// Intake Constants
     public static final int intakeWristMotorCanID = 17;

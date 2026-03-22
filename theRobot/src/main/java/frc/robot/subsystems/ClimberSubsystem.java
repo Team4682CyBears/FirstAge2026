@@ -60,7 +60,6 @@ public class ClimberSubsystem extends SubsystemBase {
         this.PIDController = this.LeadMotor.getClosedLoopController();
         this.hallEffectSensor = new DigitalInput(DIOPortID);
 
-        SmartDashboard.putNumber("Go to climber position", 28.0);
         LeadMotor.getEncoder().setPosition(MIN_HEIGHT_ABOVE_FLOOR_INCHES);
 
         configureMotors();
@@ -103,9 +102,8 @@ public class ClimberSubsystem extends SubsystemBase {
     
 
     /**
-     * Commands the climber to move to a specific height. The input is clamped 
-     * between the minimum and maximum physical limits.
-     * @param targetInches The target height in inches relative to the floor.
+     * Commands the climber to move at a specific velocity. 
+     * @param inchesPerSecond The target velocity
      */
     public void runVelocity(double inchesPerSecond) {
         PIDController.setSetpoint(inchesPerSecond, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
@@ -173,6 +171,7 @@ public class ClimberSubsystem extends SubsystemBase {
      */ 
     public void stop() {
         LeadMotor.stopMotor();
+        targetPositionInches = getPosition();
     }
 
     private void checkError(REVLibError error, int id) {

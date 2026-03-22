@@ -266,7 +266,7 @@ public class RobotContainer {
   private void initializeClimberSubsystem() {
     if (InstalledHardware.climberInstalled) {
       subsystems.setClimberSubsystem(
-          new ClimberSubsystem(Constants.climberLeadMotorCanID, Constants.climberFollowMotorCanID, Constants.climberHallEffectSensorPort));
+          new ClimberSubsystem(Constants.climberLeadMotorCanID, Constants.climberFollowMotorCanID, Constants.climberHallEffectSensorDIOPort));
       System.out.println("SUCCESS: initializeSpindexer");
     } else {
       System.out.println("FAIL: initializeSpindexer");
