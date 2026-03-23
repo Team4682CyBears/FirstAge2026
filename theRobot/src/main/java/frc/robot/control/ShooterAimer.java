@@ -57,14 +57,16 @@ public class ShooterAimer {
 
   // NOTE: these three LUTs need to have the same min input and max input range.
   private final double[][] hoodExtensionLookupTableData = {
-      { 3.4408, 0.45 },
-      { 4.7448, 0.637 },
+      { 1.0000, 0.07 },
+      { 1.3037, 0.09 },
+      { 3.4408, 0.31 },
+      { 4.7448, 0.57 },
       { 8.2705, 0.637 } };
   private final double[][] shooterRpmLookupTableData = {
       { 1.0, 2912 },
       { 1.3037, 3000 },
-      { 4.7448, 4000 },
-      { 8.2705, 5500 } };
+      { 4.7448, 4200 },
+      { 8.2705, 5000 } };
   private final double[][] kickerRpmLookupTableData = {
       { 1.0, 2000 },
       { 8.2705, 2000 } };
