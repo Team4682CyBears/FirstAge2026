@@ -60,13 +60,13 @@ public final class Constants {
     public static final Translation2d redHubPosition = new Translation2d(FIELD_LENGTH_X - blueHubPosition.getX(), FIELD_WIDTH_Y / 2.0);
 
     // meters
-    public static final double shuttleOffsetFromWall = 1.5;
+    public static final double shuttleOffsetFromWall = 2.5;
 
     // left and right are relative to (0,0) facing other end of the field
     public static final Translation2d blueLeftShuttlePosition = new Translation2d(shuttleOffsetFromWall, shuttleOffsetFromWall);
     public static final Translation2d blueRightShuttlePosition = new Translation2d(shuttleOffsetFromWall, FIELD_WIDTH_Y - shuttleOffsetFromWall);
-    public static final Translation2d redLeftShuttlePosition = new Translation2d(FIELD_LENGTH_X - shuttleOffsetFromWall, shuttleOffsetFromWall);
-    public static final Translation2d redRightShuttlePosition = new Translation2d(FIELD_LENGTH_X - shuttleOffsetFromWall, FIELD_WIDTH_Y - shuttleOffsetFromWall);
+    public static final Translation2d redRightShuttlePosition = new Translation2d(FIELD_LENGTH_X - shuttleOffsetFromWall, shuttleOffsetFromWall);
+    public static final Translation2d redLeftShuttlePosition = new Translation2d(FIELD_LENGTH_X - shuttleOffsetFromWall, FIELD_WIDTH_Y - shuttleOffsetFromWall);
 
     // *****************************************************************
     // Physical Shooter Offsets
