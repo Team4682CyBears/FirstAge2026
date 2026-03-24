@@ -105,10 +105,6 @@ public class ShooterAimer {
     }
     if (desiredTarget != null){
       predictedTarget = computePredictedTarget();
-      distance = computeDistanceToPredictedTarget();
-      predictedTimeOfFlight = tofForDistance(distance);
-
-      predictedTarget = computePredictedTarget();
       autoYaw = computeYawToFaceTarget();
       Rotation2d robotYaw = drivetrain.getGyroscopeRotation();
       desiredTurretAngle = autoYaw.minus(robotYaw);
@@ -123,6 +119,7 @@ public class ShooterAimer {
       System.out.println("Predicted Target " + predictedTarget);
       System.out.println("AutoYaw " + autoYaw);
       System.out.println("AutoYawVelocity " + autoYawVelocity);
+      System.out.println("Turret Angle" + desiredTurretAngle);
       System.out.println("Distance " + distance);
       System.out.println("PredictedTimeOfFlight " + predictedTimeOfFlight);
       }

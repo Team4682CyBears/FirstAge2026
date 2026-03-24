@@ -49,7 +49,7 @@ class ShootStationaryTest {
   void hoodExtensionValidValue() {
     // known lookup table value
     double input = 3.4408;
-    double output = 0.45;
+    double output = 0.31;
     double hoodPosition = shooterAimer.hoodExtensionForDistance(input);
     assertEquals(
         output, hoodPosition, DELTA);
@@ -58,10 +58,10 @@ class ShootStationaryTest {
   @Test
   void hoodExtensionInterpolatedValue() {
     // interpolated lookup table value
-    // 3.4408, 0.45 },
-    // { 4.7448, 0.637
+    // 3.4408, 0.31 },
+    // { 4.7448, 0.57
     double input = 4.0;
-    double numerator = (0.45 * (4.7448 - input)) + (0.637 * (input - 3.4408));
+    double numerator = (0.31 * (4.7448 - input)) + (0.57 * (input - 3.4408));
     double denominator = (4.7448 - 3.4408);
     double output = numerator / denominator;
     double hoodPosition = shooterAimer.hoodExtensionForDistance(input);
@@ -103,9 +103,9 @@ class ShootStationaryTest {
   void shooterRPMInterpolatedValue() {
     // interpolated lookup table value
     // { 1.3037, 3000 },
-    // { 4.7448, 4000 },
+    // { 4.7448, 4200 },
     double input = 4.0;
-    double numerator = (3000 * (4.7448 - input)) + (4000 * (input - 1.3037));
+    double numerator = (3000 * (4.7448 - input)) + (4200 * (input - 1.3037));
     double denominator = (4.7448 - 1.3037);
     double output = numerator / denominator;
     double hoodPosition = shooterAimer.shooterRpmForDistance(input);
@@ -127,7 +127,7 @@ class ShootStationaryTest {
   void ShooterRPMClampAboveMax() {
     // clamp to max when input above max
     double input = 9.0; // above max
-    double output = 5500;
+    double output = 5000;
     double hoodPosition = shooterAimer.shooterRpmForDistance(input);
     assertEquals(
         output, hoodPosition, DELTA);

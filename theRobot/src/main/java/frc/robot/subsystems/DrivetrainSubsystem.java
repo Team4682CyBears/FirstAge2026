@@ -396,15 +396,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
       drivetrain.setControl(brakeDriveController);
     } else if (swerveDriveMode == SwerveDriveMode.FIELD_CENTRIC_DRIVING
         || swerveDriveMode == SwerveDriveMode.FIELD_CENTRIC_SHOOTING) {
+
+      if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
+        this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
+      }
+
       // apply the speed reduction factor to the chassis speeds
       ChassisSpeeds reducedChassisSpeeds = new ChassisSpeeds(
           chassisSpeeds.vxMetersPerSecond * this.speedReductionFactor,
           chassisSpeeds.vyMetersPerSecond * this.speedReductionFactor,
           chassisSpeeds.omegaRadiansPerSecond);
-
-      if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
-        reducedChassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(reducedChassisSpeeds);
-      }
 
       // apply acceleration control
       // TODO should test this at practice feild

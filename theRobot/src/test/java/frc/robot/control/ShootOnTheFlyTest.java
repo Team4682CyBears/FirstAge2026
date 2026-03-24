@@ -64,6 +64,7 @@ class ShootOnTheFlyTest {
     shooterAimer.doCompensateForRotation = false;
 
     // setup drivetrain
+    drivetrain.setSwerveYawMode(SwerveYawMode.AUTO);
     // start 1m from target in x
     // have to set the drivetrain x/y first, and then apply the auto yaw (since the
     // PID that would set it doesn't work in sim)
@@ -71,19 +72,19 @@ class ShootOnTheFlyTest {
         .setRobotPosition(
             new Pose2d(Constants.blueHubPosition.plus(new Translation2d(-1.0, 0.0)), Constants.shooterYawOffset));
     shooterAimer.calculate();
+    // save this tof. the tof used in the shooter aimer calc is the previous tof
+    double tof = shooterAimer.getTimeOfFlight();
     // drive 1 mps away from target in x
     double vx = -1.0;
     double vy = 0.0;
     drivetrain.driveFieldCentricShooting(new ChassisSpeeds(vx, vy, 0.0));
     drivetrain.periodic();
 
-    double tof = shooterAimer.getTimeOfFlight();
     // compute expected target
     Translation2d expectedTarget = Constants.blueHubPosition.plus(
         new Translation2d(-vx * tof, -vy * tof));
 
     Translation2d actualTarget = shooterAimer.getPredictedTarget();
-    //TODO debug why this is different than getPredictedTarget
     System.out.println("original target " + Constants.blueHubPosition);
     System.out.println("expected target " + expectedTarget);
     System.out.println("drivetrain position " + drivetrain.getRobotPosition());
@@ -95,8 +96,9 @@ class ShootOnTheFlyTest {
   @Test
   void RobotYawRotationalVelocityMatters() {
     // override to enable shooter displayDiagnostics for debugging
-    shooterAimer.displayDiagnostics = true;
+    // shooterAimer.displayDiagnostics = true;
     // setup drivetrain
+    drivetrain.setSwerveYawMode(SwerveYawMode.AUTO);
     // start to the left of the target and move backwards
     // have to set the drivetrain x/y first, and then apply the auto yaw (since the
     // PID that would set it doesn't work in sim)
@@ -115,10 +117,11 @@ class ShootOnTheFlyTest {
     // this is the yaw velocity that will be used in the next predicted target
     double yawVelocityRadiansPerSecond = shooterAimer.getAutoYawVelocityRadiansPerSecond();
     System.out.println("auto yaw rotational velocity " + yawVelocityRadiansPerSecond);
+    // save this tof. the tof used in the shooter aimer calc is the previous tof
+    double tof = shooterAimer.getTimeOfFlight();
     drivetrain.periodic();
 
     // compute expected target
-    double tof = shooterAimer.getTimeOfFlight();
     Translation2d expectedTargetPreRotation = Constants.blueHubPosition.plus(
         new Translation2d(-vx * tof,
             -vy * tof));
@@ -135,7 +138,7 @@ class ShootOnTheFlyTest {
             .minus(Rotation2d.fromDegrees(Math.copySign(-90, yawVelocityRadiansPerSecond))));
 
     Translation2d expectedTargetPostRotation = expectedTargetPreRotation.minus(
-        rotVector.times(shooterAimer.getTimeOfFlight()));
+        rotVector.times(tof));
 
     Translation2d predictedTarget = shooterAimer.getPredictedTarget();
 
