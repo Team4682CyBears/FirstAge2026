@@ -20,8 +20,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.control.Constants;
@@ -42,11 +42,9 @@ public class TurretSubsystem extends SubsystemBase {
 
     private TurretAimMode turretAimMode = TurretAimMode.AUTO;
     private double targetTurretAngleRadians = 0.0;
-    // adjusted is target + offset
 
     private final double minTurretAngleRadians = Math.toRadians(Constants.turretMinAngleDegrees);
     private final double maxTurretAngleRadians = Math.toRadians(Constants.turretMaxAngleDegrees);
-    private final Rotation2d turretZeroOffset = Constants.turretZeroOffsetDegrees;
 
     // TODO tune with robot-on-carpet data
     private final Slot0Configs slot0Configs = new Slot0Configs()
@@ -83,26 +81,26 @@ public class TurretSubsystem extends SubsystemBase {
 
     /**
      * Set the desired turret angle (radians) relative to the robot.
+     * Normalizes rotations to [0 .. 2PI] before clamping
+     * to turret min and max angles
      */
     public void setTargetAngleRadians(double turretAngleRadians) {
-        targetTurretAngleRadians = turretAngleRadians;
+        // shift turretAngleRadians to [0..2PI]
+        double modAngleRadians = MathUtil.angleModulus(turretAngleRadians);
+        if (modAngleRadians < 0) {
+            modAngleRadians += 2 * Math.PI;
+        }
+        targetTurretAngleRadians = MathUtil.clamp(
+            modAngleRadians,
+            minTurretAngleRadians, 
+            maxTurretAngleRadians);
     }
 
     /**
      * Get the current turret angle (radians) relative to the robot.
      */
     public Rotation2d getAngleRotation2d() {
-        // this has the offset taken out. Do not use internally. Use getTurretMechanismAngleRadians instead
-        return Rotation2d.fromRadians(
-                MathUtil.angleModulus(getTurretMechanismAngleRadians() - turretZeroOffset.getRadians()));
-    }
-
-    /**
-     * Reset turret encoder position to match the zero offset.
-     */
-    public void zeroTurret() {
-        turretMotor.setPosition(0.0);
-        targetTurretAngleRadians = getAngleRotation2d().getRadians();
+        return Rotation2d.fromRadians(getTurretMechanismAngleRadians());
     }
 
     @Override
@@ -119,11 +117,8 @@ public class TurretSubsystem extends SubsystemBase {
                 runVoltage(Constants.turretZeroingVoltage);
             }
         } else {
-
-        double adjustedTurretRotations = MathUtil.clamp((MathUtil.angleModulus(targetTurretAngleRadians + turretZeroOffset.getRadians()) + Math.PI)
-               , minTurretAngleRadians, maxTurretAngleRadians) / (2.0 * Math.PI * Constants.turretAngleSign);
-        positionController.withPosition(adjustedTurretRotations);
-        turretMotor.setControl(positionController);
+            positionController.withPosition(radiansToRotations(targetTurretAngleRadians));
+            turretMotor.setControl(positionController);
 
         SmartDashboard.putNumber("TurretAngleDegrees", getAngleRotation2d().getDegrees());
         SmartDashboard.putNumber("TurretTargetDegrees", Math.toDegrees(targetTurretAngleRadians));
@@ -131,7 +126,12 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     private double getTurretMechanismAngleRadians() {
-        return turretMotor.getPosition().getValueAsDouble() * 2.0 * Math.PI * Constants.turretAngleSign;
+        if (RobotBase.isSimulation()) {
+            return this.targetTurretAngleRadians;
+        } 
+        else {
+            return rotationsToRadians(turretMotor.getPosition().getValueAsDouble());
+        }
     }
 
     public boolean isLimitSwitchAvailable() {
@@ -167,6 +167,8 @@ public class TurretSubsystem extends SubsystemBase {
         talonMotorConfig.CurrentLimits.SupplyCurrentLimit = HardwareConstants.ctreSupplyCurrentMaximumAmps;
         talonMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
+        // IMPORTANT! Set motor rotation so that turret runs counter clockwise positive
+        // to be consistent with the direction of the robot yaw
         talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
 
         //talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
@@ -180,5 +182,13 @@ public class TurretSubsystem extends SubsystemBase {
                     "TalonFX ID " + turretMotor.getDeviceID() + " failed config with error "
                             + response.toString());
         }
+    }
+
+    private double radiansToRotations(double radians){
+        return radians / 2.0 * Math.PI;
+    }
+
+    private double rotationsToRadians(double rotations){
+        return rotations * 2.0 * Math.PI;
     }
 }

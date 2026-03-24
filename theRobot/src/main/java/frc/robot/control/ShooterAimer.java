@@ -22,7 +22,6 @@ import frc.robot.common.LookupTableDouble;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.control.Constants;
 
 public class ShooterAimer {
   private final DrivetrainSubsystem drivetrain;
@@ -106,8 +105,7 @@ public class ShooterAimer {
     if (desiredTarget != null){
       predictedTarget = computePredictedTarget();
       autoYaw = computeYawToFaceTarget();
-      Rotation2d robotYaw = drivetrain.getGyroscopeRotation();
-      desiredTurretAngle = autoYaw.minus(robotYaw);
+      desiredTurretAngle = computeTurretAngle();
       autoYawVelocity = computeAutoYawVelocityRadiansPerSecond();
       distance = computeDistanceToPredictedTarget();
       shooterRPM = shooterRpmForDistance(distance);
@@ -340,7 +338,7 @@ public class ShooterAimer {
    * Computes an auto-yaw velocity to command the drivetrain when aiming at a
    * target.
    */
-  private double computeAutoYawVelocityRadiansPerSecond() { //USED
+  private double computeAutoYawVelocityRadiansPerSecond() {
     double robotYawRadians = drivetrain.getRobotPosition().getRotation().getRadians();
     double angleToFace = autoYaw.getRadians();
 
@@ -358,8 +356,9 @@ public class ShooterAimer {
    * 
    * @return distance
    */
-  private double computeDistanceToPredictedTarget() { // USED
-    return drivetrain.getRobotPosition().getTranslation().getDistance(predictedTarget);
+  private double computeDistanceToPredictedTarget() {
+    Pose2d botPos = drivetrain.getRobotPosition();
+    return shooterTranslationFromRobotPose(botPos).getDistance(predictedTarget);
   }
 
   /**
@@ -367,7 +366,7 @@ public class ShooterAimer {
    *
    * @return the predicted target
    */
-  protected Translation2d computePredictedTarget() { //USED
+  protected Translation2d computePredictedTarget() {
     if (desiredTarget == null) {
       return null;
     }
@@ -377,7 +376,6 @@ public class ShooterAimer {
     Translation2d fieldSpeedsTranslation = new Translation2d(fieldSpeeds.vxMetersPerSecond,
         fieldSpeeds.vyMetersPerSecond);
     if (doCompensateForRotation) {
-      // TODO test this on-robot. Not sure about direction of the velocity.
       // construct expected rot velocity vector
       Translation2d rotVelocityVector = new Translation2d(
           // magnitude is the shooter distance from center of robot * the rotational
@@ -398,14 +396,30 @@ public class ShooterAimer {
     Translation2d predicted = desiredTarget.minus(fieldSpeedsTranslation.times(predictedTimeOfFlight));
     return predicted;
   }
+  
+  /**
+   * 
+   * @return desired turret rotation2d w.r.t. the robot for the turret to face the target
+   * NOTE: this is a different angle than the robot would use for autoYaw. Since the 
+   * shooter is offset from the center of the robot. 
+   * Returns the rotation relative to the robot accounting for the current robot yaw.
+   */
+  protected Rotation2d computeTurretAngle() {
+    Pose2d botPos = drivetrain.getRobotPosition();
+    Translation2d shooterTranslation = shooterTranslationFromRobotPose(botPos);
+    double dx = predictedTarget.getX() - shooterTranslation.getX();
+    double dy = predictedTarget.getY() - shooterTranslation.getY();
+
+    double angleRad = Math.atan2(dy, dx);
+    return Rotation2d.fromRadians(angleRad).minus(botPos.getRotation());
+  }
 
   /**
-   * @param targetX meters
-   * @param targetY meters
+   * 
    * @return desired field relative Rotation2d for the robot to face the target
    *         accounts for shooterYawOffset relative to robot
    */
-  protected Rotation2d computeYawToFaceTarget() { //USED
+  protected Rotation2d computeYawToFaceTarget() {
     Pose2d botPos = drivetrain.getRobotPosition();
     double dx = predictedTarget.getX() - botPos.getX();
     double dy = predictedTarget.getY() - botPos.getY();
@@ -420,7 +434,7 @@ public class ShooterAimer {
    * The hood subsystem expects a double position (rotations) rather than a servo
    * pulse.
    */
-  protected double hoodExtensionForDistance(double distanceMeters) { //USED
+  protected double hoodExtensionForDistance(double distanceMeters) {
     double ext = hoodExtensionLookupTable.queryTable(distanceMeters);
     return MathUtil.clamp(ext, Constants.hoodMinPositionRotations, Constants.hoodMaxPositionRotations);
   }
@@ -431,9 +445,19 @@ public class ShooterAimer {
    * @param distanceMeters
    * @return kicker RPM
    */
-  private double kickerRpmForDistance(double distanceMeters) { //USED
+  private double kickerRpmForDistance(double distanceMeters) {
     return MathUtil.clamp(kickerRpmLookupTable.queryTable(distanceMeters), Constants.KICKER_MIN_RPM,
         Constants.KICKER_MAX_RPM);
+  }
+
+  /**
+   * helper to get the shooter pose from the robot pose in field coordinates
+   * @param robotPose in field coordinates
+   * @return shooter pose in field coordinates
+   */
+  protected Translation2d shooterTranslationFromRobotPose(Pose2d robotPose) {
+    return robotPose.getTranslation().plus(
+        Constants.shooterOffsetFromCenterOfRobot.rotateBy(robotPose.getRotation()));
   }
 
   /**
@@ -442,12 +466,12 @@ public class ShooterAimer {
    * @param distanceMeters
    * @return shooter RPM
    */
-  protected double shooterRpmForDistance(double distanceMeters) { //USED
+  protected double shooterRpmForDistance(double distanceMeters) {
     return MathUtil.clamp(shooterRpmLookupTable.queryTable(distanceMeters), Constants.SHOOTER_MIN_RPM,
         Constants.SHOOTER_MAX_RPM);
   }
 
-  private double tofForDistance(double distanceMeters) { //USED
+  private double tofForDistance(double distanceMeters) {
     return tofLookupTable.queryTable(distanceMeters);
   }
 
