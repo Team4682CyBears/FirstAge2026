@@ -11,10 +11,12 @@
 package frc.robot.control;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 import org.junit.jupiter.api.AfterEach;
@@ -144,7 +146,7 @@ class ShootStationaryTest {
 
   @Test
   void RobotYawTarget45degrees() {
-    // robot yaw should be -135 (180+45 - shooterYawOffset) degrees when offset equal amounts in x/y
+    // robot yaw should be -135 (180+45 + shooterYawOffset) degrees when offset equal amounts in x/y
     drivetrain
         .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 1.0)), new Rotation2d(0.0)));
     assertEquals(Rotation2d.fromDegrees(180.0 + 45.0).plus(Constants.shooterYawOffset).getDegrees(), 
@@ -160,4 +162,43 @@ class ShootStationaryTest {
     shooterAimer.computeYawToFaceTarget().getDegrees(),
     DELTA);
   }
+
+  @Test
+  void TurretYawTargetDeadOn() {
+    // turret yaw should be 0 when dead on to target
+    // to make the turret dead on target, need to shift by shooter offset
+    drivetrain
+        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)).minus(Constants.shooterOffsetFromCenterOfRobot), new Rotation2d(0.0)));
+    assertEquals(0.0, 
+    shooterAimer.computeTurretAngle().getDegrees(), DELTA);
+  }
+
+  @Test
+  void TurretYawTargetNotDeadOn() {
+    // turret yaw should be slightly (counterclockwise) positive when robot is dead on to target
+    // turret is shifted by shooter offset w.r.t. the robot, so restulting in a small positive angle
+    drivetrain
+        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(new Translation2d(1.0, 0.0)), new Rotation2d(0.0)));
+    double expectedAngleRadians = -Math.atan2(Constants.shooterYOffsetFromCenterOfRobot, 1.0 + Constants.shooterXOffsetFromCenterOfRobot);
+    double actualAngleDegrees = shooterAimer.computeTurretAngle().getDegrees();
+    assertEquals(Units.radiansToDegrees(expectedAngleRadians), actualAngleDegrees, DELTA);
+    assertTrue(actualAngleDegrees > 0.0);
+  }
+
+  @Test
+  void TurretYawTargetWithRobotYaw() {
+    // when shooter is 1m left and 1m back of target, and robot rotated CCW 90 (positive 90)
+    // turret yaw should be (counterclockwise) positive 225 (=180+45) degrees
+    // turret is offset from robot by a set offset.
+    drivetrain
+        .setRobotPosition(new Pose2d(Constants.blueHubPosition.plus(
+          new Translation2d(
+            1.0 + Constants.shooterXOffsetFromCenterOfRobot, 
+            1.0 - Constants.shooterYOffsetFromCenterOfRobot)), 
+          Rotation2d.fromDegrees(90.0)));
+    // get the actual in degrees [0..360]
+    double actualAngleDegrees = (shooterAimer.computeTurretAngle().getDegrees() + 360)%360;
+    assertEquals(225.0, actualAngleDegrees, DELTA);
+  }
+
 }

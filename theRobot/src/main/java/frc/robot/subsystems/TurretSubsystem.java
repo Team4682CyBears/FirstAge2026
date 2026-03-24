@@ -85,15 +85,7 @@ public class TurretSubsystem extends SubsystemBase {
      * to turret min and max angles
      */
     public void setTargetAngleRadians(double turretAngleRadians) {
-        // shift turretAngleRadians to [0..2PI]
-        double modAngleRadians = MathUtil.angleModulus(turretAngleRadians);
-        if (modAngleRadians < 0) {
-            modAngleRadians += 2 * Math.PI;
-        }
-        targetTurretAngleRadians = MathUtil.clamp(
-            modAngleRadians,
-            minTurretAngleRadians, 
-            maxTurretAngleRadians);
+        targetTurretAngleRadians = clampAngleRadians(turretAngleRadians, minTurretAngleRadians, maxTurretAngleRadians);
     }
 
     /**
@@ -125,7 +117,7 @@ public class TurretSubsystem extends SubsystemBase {
         }
     }
 
-    private double getTurretMechanismAngleRadians() {
+    protected double getTurretMechanismAngleRadians() {
         if (RobotBase.isSimulation()) {
             return this.targetTurretAngleRadians;
         } 
@@ -149,6 +141,28 @@ public class TurretSubsystem extends SubsystemBase {
     public void stop() {
         targetTurretAngleRadians = getAngleRotation2d().getRadians();
         turretMotor.stopMotor();
+    }
+
+    /**
+     * clamps an angle to the closest endoint
+     * @param angleRadians
+     * @param minAngleRadians
+     * @param maxAngleRadians
+     * @return
+     */
+    private double clampAngleRadians(double angleRadians, double minAngleRadians, double maxAngleRadians) {
+        double modAngleRadians = positiveAngleModulus(angleRadians);
+        if (modAngleRadians>= minAngleRadians && modAngleRadians <= maxAngleRadians){
+            return modAngleRadians;
+        }
+        double deltaToMin = Math.abs(MathUtil.angleModulus(modAngleRadians - minAngleRadians));
+        double deltaToMax = Math.abs(MathUtil.angleModulus(modAngleRadians - maxAngleRadians));
+        if (deltaToMin <= deltaToMax) {
+            return minAngleRadians;
+        } 
+        else {
+            return maxAngleRadians;
+        }
     }
 
     private void configureMotor() {
@@ -184,11 +198,31 @@ public class TurretSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+     * wraps an angle to [0 .. 2PI]
+     * @param radians
+     * @return
+     */
+    private double positiveAngleModulus(double angleRadians) {
+        double modAngleRadians = MathUtil.angleModulus(angleRadians);
+        if (modAngleRadians < 0) {
+            modAngleRadians += 2 * Math.PI;
+        }
+        return modAngleRadians;
+    }
+
     private double radiansToRotations(double radians){
         return radians / 2.0 * Math.PI;
     }
 
     private double rotationsToRadians(double rotations){
         return rotations * 2.0 * Math.PI;
+    }
+
+    /**
+     * for testing and simulation only
+     */
+    protected void close(){
+        turretSensor.close();
     }
 }
