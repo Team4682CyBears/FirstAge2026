@@ -58,8 +58,8 @@ public class ShooterAimer {
   private final double[][] hoodExtensionLookupTableData = {
       { 1.0000, 0.07 },
       { 1.3037, 0.09 },
-      { 3.4408, 0.31 },
-      { 4.7448, 0.57 },
+      { 3.4408, 0.35 },
+      { 4.7448, 0.55 },
       { 8.2705, 0.637 } };
   private final double[][] shooterRpmLookupTableData = {
       { 1.0, 2912 },
@@ -70,11 +70,11 @@ public class ShooterAimer {
       { 1.0, 2000 },
       { 8.2705, 2000 } };
   private final double[][] tofLookupTableData = {
-      { 1.0000, 0.923 },
-      { 1.3037, 0.923 },
-      { 3.4408, 1.193 },
-      { 4.7448, 1.300 },
-      { 8.2705, 2.315 } };
+      { 1.0000, 0.913 },
+      { 1.3037, 0.960 },
+      { 3.4408, 1.222 },
+      { 4.7448, 1.332 },
+      { 8.2705, 1.729 } };
 
   private final LookupTableDouble hoodExtensionLookupTable = new LookupTableDouble(hoodExtensionLookupTableData);
   private final LookupTableDouble shooterRpmLookupTable = new LookupTableDouble(shooterRpmLookupTableData);
