@@ -254,6 +254,11 @@ public class ShooterAimer {
    */
   public boolean isAtPosition() {
     Rotation2d currentYaw = getCurrentYawRotation();
+    // TODO not sure this is correct, since autoYaw != the total yaw the turret yaw is targeting
+    // I think if useTurretForAiming==true, we should return 
+    // whether the turret ange == desiredTurretAngle
+    // if useTurretForAiming==false, we should return 
+    // whether getGyroscopeRotation == autoYaw
     double yawErr = Math.abs(MathUtil.angleModulus(currentYaw.minus(autoYaw).getRadians()));
     boolean yawOk = yawErr < Math.toRadians(yawToleranceDegrees); // 3 deg tolerance
 
