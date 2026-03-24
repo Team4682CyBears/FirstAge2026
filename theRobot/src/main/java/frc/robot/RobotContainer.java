@@ -371,6 +371,9 @@ public class RobotContainer {
     if (subsystems.isTurretSubsystemAvailable()) {
       subsystems.getTurretSubsystem().setDefaultCommand(new TurretDefaultCommand(subsystems));
     }
+    if (subsystems.isShooterSubsystemAvailable()) {
+      subsystems.getShooterSubsystem().setDefaultCommand(new ShooterDefaultCommand(subsystems));
+    }
   }
 
   private static double deadband(double value, double deadband) {
