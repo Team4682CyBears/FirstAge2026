@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.common.IntakeDirection;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.commands.*;
 import frc.robot.subsystems.TurretSubsystem;
 
@@ -231,9 +232,9 @@ public class ManualInputInterfaces {
             }
         }
 
-    if (this.subsystemCollection.isKickerSubsystemAvailable()
-        && this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()
-        && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
+        if (this.subsystemCollection.isKickerSubsystemAvailable()
+                && this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()
+                && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
             this.driverController.rightTrigger().whileTrue(new KickerSpindexerAgitateCommand(
                     this.subsystemCollection.getKickerSubsystem(),
                     this.subsystemCollection.getSpindexerSpinnerSubsystem(),
@@ -254,18 +255,17 @@ public class ManualInputInterfaces {
             this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
         }
 
-    if (this.subsystemCollection.isTurretSubsystemAvailable()) {
-        TurretSubsystem turret = this.subsystemCollection.getTurretSubsystem();
-        this.driverController.povUp().onTrue(
-            new TurretTestPositionCommand(turret, Math.toRadians(90)));
-        this.driverController.povRight().onTrue(
-            new TurretTestPositionCommand(turret, Math.toRadians(180)));
-        this.driverController.povDown().onTrue(
-            new TurretTestPositionCommand(turret, Math.toRadians(270)));
-        this.driverController.povLeft().onTrue(
-            new TurretTestPositionCommand(turret, Math.toRadians(0)));
-    }
-
+        if (this.subsystemCollection.isTurretSubsystemAvailable()) {
+            TurretSubsystem turret = this.subsystemCollection.getTurretSubsystem();
+            this.driverController.povUp().onTrue(
+                    new TurretTestPositionCommand(turret, Math.toRadians(90)));
+            this.driverController.povRight().onTrue(
+                    new TurretTestPositionCommand(turret, Math.toRadians(180)));
+            this.driverController.povDown().onTrue(
+                    new TurretTestPositionCommand(turret, Math.toRadians(270)));
+            this.driverController.povLeft().onTrue(
+                    new TurretTestPositionCommand(turret, Math.toRadians(0)));
+        }
     }
 
     private ShooterAimer getActiveShooterAimer() {
@@ -289,25 +289,34 @@ public class ManualInputInterfaces {
                                     "coDriverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
 
-        if (this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
-        // if the left y stick has a magnitude greater than 0.1, run the command.
-        this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).and(this.coDriverController.b())
-            .whileTrue(new IntakeWristManualCommand(
-                this.subsystemCollection.getIntakeWristSubsystem(),
-                () -> -this.coDriverController.getLeftY()));
-        }
+            if (this.subsystemCollection.isClimberSubsystemAvailable()) {
+                this.coDriverController.leftBumper()
+                        .onTrue(new ClimberPositionCommand(this.subsystemCollection.getClimberSubsystem(),
+                                () -> ClimberSubsystem.MIN_HEIGHT_ABOVE_FLOOR_INCHES));
+                this.coDriverController.rightBumper()
+                        .onTrue(new ClimberPositionCommand(this.subsystemCollection.getClimberSubsystem(), () -> 28.0));
+                this.coDriverController.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.1)
+                        .and(this.coDriverController.b())
+                        .whileTrue(new ClimberVelocityCommand(this.subsystemCollection.getClimberSubsystem(),
+                                () -> this.coDriverController.getRightY()));
+            }
+            
+            // unsure what this should go to
+            if (this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
+                // if the left y stick has a magnitude greater than 0.1, run the command.
+                this.coDriverController.axisMagnitudeGreaterThan(XboxController.Axis.kLeftY.value, 0.1).and(this.coDriverController.b())
+                        .whileTrue(new IntakeWristManualCommand(
+                                this.subsystemCollection.getIntakeWristSubsystem(),
+                                () -> -this.coDriverController.getLeftY()));
+            }
 
-        if (this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
-        // when y is pressed, toggle the intake roller manual command
-        this.coDriverController.y()
-            .toggleOnTrue(
-        new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(),
-            IntakeDirection.INTAKE));
-        this.coDriverController.a()
-            .toggleOnTrue(
-        new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(),
-            IntakeDirection.OUTTAKE));
-        }
+            if (this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
+                // when y is pressed, toggle the intake roller manual command
+                this.coDriverController.y()
+                        .toggleOnTrue(
+                                new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(),
+                                        IntakeDirection.INTAKE));
+            }
         }
     }
 }

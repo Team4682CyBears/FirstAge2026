@@ -56,6 +56,9 @@ public class InstalledHardware {
     public static final boolean intakeWristMotorInstalled = true;
     public static final boolean intakeRollerInstalled = true;
 
+    // Climber
+    public static final boolean climberInstalled = true;
+
     // TOF Sensor Hardware
     // Important! You must disable any TOF sensor that is not installed!!
     // If you try to configure a TOF sensor that is not installed

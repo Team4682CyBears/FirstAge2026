@@ -59,6 +59,9 @@ public class RobotContainer {
 
     // init the spindexer subsystem
     this.initializeSpindexerSubsystem();
+
+    // init the climber subsystem
+    this.initializeClimberSubsystem();
     
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
@@ -257,6 +260,19 @@ public class RobotContainer {
     if (InstalledHardware.spindexerInstalled) {
       subsystems.setSpindexerSpinnerSubsystem(
           new SpindexerSpinner(Constants.spindexerTalonFXCanID, Constants.spindexerSensorLaserCanID));
+      System.out.println("SUCCESS: initializeSpindexer");
+    } else {
+      System.out.println("FAIL: initializeSpindexer");
+    }
+  }
+
+  /**
+   * A method to init the spindexer subsystem
+   */
+  private void initializeClimberSubsystem() {
+    if (InstalledHardware.climberInstalled) {
+      subsystems.setClimberSubsystem(
+          new ClimberSubsystem(Constants.climberLeadMotorCanID, Constants.climberFollowMotorCanID, Constants.climberHallEffectSensorDIOPort));
       System.out.println("SUCCESS: initializeSpindexer");
     } else {
       System.out.println("FAIL: initializeSpindexer");

@@ -18,6 +18,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.ShotLogger;
 import frc.robot.subsystems.SpindexerSpinner;
 import frc.robot.subsystems.CameraSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.IntakeRollerSubsystem;
@@ -37,6 +38,7 @@ public class SubsystemCollection {
     private ShooterSubsystem shooterSubsystem = null;
     private KickerSubsystem kickerSubsystem = null;
     private HoodSubsystem hoodSubsystem = null;
+    private ClimberSubsystem climberSubsystem = null;
     private IntakeRollerSubsystem intakeRollerSubsystem = null;
     private IntakeWristSubsystem intakeWristSubsystem = null;
     private ShotLogger shotLogger = null;
@@ -108,6 +110,18 @@ public class SubsystemCollection {
 
     public boolean isHoodSubsystemAvailable() {
         return hoodSubsystem != null;
+    }
+
+    public ClimberSubsystem getClimberSubsystem() {
+        return climberSubsystem;
+    }
+
+    public void setClimberSubsystem(ClimberSubsystem value) {
+        climberSubsystem = value;
+    }
+
+    public boolean isClimberSubsystemAvailable() {
+        return climberSubsystem != null;
     }
 
     public KickerSubsystem getKickerSubsystem() {
