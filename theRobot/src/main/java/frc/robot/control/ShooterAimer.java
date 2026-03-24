@@ -36,6 +36,7 @@ public class ShooterAimer {
   private Translation2d predictedTarget = null;
   private double distance = 0.0;
   private double shooterRPM = 0.0;
+  private boolean shouldRevShooter = false;
   private double kickerRPM = 0.0;
   private double hoodExtension = 0.0;
   private Rotation2d autoYaw = new Rotation2d();
@@ -131,6 +132,7 @@ public class ShooterAimer {
     desiredTarget = null;
     predictedTarget = null;
     shooterRPM = 0.0;
+    shouldRevShooter = false;
     kickerRPM = 0.0;
     hoodExtension = 0.0;
     autoYaw = new Rotation2d();
@@ -240,6 +242,14 @@ public class ShooterAimer {
   }
 
   /**
+   * Get pre-computed shouldRevShooter
+   * @return shouldRevShooter
+   */
+  public boolean getShouldRevShooter(){
+    return shouldRevShooter;
+  }
+
+  /**
    * Get pre-computed time of flight
    * @return time of flight (seconds)
    */
@@ -296,6 +306,8 @@ public class ShooterAimer {
    * Aim target chosen based on alliance and hub X position.
    * Score when we are at/inside the hub X (blue: <= hub X, red: >= hub X);
    * otherwise aim at the shuttle target.
+   * side effect: if canScoreFromHere is true, sets shouldRevShooter to true.
+   * TODO fix this to be handled cleanly, rather than via a side-effect.
    */
   private Translation2d getAimTarget() {
     Pose2d robotPose = drivetrain.getRobotPosition();
@@ -308,6 +320,7 @@ public class ShooterAimer {
         : robotPose.getX() >= hubX;
 
     if (canScoreFromHere) {
+      shouldRevShooter = true;
       return getHubPositionFromAlliance();
     }
 
