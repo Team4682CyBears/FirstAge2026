@@ -20,6 +20,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -47,16 +48,20 @@ public class TurretSubsystem extends SubsystemBase {
     private final double minTurretAngleRadians = Math.toRadians(Constants.turretMinAngleDegrees);
     private final double maxTurretAngleRadians = Math.toRadians(Constants.turretMaxAngleDegrees);
 
-    // // TODO tune with robot-on-carpet data
-    // private final Slot0Configs slot0Configs = new Slot0Configs()
-    //     .withKP(9.5)
-    //     .withKI(0.0)
-    //     .withKD(0.4)
-    //     .withKI(.01);
+    // TODO tune with robot-on-carpet data
+    private final Slot0Configs slot0Configs = new Slot0Configs()
+        .withKP(9.5)
+        .withKI(0.0)
+        .withKD(0.4)
+        .withKI(.01);
 
     private MotionMagicVoltage motionMagicController = new MotionMagicVoltage(0.0);
     private Slot0Configs motionMagicSlot0Configs = new Slot0Configs().withKP(0.5).withKI(0.00).withKD(0.0)
             .withKV(0.60).withKS(0.35); 
+
+    // Trapezoid profile with max velocity 80 rps, max accel 160 rps/s
+    final TrapezoidProfile m_profile = new TrapezoidProfile(
+    new TrapezoidProfile.Constraints(80, 160));
 
     /**
      * Create a turret subsystem with a motor a sensor.
@@ -132,8 +137,19 @@ public class TurretSubsystem extends SubsystemBase {
             else {
                 // positionController.withPosition(radiansToRotations(targetTurretAngleRadians));
                 // turretMotor.setControl(positionController);
-                turretMotor.setControl(
-                        motionMagicController.withPosition(radiansToRotations(targetTurretAngleRadians)));
+                // turretMotor.setControl(
+                // motionMagicController.withPosition(radiansToRotations(targetTurretAngleRadians)));
+                TrapezoidProfile.State m_goal = new TrapezoidProfile.State(radiansToRotations(targetTurretAngleRadians), 0);
+                TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+
+                // calculate the next profile setpoint
+                m_setpoint = m_profile.calculate(0.020, m_setpoint, m_goal);
+
+                // send the request to the device
+                positionController.Position = m_setpoint.position;
+                positionController.Velocity = m_setpoint.velocity;
+                turretMotor.setControl(positionController);
+
             }
         }
         SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getTurretMechanismAngleRadians()));
