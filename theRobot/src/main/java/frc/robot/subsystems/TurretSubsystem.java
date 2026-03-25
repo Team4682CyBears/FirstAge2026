@@ -20,6 +20,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -37,9 +38,9 @@ public class TurretSubsystem extends SubsystemBase {
     private final TalonFX turretMotor;
     private final DigitalInput turretSensor;
     private boolean hasZeroed = false;
-    private int ticksToWaitAfterZero = 0;
-    private final PositionVoltage positionController = new PositionVoltage(0.0)
-        .withFeedForward(0.0); // was 0.7
+    private boolean isStopped = true;
+    // offset to add when setting position
+    private double turretZeroOffsetRadians = 0.0;
     private final VoltageOut voltageOutController = new VoltageOut(0.0);
 
     private TurretAimMode turretAimMode = TurretAimMode.AUTO;
@@ -48,19 +49,13 @@ public class TurretSubsystem extends SubsystemBase {
     private final double minTurretAngleRadians = Math.toRadians(Constants.turretMinAngleDegrees);
     private final double maxTurretAngleRadians = Math.toRadians(Constants.turretMaxAngleDegrees);
 
-    // TODO tune with robot-on-carpet data
-    private final Slot0Configs slot0Configs = new Slot0Configs()
-        .withKP(0.6)
-        .withKD(0.4)
-        .withKI(.01);
-
-    private MotionMagicVoltage motionMagicController = new MotionMagicVoltage(0.0);
-    private Slot0Configs motionMagicSlot0Configs = new Slot0Configs().withKP(0.5).withKI(0.00).withKD(0.0)
-            .withKV(0.60).withKS(0.35); 
-
-    // Trapezoid profile with max velocity 80 rps, max accel 160 rps/s
-    final TrapezoidProfile m_profile = new TrapezoidProfile(
-    new TrapezoidProfile.Constraints(80, 160));
+    private double turretProfileConstraintsMaxVoltage = 5;
+    private double turretProfileConstraintsMaxVoltageDelta = 10;
+    private TrapezoidProfile.Constraints turretProfileConstraints = new TrapezoidProfile.Constraints(
+            turretProfileConstraintsMaxVoltage, turretProfileConstraintsMaxVoltageDelta);
+    private ProfiledPIDController turretPID = new ProfiledPIDController(2.0, 0.0, 0.01, turretProfileConstraints);
+    private double minTurretVoltage = 0.30;
+    private double turretPidDeadband = 0.01;
 
     /**
      * Create a turret subsystem with a motor a sensor.
@@ -71,9 +66,6 @@ public class TurretSubsystem extends SubsystemBase {
         ? new DigitalInput(Constants.turretSensorDIOChannel)
                 : null;
         hasZeroed = turretSensor == null;
-        if (!hasZeroed){
-            ticksToWaitAfterZero = 20;
-        }
         configureMotor();
     }
 
@@ -98,13 +90,14 @@ public class TurretSubsystem extends SubsystemBase {
      */
     public void setTargetAngleRadians(double turretAngleRadians) {
         targetTurretAngleRadians = clampAngleRadians(turretAngleRadians, minTurretAngleRadians, maxTurretAngleRadians);
+        isStopped = false;
     }
 
     /**
      * Get the current turret angle (radians) relative to the robot.
      */
     public double getAngleRadians() {
-        return getTurretMechanismAngleRadians();
+        return getAdjustedTurretMechanismAngleRadians();
     }
 
     @Override
@@ -115,52 +108,29 @@ public class TurretSubsystem extends SubsystemBase {
                 hasZeroed = true;
             } else if (isLimitSwitchTriggered()) {
                 stop();
-                StatusCode response = turretMotor.setPosition(radiansToRotations(Constants.turretSensorPositionRadians));
-                if (!response.isOK()) {
-                    System.out.println(
-                            "TalonFX ID " + turretMotor.getDeviceID() + " failed set position with error "
-                                    + response.toString());
-                } else {
-                    // only if the response was OK will we set hasZeroed to true
-                    // otherwise, we will try to set the position again on the next tick
-                    hasZeroed = true;
-                }
+                turretZeroOffsetRadians = -getRawTurretMechanismAngleRadians();
+                hasZeroed = true;
             } else {
                 runVoltage(Constants.turretZeroingVoltage);
             }
-        } else {
-            // wait some time after zeroing before moving. 
-            if (ticksToWaitAfterZero > 0) {
-                ticksToWaitAfterZero -= 1;
-            }
-            else {
-                // positionController.withPosition(radiansToRotations(targetTurretAngleRadians));
-                // turretMotor.setControl(positionController);
-                // turretMotor.setControl(
-                // motionMagicController.withPosition(radiansToRotations(targetTurretAngleRadians)));
-                TrapezoidProfile.State m_goal = new TrapezoidProfile.State(radiansToRotations(targetTurretAngleRadians), 0);
-                TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State(radiansToRotations(getTurretMechanismAngleRadians()), turretMotor.getVelocity().getValueAsDouble());
-
-                // calculate the next profile setpoint
-                m_setpoint = m_profile.calculate(0.020, m_setpoint, m_goal);
-
-                // send the request to the device
-                positionController.Position = m_setpoint.position;
-                positionController.Velocity = m_setpoint.velocity;
-                turretMotor.setControl(positionController);
-
-            }
+        } else if (!isStopped){
+            runVoltage(computeTurretVoltageForPosition());
         }
-        SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getTurretMechanismAngleRadians()));
+        SmartDashboard.putNumber("TurretRawAngleDegrees", Math.toDegrees(getAdjustedTurretMechanismAngleRadians()));
+        SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getAdjustedTurretMechanismAngleRadians()));
         SmartDashboard.putNumber("TurretTargetDegrees", Math.toDegrees(targetTurretAngleRadians));
     }
 
-    protected double getTurretMechanismAngleRadians() {
+    protected double getAdjustedTurretMechanismAngleRadians() {
+        return getRawTurretMechanismAngleRadians() + turretZeroOffsetRadians;
+    }
+
+    protected double getRawTurretMechanismAngleRadians() {
         if (RobotBase.isSimulation()) {
             return this.targetTurretAngleRadians;
         } 
         else {
-            return rotationsToRadians(turretMotor.getPosition().getValueAsDouble());
+            return rotationsToRadians(turretMotor.getPosition().getValueAsDouble()/Constants.turretGearRatio);
         }
     }
 
@@ -177,8 +147,8 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void stop() {
-        targetTurretAngleRadians = getAngleRadians();
         turretMotor.stopMotor();
+        isStopped = true;
     }
 
     /**
@@ -203,13 +173,28 @@ public class TurretSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+     * Computes a turret voltage to achieve target position using a trapezoidal PID
+     */
+    private double computeTurretVoltageForPosition() {
+        double turretPositionRadians = getAdjustedTurretMechanismAngleRadians();
+        if (turretPositionRadians < 0 || turretPositionRadians > 2 * Math.PI){
+            System.out.println("WARNING: turret tried to go to invalid position: " + turretPositionRadians + " !!!!!!!!!!!!!!!!!");
+            return 0.0;
+        }
+
+        double error = targetTurretAngleRadians - turretPositionRadians;
+        double pidOut = turretPID.calculate(error, 0.0);
+        double out = (Math.abs(pidOut) > turretPidDeadband)
+                ? pidOut + Math.signum(pidOut) * minTurretVoltage
+                : 0.0;
+        return out;
+    }
+
     private void configureMotor() {
         TalonFXConfiguration talonMotorConfig = new TalonFXConfiguration();
-        
-        talonMotorConfig.Feedback.SensorToMechanismRatio = Constants.turretGearRatio;
 
         talonMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        talonMotorConfig.Slot0 = slot0Configs;
         talonMotorConfig.Voltage.PeakForwardVoltage = Constants.falconMaxVoltage;
         talonMotorConfig.Voltage.PeakReverseVoltage = -Constants.falconMaxVoltage;
         talonMotorConfig.Voltage.SupplyVoltageTimeConstant = HardwareConstants.ctreSupplyVoltageTimeConstant;
@@ -222,16 +207,6 @@ public class TurretSubsystem extends SubsystemBase {
         // IMPORTANT! Set motor rotation so that turret runs counter clockwise positive
         // to be consistent with the direction of the robot yaw
         talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-
-        // TODO: Verify values
-        talonMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 800.0;
-        talonMotorConfig.MotionMagic.MotionMagicAcceleration = 160.0;
-        talonMotorConfig.MotionMagic.MotionMagicJerk = 800.0;
-
-        //talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        //talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    //talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = maxTurretAngleRadians / (2.0 * Math.PI);
-    //talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = minTurretAngleRadians / (2.0 * Math.PI);
 
         StatusCode response = turretMotor.getConfigurator().apply(talonMotorConfig);
         if (!response.isOK()) {
