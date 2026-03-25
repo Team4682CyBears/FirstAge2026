@@ -103,7 +103,8 @@ public class TurretSubsystem extends SubsystemBase {
                 hasZeroed = true;
             } else if (isLimitSwitchTriggered()) {
                 turretMotor.setPosition(radiansToRotations(Constants.turretSensorPositionRadians));
-                stop();
+                targetTurretAngleRadians = Constants.turretSensorPositionRadians;
+                turretMotor.stopMotor();
                 hasZeroed = true;
             } else {
                 runVoltage(Constants.turretZeroingVoltage);
