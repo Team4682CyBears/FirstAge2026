@@ -36,6 +36,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final TalonFX turretMotor;
     private final DigitalInput turretSensor;
     private boolean hasZeroed = false;
+    private int ticksToWaitAfterZero = 0;
     private final PositionVoltage positionController = new PositionVoltage(0.0)
         .withFeedForward(.7);
     private final VoltageOut voltageOutController = new VoltageOut(0.0);
@@ -66,6 +67,9 @@ public class TurretSubsystem extends SubsystemBase {
         ? new DigitalInput(Constants.turretSensorDIOChannel)
                 : null;
         hasZeroed = turretSensor == null;
+        if (!hasZeroed){
+            ticksToWaitAfterZero = 20;
+        }
         configureMotor();
     }
 
@@ -121,14 +125,19 @@ public class TurretSubsystem extends SubsystemBase {
                 runVoltage(Constants.turretZeroingVoltage);
             }
         } else {
-            // positionController.withPosition(radiansToRotations(targetTurretAngleRadians));
-            // turretMotor.setControl(positionController);
-            turretMotor.setControl(
-                    motionMagicController.withPosition(radiansToRotations(targetTurretAngleRadians)));
-
-            SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getTurretMechanismAngleRadians()));
-            SmartDashboard.putNumber("TurretTargetDegrees", Math.toDegrees(targetTurretAngleRadians));
+            // wait some time after zeroing before moving. 
+            if (ticksToWaitAfterZero > 0) {
+                ticksToWaitAfterZero -= 1;
+            }
+            else {
+                // positionController.withPosition(radiansToRotations(targetTurretAngleRadians));
+                // turretMotor.setControl(positionController);
+                turretMotor.setControl(
+                        motionMagicController.withPosition(radiansToRotations(targetTurretAngleRadians)));
+            }
         }
+        SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getTurretMechanismAngleRadians()));
+        SmartDashboard.putNumber("TurretTargetDegrees", Math.toDegrees(targetTurretAngleRadians));
     }
 
     protected double getTurretMechanismAngleRadians() {
