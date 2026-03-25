@@ -102,9 +102,15 @@ public class TurretSubsystem extends SubsystemBase {
             if (turretSensor == null) {
                 hasZeroed = true;
             } else if (isLimitSwitchTriggered()) {
-                turretMotor.setPosition(radiansToRotations(Constants.turretSensorPositionRadians));
                 stop();
-                hasZeroed = true;
+                StatusCode response = turretMotor.setPosition(radiansToRotations(Constants.turretSensorPositionRadians));
+                if (!response.isOK()) {
+                    System.out.println(
+                            "TalonFX ID " + turretMotor.getDeviceID() + " failed config with error "
+                                    + response.toString());
+                } else {
+                    hasZeroed = true;
+                }
             } else {
                 runVoltage(Constants.turretZeroingVoltage);
             }
