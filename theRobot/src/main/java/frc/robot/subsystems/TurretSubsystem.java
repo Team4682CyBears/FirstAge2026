@@ -10,10 +10,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -38,7 +35,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final TalonFX turretMotor;
     private final DigitalInput turretSensor;
     private boolean hasZeroed = false;
-    private boolean isStopped = true;
+    private boolean isAtPosition = true;
     // offset to add when setting position
     private double turretZeroOffsetRadians = 0.0;
     private final VoltageOut voltageOutController = new VoltageOut(0.0);
@@ -49,12 +46,13 @@ public class TurretSubsystem extends SubsystemBase {
     private final double minTurretAngleRadians = Math.toRadians(Constants.turretMinAngleDegrees);
     private final double maxTurretAngleRadians = Math.toRadians(Constants.turretMaxAngleDegrees);
 
-    private double turretProfileConstraintsMaxVoltage = 5;
+    private double turretProfileConstraintsMaxVoltage = 2;
     private double turretProfileConstraintsMaxVoltageDelta = 10;
     private TrapezoidProfile.Constraints turretProfileConstraints = new TrapezoidProfile.Constraints(
             turretProfileConstraintsMaxVoltage, turretProfileConstraintsMaxVoltageDelta);
     private ProfiledPIDController turretPID = new ProfiledPIDController(2.0, 0.0, 0.01, turretProfileConstraints);
     private double minTurretVoltage = 0.30;
+    private double turretLowVelocityTol = 10;
     private double turretPidDeadband = 0.01;
 
     /**
@@ -90,14 +88,14 @@ public class TurretSubsystem extends SubsystemBase {
      */
     public void setTargetAngleRadians(double turretAngleRadians) {
         targetTurretAngleRadians = clampAngleRadians(turretAngleRadians, minTurretAngleRadians, maxTurretAngleRadians);
-        isStopped = false;
+        isAtPosition = false;
     }
 
     /**
      * Get the current turret angle (radians) relative to the robot.
      */
     public double getAngleRadians() {
-        return getAdjustedTurretMechanismAngleRadians();
+        return getAdjustedTurretMechanismPositionRadians();
     }
 
     @Override
@@ -108,24 +106,29 @@ public class TurretSubsystem extends SubsystemBase {
                 hasZeroed = true;
             } else if (isLimitSwitchTriggered()) {
                 stop();
-                turretZeroOffsetRadians = -getRawTurretMechanismAngleRadians();
+                turretZeroOffsetRadians = -getRawTurretMechanismPositionRadians();
+                targetTurretAngleRadians = 0.0;
+                isAtPosition = true;
                 hasZeroed = true;
             } else {
                 runVoltage(Constants.turretZeroingVoltage);
             }
-        } else if (!isStopped){
+        } else if (!isAtPosition){
             runVoltage(computeTurretVoltageForPosition());
+            isAtPosition = isTurretWithinTolerance();
+        } else { // hasZeroed and isAtPosition
+            stop();
         }
-        SmartDashboard.putNumber("TurretRawAngleDegrees", Math.toDegrees(getAdjustedTurretMechanismAngleRadians()));
-        SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getAdjustedTurretMechanismAngleRadians()));
+        SmartDashboard.putNumber("TurretRawAngleDegrees", Math.toDegrees(getAdjustedTurretMechanismPositionRadians()));
+        SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getAdjustedTurretMechanismPositionRadians()));
         SmartDashboard.putNumber("TurretTargetDegrees", Math.toDegrees(targetTurretAngleRadians));
     }
 
-    protected double getAdjustedTurretMechanismAngleRadians() {
-        return getRawTurretMechanismAngleRadians() + turretZeroOffsetRadians;
+    protected double getAdjustedTurretMechanismPositionRadians() {
+        return getRawTurretMechanismPositionRadians() + turretZeroOffsetRadians;
     }
 
-    protected double getRawTurretMechanismAngleRadians() {
+    protected double getRawTurretMechanismPositionRadians() {
         if (RobotBase.isSimulation()) {
             return this.targetTurretAngleRadians;
         } 
@@ -142,13 +145,31 @@ public class TurretSubsystem extends SubsystemBase {
         return turretSensor != null && !turretSensor.get();
     }
 
+    /**
+     * A method to test whether the turret is within tolerance of the target
+     * position
+     * 
+     * @param toleranceRadians
+     * @return true if the turret is within tolerance
+     */
+    public boolean isTurretWithinTolerance() {
+        // check both the position and velocity. To allow PID to not stop before
+        // settling.
+        boolean positionTargetReached = Math
+                .abs(getAdjustedTurretMechanismPositionRadians() - targetTurretAngleRadians) < Constants.turretToleranceRadians;
+        boolean velocityIsSmall = turretMotor == null
+        || Math.abs(turretMotor.getVelocity().getValueAsDouble()) < turretLowVelocityTol;
+        return positionTargetReached && velocityIsSmall;
+    }
+
+
     public void runVoltage(double volts) {
         turretMotor.setControl(voltageOutController.withOutput(volts));
     }
 
     public void stop() {
         turretMotor.stopMotor();
-        isStopped = true;
+        isAtPosition = true;
     }
 
     /**
@@ -177,9 +198,9 @@ public class TurretSubsystem extends SubsystemBase {
      * Computes a turret voltage to achieve target position using a trapezoidal PID
      */
     private double computeTurretVoltageForPosition() {
-        double turretPositionRadians = getAdjustedTurretMechanismAngleRadians();
+        double turretPositionRadians = getAdjustedTurretMechanismPositionRadians();
         if (turretPositionRadians < 0 || turretPositionRadians > 2 * Math.PI){
-            System.out.println("WARNING: turret tried to go to invalid position: " + turretPositionRadians + " !!!!!!!!!!!!!!!!!");
+            System.out.println("WARNING: turret at invalid position: " + turretPositionRadians + " !!!!!!!!!!!!!!!!!");
             return 0.0;
         }
 

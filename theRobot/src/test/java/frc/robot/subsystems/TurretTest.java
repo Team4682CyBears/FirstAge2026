@@ -51,7 +51,7 @@ class TurretTest {
     turret = new TurretSubsystem(Constants.turretMotorCanId);
     double targetRadians = Units.degreesToRadians(-1.0);
     turret.setTargetAngleRadians(targetRadians);
-    assertEquals(Units.degreesToRadians(Constants.turretMinAngleDegrees), turret.getAdjustedTurretMechanismAngleRadians(), DELTA);
+    assertEquals(Units.degreesToRadians(Constants.turretMinAngleDegrees), turret.getAdjustedTurretMechanismPositionRadians(), DELTA);
   }
 
   @Test
@@ -60,7 +60,7 @@ class TurretTest {
     turret = new TurretSubsystem(Constants.turretMotorCanId);
     double targetRadians = Units.degreesToRadians(359.0);
     turret.setTargetAngleRadians(targetRadians);
-    assertEquals(Units.degreesToRadians(Constants.turretMinAngleDegrees), turret.getAdjustedTurretMechanismAngleRadians(), DELTA);
+    assertEquals(Units.degreesToRadians(Constants.turretMinAngleDegrees), turret.getAdjustedTurretMechanismPositionRadians(), DELTA);
   }
 
   @Test
@@ -69,7 +69,7 @@ class TurretTest {
     turret = new TurretSubsystem(Constants.turretMotorCanId);
     double targetRadians = Units.degreesToRadians(-4.0);
     turret.setTargetAngleRadians(targetRadians);
-    assertEquals(Units.degreesToRadians(Constants.turretMaxAngleDegrees), turret.getAdjustedTurretMechanismAngleRadians(), DELTA);
+    assertEquals(Units.degreesToRadians(Constants.turretMaxAngleDegrees), turret.getAdjustedTurretMechanismPositionRadians(), DELTA);
   }
 
   @Test
@@ -78,7 +78,7 @@ class TurretTest {
     turret = new TurretSubsystem(Constants.turretMotorCanId);
     double targetRadians = Units.degreesToRadians(356.0);
     turret.setTargetAngleRadians(targetRadians);
-    assertEquals(Units.degreesToRadians(Constants.turretMaxAngleDegrees), turret.getAdjustedTurretMechanismAngleRadians(), DELTA);
+    assertEquals(Units.degreesToRadians(Constants.turretMaxAngleDegrees), turret.getAdjustedTurretMechanismPositionRadians(), DELTA);
   }
 
   @Test
@@ -87,7 +87,7 @@ class TurretTest {
     turret = new TurretSubsystem(Constants.turretMotorCanId);
     double targetRadians = 2 * Math.PI + 0.1;
     turret.setTargetAngleRadians(targetRadians);
-    assertEquals(0.1, turret.getAdjustedTurretMechanismAngleRadians(), DELTA);
+    assertEquals(0.1, turret.getAdjustedTurretMechanismPositionRadians(), DELTA);
   }
 
   @Test
@@ -96,6 +96,6 @@ class TurretTest {
     turret = new TurretSubsystem(Constants.turretMotorCanId);
     double targetRadians = -2 * Math.PI + 1.0;
     turret.setTargetAngleRadians(targetRadians);
-    assertEquals(1.0, turret.getAdjustedTurretMechanismAngleRadians(), DELTA);
+    assertEquals(1.0, turret.getAdjustedTurretMechanismPositionRadians(), DELTA);
   }
 }
