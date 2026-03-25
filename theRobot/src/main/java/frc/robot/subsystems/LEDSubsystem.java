@@ -117,6 +117,12 @@ public class LEDSubsystem extends SubsystemBase {
     } else if (currentActions.containsKey(LEDState.GreenBlink)
         && currentActions.get(LEDState.GreenBlink).booleanValue()) {
       targetLedState = LEDState.GreenBlink;
+    } else if (currentActions.containsKey(LEDState.Purple)
+      && currentActions.get(LEDState.Purple).booleanValue()) {
+      targetLedState = LEDState.Purple;
+    }else if (currentActions.containsKey(LEDState.White)
+       && currentActions.get(LEDState.White).booleanValue()) {
+       targetLedState = LEDState.White;
     }
 
     if (this.currentLEDState != targetLedState)
@@ -165,7 +171,7 @@ public class LEDSubsystem extends SubsystemBase {
             setLedStringColor(0, 200, 0);
           break;
           case Yellow:
-            setLedStringColor(150, 150, 0);
+            setLedStringColor(252, 252, 0);
           break;
           case Red:
             setLedStringColor(150, 0, 0);
@@ -190,6 +196,9 @@ public class LEDSubsystem extends SubsystemBase {
           break;
           case WhiteBlink:
             blink(255, 255, 255, 0);
+          break;
+          case White:
+            setLedStringColor(255, 255, 255);
           break;
           default:
             setLedStringColor(0, 0, 225);

@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class RobotContainer {
+  private MatchTiming mt = new MatchTiming();
 
   private SubsystemCollection subsystems = new SubsystemCollection();
   private AutonomousChooser autonomousChooser;
@@ -302,13 +303,14 @@ public class RobotContainer {
   }
 
   private void initializeMatchLED(){
-    double time = MatchTiming.timeLeftInShift();
-    subsystems.getLedSubsystem().registerStateAction(LEDState.Green, () -> time < 15);
-    subsystems.getLedSubsystem().registerStateAction(LEDState.Yellow, () -> time < 20 && time >= 15);
-    subsystems.getLedSubsystem().registerStateAction(LEDState.RedBlink, () -> time <= 25 && time >= 20);
-    subsystems.getLedSubsystem().registerStateAction(LEDState.Purple, () -> time == 4682);
-    subsystems.getLedSubsystem().registerStateAction(LEDState.WhiteBlink, () -> time == 2026);
-
+    //double time = MatchTiming.timeLeftInShift();
+    //System.out.println("THE TIME IS" + time);
+    //double time = 2026;
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Green, () -> MatchTiming.isNewShift());
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Yellow, () -> MatchTiming.isTenTillShift());
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Red, () -> MatchTiming.isFiveTillShift());
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Purple, () -> MatchTiming.isAuto());
+    subsystems.getLedSubsystem().registerStateAction(LEDState.White, () -> MatchTiming.isFiveTillMajorShift());
   }
 
   /**

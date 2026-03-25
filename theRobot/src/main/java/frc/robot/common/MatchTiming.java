@@ -4,10 +4,13 @@ import java.util.Optional;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 
 public class MatchTiming {
-
+    static Timer clock;
     public MatchTiming(){
+        clock = new Timer();
+        clock.start();
     }
 
     //Returns 'B' if Blue starts and 'R' if red starts
@@ -71,8 +74,9 @@ public class MatchTiming {
     */
     public static double timeLeftInShift(){
         
-        double matchTime = DriverStation.getMatchTime();
-
+        //double matchTime = DriverStation.getMatchTime();
+        double matchTime = clock.get();
+        System.out.println("THE REAL TIME IS " + matchTime);
         if(matchTime < 30){
             if(matchTime > 25){
                 return 2026;
@@ -91,6 +95,65 @@ public class MatchTiming {
         }else{
             return 4682;
             /** same idea as above */
+        }
+    }
+
+    public static boolean isFiveTillMajorShift(){
+        //double matchTime = DriverStation.getMatchTime();
+        double matchTime = clock.get();
+
+        if(matchTime < 30 && matchTime > 25){
+            return true;
+        }else if(matchTime < 130 && matchTime > 125){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static boolean isNewShift(){
+        //double matchTime = DriverStation.getMatchTime();
+        double matchTime = clock.get();
+        double remainder = (matchTime - 30)%25;
+
+        if(remainder < 15 && matchTime < 125 && matchTime > 30){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static boolean isTenTillShift(){
+        //double matchTime = DriverStation.getMatchTime();
+        double matchTime = clock.get();
+        double remainder = (matchTime - 30)%25;
+
+        if(remainder < 20 && remainder >= 15 && matchTime < 125 && matchTime > 30){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static boolean isFiveTillShift(){
+        //double matchTime = DriverStation.getMatchTime();
+        double matchTime = clock.get();
+        double remainder = (matchTime - 30)%25;
+
+        if(remainder >= 20 && matchTime < 125 && matchTime > 30){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static boolean isAuto(){
+        //double matchTime = DriverStation.getMatchTime();
+        double matchTime = clock.get();
+        if(matchTime < 25 || matchTime > 130){
+            return true;
+        }else{
+            return false;
         }
     }
 }

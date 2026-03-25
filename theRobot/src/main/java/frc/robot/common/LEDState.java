@@ -25,4 +25,5 @@ public enum LEDState {
     Blue,
     Purple,
     WhiteBlink,
+    White
 }
