@@ -102,7 +102,7 @@ public class TurretSubsystem extends SubsystemBase {
             if (turretSensor == null) {
                 hasZeroed = true;
             } else if (isLimitSwitchTriggered()) {
-                turretMotor.setPosition(Constants.turretSensorPosition.getRotations());
+                turretMotor.setPosition(radiansToRotations(Constants.turretSensorPositionRadians));
                 stop();
                 hasZeroed = true;
             } else {
@@ -112,7 +112,7 @@ public class TurretSubsystem extends SubsystemBase {
             positionController.withPosition(radiansToRotations(targetTurretAngleRadians));
             turretMotor.setControl(positionController);
 
-        SmartDashboard.putNumber("TurretAngleDegrees", getAngleRotation2d().getDegrees());
+        SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getTurretMechanismAngleRadians()));
         SmartDashboard.putNumber("TurretTargetDegrees", Math.toDegrees(targetTurretAngleRadians));
         }
     }
@@ -212,11 +212,11 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     private double radiansToRotations(double radians){
-        return radians / 2.0 * Math.PI;
+        return radians / (2.0 * Math.PI);
     }
 
     private double rotationsToRadians(double rotations){
-        return rotations * 2.0 * Math.PI;
+        return rotations * (2.0 * Math.PI);
     }
 
     /**
