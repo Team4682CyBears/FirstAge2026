@@ -432,7 +432,8 @@ public class ShooterAimer {
     // turret zero is defined same as robot yaw, whereas botPose seems to be defined 
     // 180 from robot yaw, so need to add
     // 180 here to be consistent with robot yaw.
-    return Rotation2d.fromRadians(angleRad).minus(botPos.getRotation()).plus(Rotation2d.fromDegrees(180.0));
+    // return Rotation2d.fromRadians(angleRad).minus(botPos.getRotation()).plus(Rotation2d.fromDegrees(180.0));
+    return Rotation2d.fromRadians(angleRad).minus(botPos.getRotation());
   }
 
   /**

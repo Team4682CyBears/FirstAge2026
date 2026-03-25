@@ -46,14 +46,14 @@ public class TurretSubsystem extends SubsystemBase {
     private final double minTurretAngleRadians = Math.toRadians(Constants.turretMinAngleDegrees);
     private final double maxTurretAngleRadians = Math.toRadians(Constants.turretMaxAngleDegrees);
 
-    private double turretProfileConstraintsMaxVoltage = 2;
-    private double turretProfileConstraintsMaxVoltageDelta = 10;
+    private double turretProfileConstraintsMaxVoltage = 11.0;
+    private double turretProfileConstraintsMaxVoltageDelta = 33;
     private TrapezoidProfile.Constraints turretProfileConstraints = new TrapezoidProfile.Constraints(
             turretProfileConstraintsMaxVoltage, turretProfileConstraintsMaxVoltageDelta);
-    private ProfiledPIDController turretPID = new ProfiledPIDController(2.0, 0.0, 0.01, turretProfileConstraints);
-    private double minTurretVoltage = 0.30;
-    private double turretLowVelocityTol = 10;
-    private double turretPidDeadband = 0.01;
+    private ProfiledPIDController turretPID = new ProfiledPIDController(0.13, 0.00, 0.00, turretProfileConstraints);
+    private double minTurretVoltage = 0.28;
+    private double turretLowVelocityTol = 15;
+    private double turretPidDeadband = 0.005;
 
     /**
      * Create a turret subsystem with a motor a sensor.
@@ -119,9 +119,10 @@ public class TurretSubsystem extends SubsystemBase {
         } else { // hasZeroed and isAtPosition
             stop();
         }
-        SmartDashboard.putNumber("TurretRawAngleDegrees", Math.toDegrees(getAdjustedTurretMechanismPositionRadians()));
+        SmartDashboard.putNumber("TurretRawAngleDegrees", Math.toDegrees(getRawTurretMechanismPositionRadians()));
         SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getAdjustedTurretMechanismPositionRadians()));
         SmartDashboard.putNumber("TurretTargetDegrees", Math.toDegrees(targetTurretAngleRadians));
+        SmartDashboard.putBoolean("TurretIsAtPosition", isAtPosition);
     }
 
     protected double getAdjustedTurretMechanismPositionRadians() {
@@ -199,13 +200,12 @@ public class TurretSubsystem extends SubsystemBase {
      */
     private double computeTurretVoltageForPosition() {
         double turretPositionRadians = getAdjustedTurretMechanismPositionRadians();
-        if (turretPositionRadians < 0 || turretPositionRadians > 2 * Math.PI){
+        if (turretPositionRadians < -5 || turretPositionRadians > 2 * Math.PI){
             System.out.println("WARNING: turret at invalid position: " + turretPositionRadians + " !!!!!!!!!!!!!!!!!");
             return 0.0;
         }
 
-        double error = targetTurretAngleRadians - turretPositionRadians;
-        double pidOut = turretPID.calculate(error, 0.0);
+        double pidOut = turretPID.calculate(turretPositionRadians, targetTurretAngleRadians);
         double out = (Math.abs(pidOut) > turretPidDeadband)
                 ? pidOut + Math.signum(pidOut) * minTurretVoltage
                 : 0.0;

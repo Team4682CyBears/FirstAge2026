@@ -369,7 +369,7 @@ public class RobotContainer {
    */
   private void lateBindDefaultCommands() {
     if (subsystems.isTurretSubsystemAvailable()) {
-      //getTurretSubsystem().setDefaultCommand(new TurretDefaultCommand(subsystems));
+      subsystems.getTurretSubsystem().setDefaultCommand(new TurretDefaultCommand(subsystems));
     }
     if (subsystems.isShooterSubsystemAvailable()) {
       //subsystems.getShooterSubsystem().setDefaultCommand(new ShooterDefaultCommand(subsystems));

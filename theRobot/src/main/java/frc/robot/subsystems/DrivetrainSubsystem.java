@@ -313,7 +313,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     if (RobotBase.isSimulation()) {
       return simPosition.getRotation();
     }
-    return drivetrain.getState().Pose.getRotation();
+    return drivetrain.getStateCopy().Pose.getRotation();
   }
 
   /**
@@ -369,6 +369,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * This ensures driving behavior doesn't change until an explicit disable event
      * occurs during testing.
      */
+    SmartDashboard.putNumber("Gyro", getGyroscopeRotation().getDegrees());
+    SmartDashboard.putNumber("Pigoon", drivetrain.getPigeon2().getYaw().getValueAsDouble());
     if (DriverStation.isDisabled() || isSeedingCamera) {
       updateVisionMeasurements(CameraMode.SEEDING);
 
