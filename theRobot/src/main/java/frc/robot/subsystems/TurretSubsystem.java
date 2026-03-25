@@ -12,6 +12,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -19,7 +20,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -46,12 +46,16 @@ public class TurretSubsystem extends SubsystemBase {
     private final double minTurretAngleRadians = Math.toRadians(Constants.turretMinAngleDegrees);
     private final double maxTurretAngleRadians = Math.toRadians(Constants.turretMaxAngleDegrees);
 
-    // TODO tune with robot-on-carpet data
-    private final Slot0Configs slot0Configs = new Slot0Configs()
-        .withKP(9.5)
-        .withKI(0.0)
-        .withKD(0.4)
-        .withKI(.01);
+    // // TODO tune with robot-on-carpet data
+    // private final Slot0Configs slot0Configs = new Slot0Configs()
+    //     .withKP(9.5)
+    //     .withKI(0.0)
+    //     .withKD(0.4)
+    //     .withKI(.01);
+
+    private MotionMagicVoltage motionMagicController = new MotionMagicVoltage(0.0);
+    private Slot0Configs motionMagicSlot0Configs = new Slot0Configs().withKP(0.4).withKI(0.02).withKD(0.0)
+            .withKV(0.58).withKS(0.10); 
 
     /**
      * Create a turret subsystem with a motor a sensor.
@@ -117,8 +121,10 @@ public class TurretSubsystem extends SubsystemBase {
                 runVoltage(Constants.turretZeroingVoltage);
             }
         } else {
-            positionController.withPosition(radiansToRotations(targetTurretAngleRadians));
-            turretMotor.setControl(positionController);
+            // positionController.withPosition(radiansToRotations(targetTurretAngleRadians));
+            // turretMotor.setControl(positionController);
+            turretMotor.setControl(
+                    motionMagicController.withPosition(radiansToRotations(targetTurretAngleRadians)));
 
             SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getTurretMechanismAngleRadians()));
             SmartDashboard.putNumber("TurretTargetDegrees", Math.toDegrees(targetTurretAngleRadians));
@@ -179,7 +185,7 @@ public class TurretSubsystem extends SubsystemBase {
         talonMotorConfig.Feedback.SensorToMechanismRatio = Constants.turretGearRatio;
 
         talonMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        talonMotorConfig.Slot0 = slot0Configs;
+        talonMotorConfig.Slot0 = motionMagicSlot0Configs;
         talonMotorConfig.Voltage.PeakForwardVoltage = Constants.falconMaxVoltage;
         talonMotorConfig.Voltage.PeakReverseVoltage = -Constants.falconMaxVoltage;
         talonMotorConfig.Voltage.SupplyVoltageTimeConstant = HardwareConstants.ctreSupplyVoltageTimeConstant;
@@ -192,6 +198,11 @@ public class TurretSubsystem extends SubsystemBase {
         // IMPORTANT! Set motor rotation so that turret runs counter clockwise positive
         // to be consistent with the direction of the robot yaw
         talonMotorConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+
+        // TODO: Verify values
+        talonMotorConfig.MotionMagic.MotionMagicCruiseVelocity = 800.0;
+        talonMotorConfig.MotionMagic.MotionMagicAcceleration = 160.0;
+        talonMotorConfig.MotionMagic.MotionMagicJerk = 800.0;
 
         //talonMotorConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         //talonMotorConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
