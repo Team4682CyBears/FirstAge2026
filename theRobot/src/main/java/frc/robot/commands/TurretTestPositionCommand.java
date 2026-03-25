@@ -10,11 +10,11 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.control.TurretAimMode;
 import frc.robot.subsystems.TurretSubsystem;
 
-public class TurretTestPositionCommand extends InstantCommand {
+public class TurretTestPositionCommand extends Command {
   private final TurretSubsystem turret;
   private final double targetRadians;
 
@@ -31,7 +31,17 @@ public class TurretTestPositionCommand extends InstantCommand {
   }
 
   @Override
+  public void execute() {
+    turret.setTargetAngleRadians(targetRadians);
+  }
+
+  @Override
   public void end(boolean interrupted) {
     turret.setAimMode(TurretAimMode.AUTO);
+  }
+
+  @Override
+  public boolean isFinished() {
+    return false;
   }
 }
