@@ -91,6 +91,12 @@ public class LEDSubsystem extends SubsystemBase {
     } else if (currentActions.containsKey(LEDState.OrangeBlink)
         && currentActions.get(LEDState.OrangeBlink).booleanValue()) {
       targetLedState = LEDState.OrangeBlink;
+    }else if (currentActions.containsKey(LEDState.WhiteBlink)
+        && currentActions.get(LEDState.WhiteBlink).booleanValue()) {
+      targetLedState = LEDState.WhiteBlink;
+    }else if (currentActions.containsKey(LEDState.Purple)
+        && currentActions.get(LEDState.Purple).booleanValue()) {
+      targetLedState = LEDState.Purple;
     }
     // update the LED state when the target state has changed
     if (this.currentLEDState != targetLedState) {
@@ -109,6 +115,10 @@ public class LEDSubsystem extends SubsystemBase {
         this.redBlink();
       } else if (this.currentLEDState == LEDState.GreenBlink) {
         this.greenBlink();
+      } else if(this.currentLEDState == LEDState.WhiteBlink) {
+        this.WhiteBlink();
+      } else if(this.currentLEDState == LEDState.Purple) {
+        this.Purple();
       }
       /*
        * else if(this.currentLEDState == LEDState.Blue){
