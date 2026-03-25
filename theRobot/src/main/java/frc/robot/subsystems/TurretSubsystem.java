@@ -39,7 +39,7 @@ public class TurretSubsystem extends SubsystemBase {
     private boolean hasZeroed = false;
     private int ticksToWaitAfterZero = 0;
     private final PositionVoltage positionController = new PositionVoltage(0.0)
-        .withFeedForward(.7);
+        .withFeedForward(0.0); // was 0.7
     private final VoltageOut voltageOutController = new VoltageOut(0.0);
 
     private TurretAimMode turretAimMode = TurretAimMode.AUTO;
@@ -50,8 +50,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     // TODO tune with robot-on-carpet data
     private final Slot0Configs slot0Configs = new Slot0Configs()
-        .withKP(9.5)
-        .withKI(0.0)
+        .withKP(0.6)
         .withKD(0.4)
         .withKI(.01);
 
@@ -140,7 +139,7 @@ public class TurretSubsystem extends SubsystemBase {
                 // turretMotor.setControl(
                 // motionMagicController.withPosition(radiansToRotations(targetTurretAngleRadians)));
                 TrapezoidProfile.State m_goal = new TrapezoidProfile.State(radiansToRotations(targetTurretAngleRadians), 0);
-                TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+                TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State(radiansToRotations(getTurretMechanismAngleRadians()), turretMotor.getVelocity().getValueAsDouble());
 
                 // calculate the next profile setpoint
                 m_setpoint = m_profile.calculate(0.020, m_setpoint, m_goal);
@@ -210,7 +209,7 @@ public class TurretSubsystem extends SubsystemBase {
         talonMotorConfig.Feedback.SensorToMechanismRatio = Constants.turretGearRatio;
 
         talonMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        talonMotorConfig.Slot0 = motionMagicSlot0Configs;
+        talonMotorConfig.Slot0 = slot0Configs;
         talonMotorConfig.Voltage.PeakForwardVoltage = Constants.falconMaxVoltage;
         talonMotorConfig.Voltage.PeakReverseVoltage = -Constants.falconMaxVoltage;
         talonMotorConfig.Voltage.SupplyVoltageTimeConstant = HardwareConstants.ctreSupplyVoltageTimeConstant;
