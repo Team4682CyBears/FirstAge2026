@@ -42,6 +42,7 @@ public class TurretSubsystem extends SubsystemBase {
 
     private TurretAimMode turretAimMode = TurretAimMode.AUTO;
     private double targetTurretAngleRadians = 0.0;
+    private double turretMotorOffsetRotations = 0.0;
 
     private final double minTurretAngleRadians = Math.toRadians(Constants.turretMinAngleDegrees);
     private final double maxTurretAngleRadians = Math.toRadians(Constants.turretMaxAngleDegrees);
@@ -96,7 +97,7 @@ public class TurretSubsystem extends SubsystemBase {
      * Get the current turret angle (radians) relative to the robot.
      */
     public double getAngleRadians() {
-        return getTurretMechanismAngleRadians();
+        return getTurretMechanismAngleRadians() - rotationsToRadians(turretMotorOffsetRotations);
     }
 
     @Override
@@ -107,16 +108,8 @@ public class TurretSubsystem extends SubsystemBase {
                 hasZeroed = true;
             } else if (isLimitSwitchTriggered()) {
                 stop();
-                StatusCode response = turretMotor.setPosition(radiansToRotations(Constants.turretSensorPositionRadians));
-                if (!response.isOK()) {
-                    System.out.println(
-                            "TalonFX ID " + turretMotor.getDeviceID() + " failed set position with error "
-                                    + response.toString());
-                } else {
-                    // only if the response was OK will we set hasZeroed to true
-                    // otherwise, we will try to set the position again on the next tick
-                    hasZeroed = true;
-                }
+                turretMotorOffsetRotations = turretMotor.getPosition().getValueAsDouble();
+                hasZeroed = true;
             } else {
                 runVoltage(Constants.turretZeroingVoltage);
             }
@@ -124,7 +117,7 @@ public class TurretSubsystem extends SubsystemBase {
             // positionController.withPosition(radiansToRotations(targetTurretAngleRadians));
             // turretMotor.setControl(positionController);
             turretMotor.setControl(
-                    motionMagicController.withPosition(radiansToRotations(targetTurretAngleRadians)));
+                    motionMagicController.withPosition(radiansToRotations(targetTurretAngleRadians)-turretMotorOffsetRotations));
 
             SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getTurretMechanismAngleRadians()));
             SmartDashboard.putNumber("TurretTargetDegrees", Math.toDegrees(targetTurretAngleRadians));
