@@ -178,6 +178,14 @@ public final class Constants {
 
     public static final double HOOD_CLOSE_EXTENDO_POSITION = 0.12;
 
+
+    /// ******************************
+    /// Climber Constants
+    
+    public static final int climberLeadMotorCanID = 25;
+    public static final int climberFollowMotorCanID = 26;
+    public static final int climberHallEffectSensorDIOPort = 0;
+
     /// Intake Constants
     public static final int intakeWristMotorCanID = 17;
     public static final int intakeWristEncoderCanID = 32;

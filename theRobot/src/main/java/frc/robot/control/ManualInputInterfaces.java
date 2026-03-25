@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.common.IntakeDirection;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.commands.*;
 
 public class ManualInputInterfaces {
@@ -256,14 +257,14 @@ public class ManualInputInterfaces {
                 && this.subsystemCollection.isHoodSubsystemAvailable()) {
             this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
         }
-    if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
-        && this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()
-        && this.subsystemCollection.isHoodSubsystemAvailable()
-        && this.subsystemCollection.isShooterSubsystemAvailable()
-        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
-        this.driverController.a().whileTrue(new AutoAimShuttlingCommand(subsystemCollection,
-            subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
-    }
+        if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
+            && this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()
+            && this.subsystemCollection.isHoodSubsystemAvailable()
+            && this.subsystemCollection.isShooterSubsystemAvailable()
+            && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
+            this.driverController.a().whileTrue(new AutoAimShuttlingCommand(subsystemCollection,
+                subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+        }
     }
 
     /**
@@ -316,26 +317,34 @@ public class ManualInputInterfaces {
                     this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer().resetTargetAdjustment();
                 }
             }));
+            if (this.subsystemCollection.isClimberSubsystemAvailable()) {
+                this.coDriverController.leftBumper()
+                        .onTrue(new ClimberPositionCommand(this.subsystemCollection.getClimberSubsystem(),
+                                () -> ClimberSubsystem.MIN_HEIGHT_ABOVE_FLOOR_INCHES));
+                this.coDriverController.rightBumper()
+                        .onTrue(new ClimberPositionCommand(this.subsystemCollection.getClimberSubsystem(), () -> 28.0));
+                this.coDriverController.axisMagnitudeGreaterThan(XboxController.Axis.kRightY.value, 0.1)
+                        .and(this.coDriverController.b())
+                        .whileTrue(new ClimberVelocityCommand(this.subsystemCollection.getClimberSubsystem(),
+                                () -> this.coDriverController.getRightY()));
+            }
+            
+            // unsure what this should go to
+            if (this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
+                // if the left y stick has a magnitude greater than 0.1, run the command.
+                this.coDriverController.axisMagnitudeGreaterThan(XboxController.Axis.kLeftY.value, 0.1).and(this.coDriverController.b())
+                        .whileTrue(new IntakeWristManualCommand(
+                                this.subsystemCollection.getIntakeWristSubsystem(),
+                                () -> -this.coDriverController.getLeftY()));
+            }
 
-        if (this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
-        // if the left y stick has a magnitude greater than 0.1, run the command.
-        this.coDriverController.axisMagnitudeGreaterThan(1, 0.1).and(this.coDriverController.b())
-            .whileTrue(new IntakeWristManualCommand(
-                this.subsystemCollection.getIntakeWristSubsystem(),
-                () -> -this.coDriverController.getLeftY()));
-        }
-
-        if (this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
-        // when y is pressed, toggle the intake roller manual command
-        this.coDriverController.y()
-            .toggleOnTrue(
-        new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(),
-            IntakeDirection.INTAKE));
-        this.coDriverController.a()
-            .toggleOnTrue(
-        new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(),
-            IntakeDirection.OUTTAKE));
-        }
+            if (this.subsystemCollection.isIntakeRollerSubsystemAvailable()) {
+                // when y is pressed, toggle the intake roller manual command
+                this.coDriverController.y()
+                        .toggleOnTrue(
+                                new IntakeRollerManualCommand(this.subsystemCollection.getIntakeRollerSubsystem(),
+                                        IntakeDirection.INTAKE));
+            }
         }
     }
 }
