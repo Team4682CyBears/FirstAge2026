@@ -65,42 +65,9 @@ public class MatchTiming {
         }
     }
 
-    /**Returns how much time is left in the shift as a double 
-     * returns 4682 if in endgame or auto and it it returns 2026
-     * 5 seconds before you switch out of auto or 5 seconds before you 
-     * switch into endgame
-     * I can improve on how it handles those "edge" cases as
-     * I learn better what we want the final implementation to do
-    */
-    public static double timeLeftInShift(){
-        
-        //double matchTime = DriverStation.getMatchTime();
-        double matchTime = clock.get();
-        System.out.println("THE REAL TIME IS " + matchTime);
-        if(matchTime < 30){
-            if(matchTime > 25){
-                return 2026;
-            }
-            return 4682;
-            /**this could defintiely be done better but it is 
-              * basically just to tell you that you are in auto and not 
-              * something else because the time will never be over 25 otherwise
-            **/
-        }else if(matchTime < 125){
-            double remainder = (matchTime - 30)%25;
-            return remainder;
-        
-        }else if(matchTime < 130){
-            return 2026;
-        }else{
-            return 4682;
-            /** same idea as above */
-        }
-    }
-
     public static boolean isFiveTillMajorShift(){
-        //double matchTime = DriverStation.getMatchTime();
-        double matchTime = clock.get();
+        double matchTime = DriverStation.getMatchTime();
+        //double matchTime = clock.get();
 
         if(matchTime < 30 && matchTime > 25){
             return true;
@@ -112,8 +79,8 @@ public class MatchTiming {
     }
 
     public static boolean isNewShift(){
-        //double matchTime = DriverStation.getMatchTime();
-        double matchTime = clock.get();
+        double matchTime = DriverStation.getMatchTime();
+        //double matchTime = clock.get();
         double remainder = (matchTime - 30)%25;
 
         if(remainder < 15 && matchTime < 125 && matchTime > 30){
@@ -124,8 +91,8 @@ public class MatchTiming {
     }
 
     public static boolean isTenTillShift(){
-        //double matchTime = DriverStation.getMatchTime();
-        double matchTime = clock.get();
+        double matchTime = DriverStation.getMatchTime();
+        //double matchTime = clock.get();
         double remainder = (matchTime - 30)%25;
 
         if(remainder < 20 && remainder >= 15 && matchTime < 125 && matchTime > 30){
@@ -136,8 +103,8 @@ public class MatchTiming {
     }
 
     public static boolean isFiveTillShift(){
-        //double matchTime = DriverStation.getMatchTime();
-        double matchTime = clock.get();
+        double matchTime = DriverStation.getMatchTime();
+        //double matchTime = clock.get();
         double remainder = (matchTime - 30)%25;
 
         if(remainder >= 20 && matchTime < 125 && matchTime > 30){
@@ -148,8 +115,8 @@ public class MatchTiming {
     }
 
     public static boolean isAuto(){
-        //double matchTime = DriverStation.getMatchTime();
-        double matchTime = clock.get();
+        double matchTime = DriverStation.getMatchTime();
+        //double matchTime = clock.get();
         if(matchTime < 25 || matchTime > 130){
             return true;
         }else{
