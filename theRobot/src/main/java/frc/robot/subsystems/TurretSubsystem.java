@@ -54,8 +54,8 @@ public class TurretSubsystem extends SubsystemBase {
     //     .withKI(.01);
 
     private MotionMagicVoltage motionMagicController = new MotionMagicVoltage(0.0);
-    private Slot0Configs motionMagicSlot0Configs = new Slot0Configs().withKP(0.4).withKI(0.02).withKD(0.0)
-            .withKV(0.58).withKS(0.10); 
+    private Slot0Configs motionMagicSlot0Configs = new Slot0Configs().withKP(0.5).withKI(0.00).withKD(0.0)
+            .withKV(0.60).withKS(0.35); 
 
     /**
      * Create a turret subsystem with a motor a sensor.
