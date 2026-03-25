@@ -36,7 +36,7 @@ public class TurretDefaultCommand extends Command {
     if (!subsystems.isShooterAimerAvailable()) {
       if (turret != null) {
         turret.setAimMode(TurretAimMode.MANUAL);
-        turret.setTargetAngleRadians(turret.getAngleRotation2d().getRadians());
+        turret.setTargetAngleRadians(turret.getAngleRadians());
       }
       return;
     }

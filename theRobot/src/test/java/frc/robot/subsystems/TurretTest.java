@@ -41,7 +41,7 @@ class TurretTest {
     turret = new TurretSubsystem(Constants.turretMotorCanId);
     double targetRadians = Units.degreesToRadians(30.0);
     turret.setTargetAngleRadians(targetRadians);
-    double error = MathUtil.angleModulus(targetRadians - turret.getAngleRotation2d().getRadians());
+    double error = MathUtil.angleModulus(targetRadians - turret.getAngleRadians());
     assertEquals(error, 0.0, DELTA);
   }
 

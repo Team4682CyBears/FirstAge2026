@@ -498,7 +498,7 @@ public class ShooterAimer {
 
   private Rotation2d getCurrentYawRotation() {
     if (InstalledHardware.useTurretForAiming && subsystemCollection.getTurretSubsystem() != null) {
-      return drivetrain.getGyroscopeRotation().plus(subsystemCollection.getTurretSubsystem().getAngleRotation2d());
+      return drivetrain.getGyroscopeRotation().plus(Rotation2d.fromRadians(subsystemCollection.getTurretSubsystem().getAngleRadians()));
     }
     return drivetrain.getGyroscopeRotation();
   }

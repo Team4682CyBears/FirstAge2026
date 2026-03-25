@@ -91,8 +91,8 @@ public class TurretSubsystem extends SubsystemBase {
     /**
      * Get the current turret angle (radians) relative to the robot.
      */
-    public Rotation2d getAngleRotation2d() {
-        return Rotation2d.fromRadians(getTurretMechanismAngleRadians());
+    public double getAngleRadians() {
+        return getTurretMechanismAngleRadians();
     }
 
     @Override
@@ -106,9 +106,11 @@ public class TurretSubsystem extends SubsystemBase {
                 StatusCode response = turretMotor.setPosition(radiansToRotations(Constants.turretSensorPositionRadians));
                 if (!response.isOK()) {
                     System.out.println(
-                            "TalonFX ID " + turretMotor.getDeviceID() + " failed config with error "
+                            "TalonFX ID " + turretMotor.getDeviceID() + " failed set position with error "
                                     + response.toString());
                 } else {
+                    // only if the response was OK will we set hasZeroed to true
+                    // otherwise, we will try to set the position again on the next tick
                     hasZeroed = true;
                 }
             } else {
@@ -118,8 +120,8 @@ public class TurretSubsystem extends SubsystemBase {
             positionController.withPosition(radiansToRotations(targetTurretAngleRadians));
             turretMotor.setControl(positionController);
 
-        SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getTurretMechanismAngleRadians()));
-        SmartDashboard.putNumber("TurretTargetDegrees", Math.toDegrees(targetTurretAngleRadians));
+            SmartDashboard.putNumber("TurretAngleDegrees", Math.toDegrees(getTurretMechanismAngleRadians()));
+            SmartDashboard.putNumber("TurretTargetDegrees", Math.toDegrees(targetTurretAngleRadians));
         }
     }
 
@@ -145,7 +147,7 @@ public class TurretSubsystem extends SubsystemBase {
     }
 
     public void stop() {
-        targetTurretAngleRadians = getAngleRotation2d().getRadians();
+        targetTurretAngleRadians = getAngleRadians();
         turretMotor.stopMotor();
     }
 
