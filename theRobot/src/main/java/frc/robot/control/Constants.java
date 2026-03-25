@@ -141,6 +141,12 @@ public final class Constants {
                                                      // more influence on the final angle output
 
     // ********************************************************************
+    // Odometry coordinate adjustments
+    // If true, flips the Y axis of drivetrain odometry to align with WPI/vision
+    // field coordinates. Use this when the left-right odometry axis is mirrored.
+    public static final boolean INVERT_ODOMETRY_Y = true;
+
+    // ********************************************************************
     // Controller Constants
     public static final double rumbleTimeSeconds = 0.15;
 

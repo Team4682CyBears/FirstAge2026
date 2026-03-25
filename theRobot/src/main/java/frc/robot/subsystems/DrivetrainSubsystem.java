@@ -316,6 +316,20 @@ public class DrivetrainSubsystem extends SubsystemBase {
     return drivetrain.getStateCopy().Pose.getRotation();
   }
 
+  private Pose2d toWpiPose(Pose2d drivetrainPose) {
+    if (!Constants.INVERT_ODOMETRY_Y || RobotBase.isSimulation() || drivetrainPose == null) {
+      return drivetrainPose;
+    }
+    return new Pose2d(drivetrainPose.getX(), -drivetrainPose.getY(), drivetrainPose.getRotation());
+  }
+
+  private Pose2d fromWpiPose(Pose2d wpiPose) {
+    if (!Constants.INVERT_ODOMETRY_Y || RobotBase.isSimulation() || wpiPose == null) {
+      return wpiPose;
+    }
+    return new Pose2d(wpiPose.getX(), -wpiPose.getY(), wpiPose.getRotation());
+  }
+
   /**
    * Method to get the current auto yaw velocity in radians per second.
    * 
@@ -331,7 +345,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    * @return the current Pose2d position of the robot
    */
   public Pose2d getRobotPosition() {
-    return drivetrain.getState().Pose;
+    return toWpiPose(drivetrain.getState().Pose);
   }
 
   /**
@@ -444,7 +458,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     if (RobotBase.isSimulation()) {
       this.simPosition = updatedPosition;
     }
-    drivetrain.resetPose(updatedPosition);
+    drivetrain.resetPose(fromWpiPose(updatedPosition));
   }
 
   /**
@@ -506,7 +520,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       if (visionComputedMeasurement != null) {
         // we want to reject vision measurements that are more than 1 meter away in case
         // vison gives a bad read
-        drivetrain.addVisionMeasurement(visionComputedMeasurement, visionMeasurement.getTimestamp());
+        drivetrain.addVisionMeasurement(fromWpiPose(visionComputedMeasurement), visionMeasurement.getTimestamp());
       }
     }
   }
@@ -632,9 +646,10 @@ public class DrivetrainSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("VisionMaxFiducialAmbiguity", cameraSubsystem.getLastMaxFiducialAmbiguity());
         SmartDashboard.putNumber("VisionHeartbeat", cameraSubsystem.getLastHeartbeat());
       }
-      SmartDashboard.putNumber("RobotFieldHeadingDegrees", drivetrain.getState().Pose.getRotation().getDegrees());
-      SmartDashboard.putNumber("RobotFieldXCoordinateMeters", drivetrain.getState().Pose.getX());
-      SmartDashboard.putNumber("RobotFieldYCoordinateMeters", drivetrain.getState().Pose.getY());
+  Pose2d robotPose = getRobotPosition();
+  SmartDashboard.putNumber("RobotFieldHeadingDegrees", robotPose.getRotation().getDegrees());
+  SmartDashboard.putNumber("RobotFieldXCoordinateMeters", robotPose.getX());
+  SmartDashboard.putNumber("RobotFieldYCoordinateMeters", robotPose.getY());
 
       SmartDashboard.putBoolean("UseVision", useVision);
       if (swerveYawMode == SwerveYawMode.AUTO) {
