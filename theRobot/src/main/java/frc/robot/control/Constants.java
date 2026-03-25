@@ -105,7 +105,7 @@ public final class Constants {
 
     // ******************************************************************
     // led constants
-    public static final int ledPWMID = 1;
+    public static final int ledPWMID = 0;
     public static final int ledLength = 30;
     public static final int ledStartIdx = 0;
     public static final int ledBlinkFrquencyInHertz = 2;
