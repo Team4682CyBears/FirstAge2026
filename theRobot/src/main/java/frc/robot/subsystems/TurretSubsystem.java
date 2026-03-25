@@ -34,6 +34,7 @@ import frc.robot.control.TurretAimMode;
 public class TurretSubsystem extends SubsystemBase {
     private final TalonFX turretMotor;
     private final DigitalInput turretSensor;
+    private final DigitalInput secondTurretSensor;
     private boolean hasZeroed = false;
     private boolean isAtPosition = true;
     // offset to add when setting position
@@ -62,6 +63,9 @@ public class TurretSubsystem extends SubsystemBase {
         this.turretMotor = new TalonFX(turretCanId);
         this.turretSensor = InstalledHardware.turretSensorInstalled
         ? new DigitalInput(Constants.turretSensorDIOChannel)
+                : null;
+        this.secondTurretSensor = InstalledHardware.turretSecondSensorInstalled
+        ? new DigitalInput(Constants.secondTurretSensorDIOChannel)
                 : null;
         hasZeroed = turretSensor == null;
         configureMotor();
@@ -101,13 +105,20 @@ public class TurretSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putBoolean("TurretLimitSwitchTriggered", isLimitSwitchTriggered());
+        SmartDashboard.putBoolean("TurretSecondLimitSwitchTriggered", isSecondLimitSwitchTriggered());
         if (!hasZeroed) {
             if (turretSensor == null) {
                 hasZeroed = true;
             } else if (isLimitSwitchTriggered()) {
                 stop();
                 turretZeroOffsetRadians = -getRawTurretMechanismPositionRadians();
-                targetTurretAngleRadians = 0.0;
+                targetTurretAngleRadians = Constants.turretSensorPositionRadians;
+                isAtPosition = true;
+                hasZeroed = true;
+            } else if (isSecondLimitSwitchTriggered()) {
+                stop();
+                turretZeroOffsetRadians = -getRawTurretMechanismPositionRadians();
+                targetTurretAngleRadians = Constants.turretSecondPositionRadians;
                 isAtPosition = true;
                 hasZeroed = true;
             } else {
@@ -138,12 +149,12 @@ public class TurretSubsystem extends SubsystemBase {
         }
     }
 
-    public boolean isLimitSwitchAvailable() {
-        return turretSensor != null;
-    }
-
     public boolean isLimitSwitchTriggered() {
         return turretSensor != null && !turretSensor.get();
+    }
+
+    public boolean isSecondLimitSwitchTriggered() {
+        return secondTurretSensor != null && !secondTurretSensor.get();
     }
 
     /**
