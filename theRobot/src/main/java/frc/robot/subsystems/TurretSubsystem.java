@@ -51,13 +51,13 @@ public class TurretSubsystem extends SubsystemBase {
     private double turretProfileConstraintsMaxVoltageDelta = 33;
     private TrapezoidProfile.Constraints turretProfileConstraints = new TrapezoidProfile.Constraints(
             turretProfileConstraintsMaxVoltage, turretProfileConstraintsMaxVoltageDelta);
-    private ProfiledPIDController turretPID = new ProfiledPIDController(0.13, 0.00, 0.00, turretProfileConstraints);
-    private double minTurretVoltage = 0.28;
+    private ProfiledPIDController turretPID = new ProfiledPIDController(0.14, 0.00, 0.00, turretProfileConstraints);
+    private double minTurretVoltage = 0.38;
     private double turretLowVelocityTol = 15;
     private double turretPidDeadband = 0.005;
 
     /**
-     * Create a turret subsystem with a motor a sensor.
+     * Create a turret subsystem with a motor a sensor
      */
     public TurretSubsystem(int turretCanId) {
         this.turretMotor = new TalonFX(turretCanId);
@@ -83,6 +83,10 @@ public class TurretSubsystem extends SubsystemBase {
      */
     public TurretAimMode getAimMode() {
         return turretAimMode;
+    }
+
+    public void setHasZeroed(boolean hasZeroed) {
+        this.hasZeroed = hasZeroed;
     }
 
     /**
@@ -117,7 +121,7 @@ public class TurretSubsystem extends SubsystemBase {
                 hasZeroed = true;
             } else if (isSecondLimitSwitchTriggered()) {
                 stop();
-                turretZeroOffsetRadians = -getRawTurretMechanismPositionRadians();
+                turretZeroOffsetRadians = -getRawTurretMechanismPositionRadians() + Constants.turretSecondPositionRadians;
                 targetTurretAngleRadians = Constants.turretSecondPositionRadians;
                 isAtPosition = true;
                 hasZeroed = true;

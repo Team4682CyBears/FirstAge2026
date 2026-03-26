@@ -83,13 +83,13 @@ public final class Constants {
     // Turret mechanism angle when the limit switch is triggered.
     // should be relative to robot 0 yaw, with the intake side as the front. 
     public static final double turretSensorPositionRadians = 0.0;
-    public static final double turretSecondPositionRadians = Math.toRadians(10.0);
+    public static final double turretSecondPositionRadians = Math.toRadians(-15.0);
     public static final int turretSensorDIOChannel = 1;
     public static final int secondTurretSensorDIOChannel = 2;
     public static final double turretMinAngleDegrees = 0.0;
     public static final double turretMaxAngleDegrees = 355.0;
     public static final Rotation2d turretManualShootAngleDegrees = Rotation2d.fromDegrees(90.0); // TODO set desired fixed angle
-    public static final double turretZeroingVoltage = -.3; // tuned for a steady homing speed
+    public static final double turretZeroingVoltage = -.5; // tuned for a steady homing speed
     public static final double turretToleranceRadians = 0.018;
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
