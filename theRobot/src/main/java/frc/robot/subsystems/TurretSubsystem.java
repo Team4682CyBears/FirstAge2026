@@ -37,6 +37,7 @@ public class TurretSubsystem extends SubsystemBase {
     private final DigitalInput secondTurretSensor;
     private boolean hasZeroed = false;
     private boolean isAtPosition = true;
+    private boolean turretSafetyOverride = true;
     // offset to add when setting position
     private double turretZeroOffsetRadians = 0.0;
     private final VoltageOut voltageOutController = new VoltageOut(0.0);
@@ -215,7 +216,7 @@ public class TurretSubsystem extends SubsystemBase {
      */
     private double computeTurretVoltageForPosition() {
         double turretPositionRadians = getAdjustedTurretMechanismPositionRadians();
-        if (turretPositionRadians < -5 || turretPositionRadians > 2 * Math.PI){
+        if (!turretSafetyOverride && (turretPositionRadians < -5 || turretPositionRadians > 2 * Math.PI)){
             System.out.println("WARNING: turret at invalid position: " + turretPositionRadians + " !!!!!!!!!!!!!!!!!");
             return 0.0;
         }
