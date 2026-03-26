@@ -97,7 +97,7 @@ public class KickerSpindexerAgitateCommand extends Command {
     public void end(boolean interrupted) {
         kickerSubsystem.stop();
         spindexerSpinner.stop();
-        intakeWristSubsystem.stop();
+        intakeWristSubsystem.setPosition(Constants.intakeWristDeployedPositionRotations);
         timer.stop();
     }
 

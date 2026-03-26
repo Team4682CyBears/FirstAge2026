@@ -22,6 +22,7 @@ import frc.robot.common.LookupTableDouble;
 import frc.robot.subsystems.DrivetrainSubsystem;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class ShooterAimer {
   private final DrivetrainSubsystem drivetrain;
@@ -57,11 +58,11 @@ public class ShooterAimer {
 
   // NOTE: these three LUTs need to have the same min input and max input range.
   private final double[][] hoodExtensionLookupTableData = {
-      { 1.0000, 0.07 },
-      { 1.3037, 0.09 },
-      { 3.4408, 0.35 },
-      { 4.7448, 0.55 },
-      { 8.2705, 0.637 } };
+      { 1.0000, 0.00 },
+      { 1.3037, 0.00 },
+      { 3.4408, 0.25 },
+      { 4.7448, 0.38 },
+      { 8.2705, 0.50 } };
   private final double[][] shooterRpmLookupTableData = {
       { 1.0, 2912 },
       { 1.3037, 3000 },
@@ -113,6 +114,7 @@ public class ShooterAimer {
       kickerRPM = kickerRpmForDistance(distance);
       hoodExtension = hoodExtensionForDistance(distance);
       predictedTimeOfFlight = tofForDistance(distance);
+      SmartDashboard.putNumber("distance", distance);
       if (displayDiagnostics) {
       System.out.println("Shooter Aimer updated!");
       System.out.println("Predicted Target " + predictedTarget);

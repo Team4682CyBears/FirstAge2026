@@ -22,7 +22,7 @@ public final class Constants {
 
     //////// SPINDEXER CONSTANTS ///////////
     // 10 balls per second / 4 balls per rotation
-    public static final double spindexerSpeedRotationsPerMinute  = 300;
+    public static final double spindexerSpeedRotationsPerMinute  = 150;
     public static final double kickerBallDetectionRangeInches = 4.0; 
     public static final int spindexerSensorLaserCanID = 27;
     public static final int spindexerTalonFXCanID = 18;
@@ -212,7 +212,7 @@ public final class Constants {
     public static final int intakeWristMotorCanID = 17;
     public static final int intakeWristEncoderCanID = 32;
 
-    public static final double intakeWristEncoderAbsoluteOffset = -0.17789;
+    public static final double intakeWristEncoderAbsoluteOffset = -0.17789 + 0.0386;
 
     public static final double intakeWristTolerance = 0.05;
     public static final double intakeWristStartingPositionRotations = 0.586;
