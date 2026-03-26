@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.common.LEDState;
+import frc.robot.common.MatchTiming;
 import frc.robot.common.TestTrajectories;
 import frc.robot.control.InstalledHardware;
 import frc.robot.control.ManualInputInterfaces;
@@ -27,6 +28,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class RobotContainer {
+  private MatchTiming mt = new MatchTiming();
 
   private SubsystemCollection subsystems = new SubsystemCollection();
   private AutonomousChooser autonomousChooser;
@@ -78,6 +80,8 @@ public class RobotContainer {
 
     // do late binding of default commands
     this.lateBindDefaultCommands();
+
+    this.initializeMatchLED();
 
     if (subsystems.isDriveTrainSubsystemAvailable()) {
       AutonomousChooser.configureAutoBuilder(subsystems);
@@ -312,6 +316,17 @@ public class RobotContainer {
     } else {
       DataLogManager.log("FAIL: initializeManualInputInterfaces");
     }
+  }
+
+  private void initializeMatchLED(){
+    //double time = MatchTiming.timeLeftInShift();
+    //System.out.println("THE TIME IS" + time);
+    //double time = 2026;
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Green, () -> MatchTiming.isNewShift());
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Yellow, () -> MatchTiming.isTenTillShift());
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Red, () -> MatchTiming.isFiveTillShift());
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Purple, () -> MatchTiming.isAuto());
+    subsystems.getLedSubsystem().registerStateAction(LEDState.White, () -> MatchTiming.isFiveTillMajorShift());
   }
 
   /**

@@ -25,32 +25,32 @@ public class InstalledHardware {
 
     // Onboard Hardware - Orentation/Navigation Hardware
     public static final boolean wifiRadioInstalled = true;
-    public static final boolean limelightInstalled = true;
+    public static final boolean limelightInstalled = false;
 
     // External Input Hardware
-    public static final boolean driverXboxControllerInstalled = true;
-    public static final boolean coDriverXboxControllerInstalled = true;
+    public static final boolean driverXboxControllerInstalled = false;
+    public static final boolean coDriverXboxControllerInstalled = false;
 
     // DriveTrain Related Hardware
-    public static final boolean drivetrainInstalled = true;
-    public static final boolean bareDrivetrainInstalled = true;
+    public static final boolean drivetrainInstalled = false;
+    public static final boolean bareDrivetrainInstalled = false;
 
     // Shooter related hardware
-    public static final boolean shooterInstalled = true;
-    public static final boolean hoodMotorInstalled = true;
-    public static final boolean hoodEncoderInstalled = true;
+    public static final boolean shooterInstalled = false;
+    public static final boolean hoodMotorInstalled = false;
+    public static final boolean hoodEncoderInstalled = false;
 
     // Spindexer
-    public static final boolean spindexerInstalled = true;
+    public static final boolean spindexerInstalled = false;
     public static final boolean spindexerSensorInstalled = false;
     
     // Kicker
-    public static final boolean kickerInstalled = true;
+    public static final boolean kickerInstalled = false;
 
     // Intake wrist encoder
-    public static final boolean intakeWristEncoderInstalled = true;
-    public static final boolean intakeWristMotorInstalled = true;
-    public static final boolean intakeRollerInstalled = true;
+    public static final boolean intakeWristEncoderInstalled = false;
+    public static final boolean intakeWristMotorInstalled = false;
+    public static final boolean intakeRollerInstalled = false;
 
     // Climber
     public static final boolean climberInstalled = true;
@@ -61,5 +61,5 @@ public class InstalledHardware {
     // the other TOF sensors that are installed will not work.
 
     // LED Hardware
-    public static final boolean LEDSInstalled = false;
+    public static final boolean LEDSInstalled = true;
 }
