@@ -216,7 +216,6 @@ public class LEDSubsystem extends SubsystemBase {
   // Method to set blinkin's PWM
   public void setPattern(double pwm) {
     blinkin.set(pwm);
-    //System.out.println("!!!!!!!!!!!!!!!!!SETTING PWM TO " + pwm + " !!!!!!!!!!!!!!!!!!!!!!!!");
   }
 
   // Method to use a blinking pattern on the LEDs
