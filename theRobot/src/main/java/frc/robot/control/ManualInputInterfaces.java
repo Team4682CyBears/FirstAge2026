@@ -300,6 +300,11 @@ public class ManualInputInterfaces {
                         .whileTrue(new ClimberVelocityCommand(this.subsystemCollection.getClimberSubsystem(),
                                 () -> this.coDriverController.getRightY()));
             }
+
+            if (this.subsystemCollection.isTurretSubsystemAvailable()) {
+                                this.coDriverController.start().onTrue(
+                                                new ToggleTurretAimModeCommand(subsystemCollection.getTurretSubsystem()));
+            }
             
             // unsure what this should go to
             if (this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
