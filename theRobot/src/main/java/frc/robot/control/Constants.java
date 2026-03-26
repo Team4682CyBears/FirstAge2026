@@ -82,8 +82,8 @@ public final class Constants {
 
     // Turret mechanism angle when the limit switch is triggered.
     // should be relative to robot 0 yaw, with the intake side as the front. 
-    public static final double turretSensorPositionRadians = 0.0;
-    public static final double turretSecondPositionRadians = Math.toRadians(-15.0);
+    public static final double turretSensorPositionRadians = Math.toRadians(7.0);
+    public static final double turretSecondPositionRadians = turretSensorPositionRadians + Math.toRadians(-15.0);
     public static final int turretSensorDIOChannel = 1;
     public static final int secondTurretSensorDIOChannel = 2;
     public static final double turretMinAngleDegrees = 0.0;
@@ -146,7 +146,7 @@ public final class Constants {
     // Odometry coordinate adjustments
     // If true, flips the Y axis of drivetrain odometry to align with WPI/vision
     // field coordinates. Use this when the left-right odometry axis is mirrored.
-    public static final boolean INVERT_ODOMETRY_Y = true;
+    public static final boolean INVERT_ODOMETRY_Y = false;
 
     // ********************************************************************
     // Controller Constants

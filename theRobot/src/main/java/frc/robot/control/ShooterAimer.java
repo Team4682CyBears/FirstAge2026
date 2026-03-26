@@ -114,7 +114,10 @@ public class ShooterAimer {
       kickerRPM = kickerRpmForDistance(distance);
       hoodExtension = hoodExtensionForDistance(distance);
       predictedTimeOfFlight = tofForDistance(distance);
-      SmartDashboard.putNumber("distance", distance);
+      SmartDashboard.putNumber("SA distance", distance);
+      SmartDashboard.putString("SA desired target", desiredTarget.toString());
+      SmartDashboard.putString("SA Predicted Target", predictedTarget.toString());
+      SmartDashboard.putNumber("SA Turret Angle", desiredTurretAngle.getDegrees());
       if (displayDiagnostics) {
       System.out.println("Shooter Aimer updated!");
       System.out.println("Predicted Target " + predictedTarget);
@@ -430,7 +433,7 @@ public class ShooterAimer {
     double dx = predictedTarget.getX() - shooterTranslation.getX();
     double dy = predictedTarget.getY() - shooterTranslation.getY();
 
-    double angleRad = -Math.atan2(dy, dx);
+    double angleRad = Math.atan2(dy, dx);
     // turret zero is defined same as robot yaw, whereas botPose seems to be defined 
     // 180 from robot yaw, so need to add
     // 180 here to be consistent with robot yaw.
