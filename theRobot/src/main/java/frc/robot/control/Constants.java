@@ -74,7 +74,7 @@ public final class Constants {
     public static final double shooterYOffsetFromCenterOfRobot = -0.2032; // in meters, positive is to the left
     public static final Translation2d shooterOffsetFromCenterOfRobot = new Translation2d(
             shooterXOffsetFromCenterOfRobot, shooterYOffsetFromCenterOfRobot);
-    public static final Rotation2d shooterYawOffset = Rotation2d.fromDegrees(35.0); 
+    public static final Rotation2d shooterYawOffset = Rotation2d.fromDegrees(-60.0); 
     // *****************************************************************
     // Turret Constants
     public static final int turretMotorCanId = 23;
