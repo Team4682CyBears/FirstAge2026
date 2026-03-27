@@ -78,7 +78,7 @@ public final class Constants {
     // *****************************************************************
     // Turret Constants
     public static final int turretMotorCanId = 23;
-    public static final double turretGearRatio = 136.0/24.0;
+    public static final double turretGearRatio = 3.0*136.0/24.0;
 
     // Turret mechanism angle when the limit switch is triggered.
     // should be relative to robot 0 yaw, with the intake side as the front. 

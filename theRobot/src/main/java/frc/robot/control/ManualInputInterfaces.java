@@ -189,28 +189,28 @@ public class ManualInputInterfaces {
 
             if (this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()) {
                 // Enable pit limiter
-                this.driverController.leftTrigger().onTrue(
-                        new ParallelCommandGroup(
-                                new InstantCommand(
-                                        subsystemCollection
-                                                .getDriveTrainPowerSubsystem()::setReducedPowerReductionFactor,
-                                        subsystemCollection
-                                                .getDriveTrainPowerSubsystem()),
-                                new ButtonPressCommand(
-                                        "driverController.leftTrigger()",
-                                        "ramp down to reduced speed")));
+                // this.driverController.leftTrigger().onTrue(
+                //         new ParallelCommandGroup(
+                //                 new InstantCommand(
+                //                         subsystemCollection
+                //                                 .getDriveTrainPowerSubsystem()::setReducedPowerReductionFactor,
+                //                         subsystemCollection
+                //                                 .getDriveTrainPowerSubsystem()),
+                //                 new ButtonPressCommand(
+                //                         "driverController.leftTrigger()",
+                //                         "ramp down to reduced speed")));
 
-                // Disable pit limiter
-                this.driverController.leftTrigger().onFalse(
-                        new ParallelCommandGroup(
-                                new InstantCommand(
-                                        subsystemCollection
-                                                .getDriveTrainPowerSubsystem()::resetPowerReductionFactor,
-                                        subsystemCollection
-                                                .getDriveTrainPowerSubsystem()),
-                                new ButtonPressCommand(
-                                        "driverController.leftTrigger()",
-                                        "ramp up to default speed")));
+                // // Disable pit limiter
+                // this.driverController.leftTrigger().onFalse(
+                //         new ParallelCommandGroup(
+                //                 new InstantCommand(
+                //                         subsystemCollection
+                //                                 .getDriveTrainPowerSubsystem()::resetPowerReductionFactor,
+                //                         subsystemCollection
+                //                                 .getDriveTrainPowerSubsystem()),
+                //                 new ButtonPressCommand(
+                //                         "driverController.leftTrigger()",
+                //                         "ramp up to default speed")));
             }
 
             // x button press will stop all
@@ -227,7 +227,7 @@ public class ManualInputInterfaces {
                     && this.subsystemCollection.isHoodSubsystemAvailable()
                     && this.subsystemCollection.isShooterSubsystemAvailable()
                     && shooterAimer != null) {
-        this.driverController.y().whileTrue(
+        this.driverController.leftTrigger().whileTrue(
             new AutoAimCommand(subsystemCollection, shooterAimer));
             }
         }
