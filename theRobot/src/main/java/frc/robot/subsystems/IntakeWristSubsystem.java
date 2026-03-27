@@ -15,6 +15,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -44,7 +45,9 @@ public class IntakeWristSubsystem extends SubsystemBase {
 
     private TalonFX motor;
     private CANcoder encoder;
-    private MotionMagicVoltage voltageController = new MotionMagicVoltage(0.0).withOverrideBrakeDurNeutral(true);
+    // can't figure out feedforward direction. When set to positive value, seems to drive in the wrong direction
+    // when set to negative value, seems to not work at all. 
+    private PositionVoltage voltageController = new PositionVoltage(0.0).withFeedForward(0.0);
     // For manual mode;
     private boolean isManualMode = false;
     private VoltageOut voltageOut = new VoltageOut(0.0);
@@ -53,8 +56,8 @@ public class IntakeWristSubsystem extends SubsystemBase {
     private IntakeWristMode intakeWristMode = IntakeWristMode.RETRACTED;
     private double desiredExtension = Constants.intakeWristDefensivePositionRotations;
 
-    private Slot0Configs slot0Configs = new Slot0Configs().withKP(0.2).withKI(0.003).withKD(0.0)
-            .withKV(2.5).withKS(0.44); // DO NOT SET KD!!
+    // position voltage PID
+    private Slot0Configs slot0Configs = new Slot0Configs().withKP(6.0).withKI(0.0).withKD(0.0);
 
     public IntakeWristSubsystem(int motorCanID, int encoderCanID) {
         if (InstalledHardware.intakeWristEncoderInstalled) {
@@ -105,9 +108,6 @@ public class IntakeWristSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         if (motor == null) {
-            if (encoder != null) {
-                SmartDashboard.putNumber("IntakeWrist Encoder Position", encoder.getPosition().getValueAsDouble());
-            }
             return;
         }
         if (!isManualMode) {
@@ -118,8 +118,11 @@ public class IntakeWristSubsystem extends SubsystemBase {
                 stop();
             }
         }
-        SmartDashboard.putNumber("IntakeWrist Motor Encoder Position", getPosition());
-        SmartDashboard.putBoolean("IntakeWrist Motor Output Velocity", motor.getMotionMagicAtTarget().getValue());
+        SmartDashboard.putNumber("IntakeWrist Motor Encoder Position", motor.getPosition().getValueAsDouble());
+        SmartDashboard.putNumber("IntakeWrist Motor Output Voltage", motor.getMotorVoltage().getValueAsDouble());
+        if (encoder != null) {
+             SmartDashboard.putNumber("IntakeWrist Encoder Position", encoder.getPosition().getValueAsDouble());
+        }
     }
 
     /**
