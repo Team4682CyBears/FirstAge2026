@@ -169,7 +169,8 @@ public class AutonomousChooser {
                     new KickerSpindexerAgitateCommand(
                             subsystems.getKickerSubsystem(),
                             subsystems.getSpindexerSpinnerSubsystem(),
-                            subsystems.getIntakeWristSubsystem()).withTimeout(4.8));
+                            subsystems.getIntakeWristSubsystem(),
+                            subsystems.getIntakeRollerSubsystem()).withTimeout(4.8));
         }
 
         if (subsystems.isIntakeWristSubsystemAvailable()

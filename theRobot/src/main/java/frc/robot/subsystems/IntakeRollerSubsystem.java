@@ -27,6 +27,8 @@ import frc.robot.control.Constants;
  */
 public class IntakeRollerSubsystem extends SubsystemBase {
     private TalonFX intakeTalonFX;
+    private IntakeWristSubsystem wrist;
+    private boolean overrideWristConstraint = false;
     private final VelocityVoltage leaderController = new VelocityVoltage(0.0);
     private double targetRPS = 0.0;
 
@@ -36,8 +38,9 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     /*
      * Initialize the intake roller and configure the motor
      */
-    public IntakeRollerSubsystem(int motorCanID) {
+    public IntakeRollerSubsystem(int motorCanID, IntakeWristSubsystem wrist) {
         intakeTalonFX = new TalonFX(motorCanID);
+        this.wrist = wrist;
         configureMotor();
     }
 
@@ -53,9 +56,11 @@ public class IntakeRollerSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        leaderController.withVelocity(targetRPS);
-        intakeTalonFX.setControl(leaderController);
-        SmartDashboard.putNumber("Intake Real RPM", getRPM());
+        if (wrist.getPosition() <= Constants.intakeWristAngleGoodToRoll || overrideWristConstraint){
+            leaderController.withVelocity(targetRPS);
+            intakeTalonFX.setControl(leaderController);
+            SmartDashboard.putNumber("Intake Real RPM", getRPM());
+        }
     }
 
     /*
@@ -109,4 +114,11 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         return rpm / 60.0;
     }
 
+    public void setOverrideWristConstraint(boolean shouldOverrideWristConstraint){
+        this.overrideWristConstraint = shouldOverrideWristConstraint;
+    }
+
+    public boolean getOverrideWristConstraint(){
+        return overrideWristConstraint;
+    }
 }

@@ -251,5 +251,4 @@ public class IntakeWristSubsystem extends SubsystemBase {
         || Math.abs(motor.getVelocity().getValueAsDouble()) < intakeWristLowVelocityTol;
         return positionTargetReached && velocityIsSmall;
     }
-
 }

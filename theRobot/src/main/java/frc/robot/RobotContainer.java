@@ -293,7 +293,7 @@ public class RobotContainer {
       }
 
       if (InstalledHardware.intakeRollerInstalled) {
-        subsystems.setIntakeRollerSubsystem(new IntakeRollerSubsystem(Constants.intakeRollerCanId));
+        subsystems.setIntakeRollerSubsystem(new IntakeRollerSubsystem(Constants.intakeRollerCanId, subsystems.getIntakeWristSubsystem()));
         DataLogManager.log("SUCCESS: initializeIntakeRollerSubsystem");
       } else {
         DataLogManager.log("FAIL: initializeIntakeRollerSubsystem");

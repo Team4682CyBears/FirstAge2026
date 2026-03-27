@@ -14,6 +14,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.control.Constants;
+import frc.robot.subsystems.IntakeRollerSubsystem;
 import frc.robot.subsystems.IntakeWristSubsystem;
 import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.SpindexerSpinner;
@@ -27,6 +28,7 @@ public class KickerSpindexerAgitateCommand extends Command {
     private final KickerSubsystem kickerSubsystem;
     private final SpindexerSpinner spindexerSpinner;
     private final IntakeWristSubsystem intakeWristSubsystem;
+    private final IntakeRollerSubsystem intakeRollerSubsystem;
     private final Timer timer = new Timer();
     private final double togglePeriodSeconds;
 
@@ -39,13 +41,15 @@ public class KickerSpindexerAgitateCommand extends Command {
      * @param kickerSubsystem
      * @param spindexerSpinner
      * @param intakeWristSubsystem
+     * @param intakeRollerSubsystem
      * @param kickSpeedSupplier
      */
     public KickerSpindexerAgitateCommand(
             KickerSubsystem kickerSubsystem,
             SpindexerSpinner spindexerSpinner,
-            IntakeWristSubsystem intakeWristSubsystem) {
-        this(kickerSubsystem, spindexerSpinner, intakeWristSubsystem, defaultTogglePeriodSeconds);
+            IntakeWristSubsystem intakeWristSubsystem,
+            IntakeRollerSubsystem intakeRollerSubsystem) {
+        this(kickerSubsystem, spindexerSpinner, intakeWristSubsystem, intakeRollerSubsystem, defaultTogglePeriodSeconds);
     }
 
     /**
@@ -61,12 +65,14 @@ public class KickerSpindexerAgitateCommand extends Command {
             KickerSubsystem kickerSubsystem,
             SpindexerSpinner spindexerSpinner,
             IntakeWristSubsystem intakeWristSubsystem,
+            IntakeRollerSubsystem intakeRollerSubsystem,
             double togglePeriodSeconds) {
         this.kickerSubsystem = kickerSubsystem;
         this.spindexerSpinner = spindexerSpinner;
         this.intakeWristSubsystem = intakeWristSubsystem;
+        this.intakeRollerSubsystem = intakeRollerSubsystem;
         this.togglePeriodSeconds = togglePeriodSeconds;
-        addRequirements(kickerSubsystem, spindexerSpinner, intakeWristSubsystem);
+        addRequirements(kickerSubsystem, spindexerSpinner, intakeWristSubsystem, intakeRollerSubsystem);
     }
 
     @Override
@@ -75,6 +81,7 @@ public class KickerSpindexerAgitateCommand extends Command {
         spindexerSpinner.runRPMContinus();
         wristIsDeployed = true;
         intakeWristSubsystem.setPosition(Constants.intakeWristDeployedPositionRotations);
+        intakeRollerSubsystem.runRPM(5000);
         timer.reset();
         timer.start();
     nextToggleTimeSeconds = togglePeriodSeconds;

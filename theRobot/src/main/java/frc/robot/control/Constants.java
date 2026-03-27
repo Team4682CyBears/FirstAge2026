@@ -187,7 +187,7 @@ public final class Constants {
     public static final int hoodMotorCanID = 30;
     public static final int hoodEncoderCanID = 31;
 
-    public static final double hoodEncoderAbsoluteOffset = 0.7220;
+    public static final double hoodEncoderAbsoluteOffset = 0.7220 + .0774;
     public static final double hoodExtendoTolerance = 0.01;
     public static final double hoodMinPositionRotations = 0.0;
     public static final double hoodMaxPositionRotations = 0.635; 
@@ -212,7 +212,8 @@ public final class Constants {
     public static final double intakeWristStartingPositionRotations = 0.586;
     public static final double intakeWristDefensivePositionRotations = 0.511;
     public static final double intakeWristAgitateStowPositionRotations = 0.3439;
-    public static final double intakeWristDeployedPositionRotations = 0.0; 
+    public static final double intakeWristDeployedPositionRotations = 0.0;
+    public static final double intakeWristAngleGoodToRoll = .1; 
 
     public static final int intakeRollerCanId = 16;
 }
