@@ -49,12 +49,12 @@ public class TurretSubsystem extends SubsystemBase {
     private final double maxTurretAngleRadians = Math.toRadians(Constants.turretMaxAngleDegrees);
 
     private double turretProfileConstraintsMaxVoltage = 11.0;
-    private double turretProfileConstraintsMaxVoltageDelta = 33;
+    private double turretProfileConstraintsMaxVoltageDelta = 50;
     private TrapezoidProfile.Constraints turretProfileConstraints = new TrapezoidProfile.Constraints(
             turretProfileConstraintsMaxVoltage, turretProfileConstraintsMaxVoltageDelta);
-    private ProfiledPIDController turretPID = new ProfiledPIDController(0.14, 0.00, 0.00, turretProfileConstraints);
-    private double minTurretVoltage = 0.38;
-    private double turretLowVelocityTol = 15;
+    private ProfiledPIDController turretPID = new ProfiledPIDController(0.19, 0.03, 0.00, turretProfileConstraints);
+    private double minTurretVoltage = 0.42;
+    private double turretLowVelocityTol = 20.0;
     private double turretPidDeadband = 0.005;
 
     /**
