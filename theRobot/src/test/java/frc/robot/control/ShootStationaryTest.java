@@ -51,7 +51,7 @@ class ShootStationaryTest {
   void hoodExtensionValidValue() {
     // known lookup table value
     double input = 3.4408;
-    double output = 0.35;
+    double output = 0.25;
     double hoodPosition = shooterAimer.hoodExtensionForDistance(input);
     assertEquals(
         output, hoodPosition, DELTA);
@@ -60,10 +60,10 @@ class ShootStationaryTest {
   @Test
   void hoodExtensionInterpolatedValue() {
     // interpolated lookup table value
-    // 3.4408, 0.35 },
-    // { 4.7448, 0.55
+    //{ 3.4408, 0.25 },
+    //{ 4.7448, 0.38 },
     double input = 4.0;
-    double numerator = (0.35 * (4.7448 - input)) + (0.55 * (input - 3.4408));
+    double numerator = (0.25 * (4.7448 - input)) + (0.38 * (input - 3.4408));
     double denominator = (4.7448 - 3.4408);
     double output = numerator / denominator;
     double hoodPosition = shooterAimer.hoodExtensionForDistance(input);
@@ -75,7 +75,7 @@ class ShootStationaryTest {
   void hoodExtensionClampBelowMin() {
     // clamp to min when input below min
     double input = 0.5; // below min
-    double output = 0.08;
+    double output = 0.0;
     double hoodPosition = shooterAimer.hoodExtensionForDistance(input);
     assertEquals(
         output, hoodPosition, DELTA);
@@ -85,7 +85,7 @@ class ShootStationaryTest {
   void hoodExtensionClampAboveMax() {
     // clamp to max when input above max
     double input = 9.0; // below min
-    double output = Constants.hoodMaxPositionRotations;
+    double output = 0.50;
     double hoodPosition = shooterAimer.hoodExtensionForDistance(input);
     assertEquals(
         output, hoodPosition, DELTA);

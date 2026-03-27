@@ -279,5 +279,6 @@ public class TurretSubsystem extends SubsystemBase {
      */
     protected void close(){
         turretSensor.close();
+        secondTurretSensor.close();
     }
 }
