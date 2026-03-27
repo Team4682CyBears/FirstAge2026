@@ -22,7 +22,7 @@ public final class Constants {
 
     //////// SPINDEXER CONSTANTS ///////////
     // 10 balls per second / 4 balls per rotation
-    public static final double spindexerSpeedRotationsPerMinute  = 300;
+    public static final double spindexerSpeedRotationsPerMinute  = 150;
     public static final double kickerBallDetectionRangeInches = 4.0; 
     public static final int spindexerSensorLaserCanID = 27;
     public static final int spindexerTalonFXCanID = 18;
@@ -60,21 +60,37 @@ public final class Constants {
     public static final Translation2d redHubPosition = new Translation2d(FIELD_LENGTH_X - blueHubPosition.getX(), FIELD_WIDTH_Y / 2.0);
 
     // meters
-    public static final double shuttleOffsetFromWall = 1.5;
+    public static final double shuttleOffsetFromWall = 2.5;
 
     // left and right are relative to (0,0) facing other end of the field
     public static final Translation2d blueLeftShuttlePosition = new Translation2d(shuttleOffsetFromWall, shuttleOffsetFromWall);
     public static final Translation2d blueRightShuttlePosition = new Translation2d(shuttleOffsetFromWall, FIELD_WIDTH_Y - shuttleOffsetFromWall);
-    public static final Translation2d redLeftShuttlePosition = new Translation2d(FIELD_LENGTH_X - shuttleOffsetFromWall, shuttleOffsetFromWall);
-    public static final Translation2d redRightShuttlePosition = new Translation2d(FIELD_LENGTH_X - shuttleOffsetFromWall, FIELD_WIDTH_Y - shuttleOffsetFromWall);
+    public static final Translation2d redRightShuttlePosition = new Translation2d(FIELD_LENGTH_X - shuttleOffsetFromWall, shuttleOffsetFromWall);
+    public static final Translation2d redLeftShuttlePosition = new Translation2d(FIELD_LENGTH_X - shuttleOffsetFromWall, FIELD_WIDTH_Y - shuttleOffsetFromWall);
 
     // *****************************************************************
     // Physical Shooter Offsets
-    public static final double shooterXOffsetFromCenterOfRobot = -.2159; // in meters, positive is forward
-    public static final double shooterYOffsetFromCenterOfRobot = -.1397; // in meters, positive is to the left
+    public static final double shooterXOffsetFromCenterOfRobot = -0.1397; // in meters, positive is forward
+    public static final double shooterYOffsetFromCenterOfRobot = -0.2032; // in meters, positive is to the left
     public static final Translation2d shooterOffsetFromCenterOfRobot = new Translation2d(
             shooterXOffsetFromCenterOfRobot, shooterYOffsetFromCenterOfRobot);
     public static final Rotation2d shooterYawOffset = Rotation2d.fromDegrees(-60.0); 
+    // *****************************************************************
+    // Turret Constants
+    public static final int turretMotorCanId = 23;
+    public static final double turretGearRatio = 136.0/24.0;
+
+    // Turret mechanism angle when the limit switch is triggered.
+    // should be relative to robot 0 yaw, with the intake side as the front. 
+    public static final double turretSensorPositionRadians = Math.toRadians(7.0);
+    public static final double turretSecondPositionRadians = turretSensorPositionRadians + Math.toRadians(-15.0);
+    public static final int turretSensorDIOChannel = 1;
+    public static final int secondTurretSensorDIOChannel = 2;
+    public static final double turretMinAngleDegrees = 0.0;
+    public static final double turretMaxAngleDegrees = 355.0;
+    public static final Rotation2d turretManualShootAngleDegrees = Rotation2d.fromDegrees(90.0); // TODO set desired fixed angle
+    public static final double turretZeroingVoltage = -.5; // tuned for a steady homing speed
+    public static final double turretToleranceRadians = 0.018;
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
     public static final double DegreesPerRevolution = 360.0;
@@ -101,7 +117,7 @@ public final class Constants {
     // input device constants
     public static final int portDriverController = 0;
     public static final int portCoDriverController = 1;
-    public static final int climberLimSwtichChannel = 1;
+    public static final int climberLimSwtichChannel = 0;
 
     // ******************************************************************
     // led constants
@@ -154,7 +170,7 @@ public final class Constants {
     public static final double SHOOTER_MAX_RPM = 6500.0;
     public static final double SHOOTER_PONDER_RPM = 1000.0;
     public static final double SHOOTER_CLOSE_RPM = 3000.0;
-    public static final double SHOOTER_RPM_OFFSET = 200;
+    public static final double SHOOTER_RPM_OFFSET = 0.0;
 
     // ********************************************************************
     // Kicker Constants
@@ -190,7 +206,7 @@ public final class Constants {
     public static final int intakeWristMotorCanID = 17;
     public static final int intakeWristEncoderCanID = 32;
 
-    public static final double intakeWristEncoderAbsoluteOffset = -0.17789;
+    public static final double intakeWristEncoderAbsoluteOffset = -0.17789 + 0.0386;
 
     public static final double intakeWristTolerance = 0.05;
     public static final double intakeWristStartingPositionRotations = 0.586;

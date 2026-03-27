@@ -313,7 +313,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     if (RobotBase.isSimulation()) {
       return simPosition.getRotation();
     }
-    return drivetrain.getState().Pose.getRotation();
+    return drivetrain.getStateCopy().Pose.getRotation();
   }
 
   /**
@@ -369,6 +369,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
      * This ensures driving behavior doesn't change until an explicit disable event
      * occurs during testing.
      */
+    SmartDashboard.putNumber("Gyro", getGyroscopeRotation().getDegrees());
+    SmartDashboard.putNumber("Pigoon", drivetrain.getPigeon2().getYaw().getValueAsDouble());
     if (DriverStation.isDisabled() || isSeedingCamera) {
       updateVisionMeasurements(CameraMode.SEEDING);
 
@@ -385,9 +387,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
       updateVisionMeasurements(CameraMode.TRACKING);
     }
 
-    if (swerveYawMode == SwerveYawMode.AUTO) {
+    if (shooterAimer != null) {
       shooterAimer.calculate(); // update all the shooterAimer parameters
-      this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
     }
 
     if (swerveDriveMode == SwerveDriveMode.IMMOVABLE_STANCE && chassisSpeedsAreZero()) {
@@ -397,15 +398,16 @@ public class DrivetrainSubsystem extends SubsystemBase {
       drivetrain.setControl(brakeDriveController);
     } else if (swerveDriveMode == SwerveDriveMode.FIELD_CENTRIC_DRIVING
         || swerveDriveMode == SwerveDriveMode.FIELD_CENTRIC_SHOOTING) {
+
+      if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
+        this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
+      }
+
       // apply the speed reduction factor to the chassis speeds
       ChassisSpeeds reducedChassisSpeeds = new ChassisSpeeds(
           chassisSpeeds.vxMetersPerSecond * this.speedReductionFactor,
           chassisSpeeds.vyMetersPerSecond * this.speedReductionFactor,
           chassisSpeeds.omegaRadiansPerSecond);
-
-      if (swerveYawMode == SwerveYawMode.AUTO) {
-        reducedChassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(reducedChassisSpeeds);
-      }
 
       // apply acceleration control
       // TODO should test this at practice feild
@@ -421,7 +423,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
       // do not apply acceleration limis or speed limits.
       // assumes this is used by a trajectory follower that already imposes those
       // constraints.
-      if (swerveYawMode == SwerveYawMode.AUTO) {
+      if (swerveYawMode == SwerveYawMode.AUTO && shooterAimer != null) {
         this.chassisSpeeds = shooterAimer.updateChassisSpeedsWithAutoYaw(this.chassisSpeeds);
       }
       drivetrain.setControl(robotCentricDriveController

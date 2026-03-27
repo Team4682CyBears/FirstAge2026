@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.common.IntakeDirection;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.commands.*;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class ManualInputInterfaces {
 
@@ -221,24 +222,19 @@ public class ManualInputInterfaces {
                                     "driverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
 
-        if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
-            && this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()
-            && this.subsystemCollection.isHoodSubsystemAvailable()
-            && this.subsystemCollection.isShooterSubsystemAvailable()
-            && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
-        this.driverController.y().whileTrue(new AutoAimMovingCommand(subsystemCollection,
-            subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
-        }
-        }
-
-    if (this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()) {
-            this.driverController.leftBumper().whileTrue(new SpindexerCommand(
-                    this.subsystemCollection.getSpindexerSpinnerSubsystem(), false));
+            ShooterAimer shooterAimer = getActiveShooterAimer();
+            if (this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()
+                    && this.subsystemCollection.isHoodSubsystemAvailable()
+                    && this.subsystemCollection.isShooterSubsystemAvailable()
+                    && shooterAimer != null) {
+        this.driverController.y().whileTrue(
+            new AutoAimCommand(subsystemCollection, shooterAimer));
+            }
         }
 
-    if (this.subsystemCollection.isKickerSubsystemAvailable()
-        && this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()
-        && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
+        if (this.subsystemCollection.isKickerSubsystemAvailable()
+                && this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()
+                && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
             this.driverController.rightTrigger().whileTrue(new KickerSpindexerAgitateCommand(
                     this.subsystemCollection.getKickerSubsystem(),
                     this.subsystemCollection.getSpindexerSpinnerSubsystem(),
@@ -254,17 +250,29 @@ public class ManualInputInterfaces {
         }
 
         if (this.subsystemCollection.isShooterSubsystemAvailable()
-                && this.subsystemCollection.isHoodSubsystemAvailable()) {
+                && this.subsystemCollection.isHoodSubsystemAvailable()
+                && this.subsystemCollection.isKickerSubsystemAvailable()) {
             this.driverController.rightBumper().whileTrue(new ShooterManualCommand(subsystemCollection));
         }
-        if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
-            && this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()
-            && this.subsystemCollection.isHoodSubsystemAvailable()
-            && this.subsystemCollection.isShooterSubsystemAvailable()
-            && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
-            this.driverController.a().whileTrue(new AutoAimShuttlingCommand(subsystemCollection,
-                subsystemCollection.getDriveTrainSubsystem().getShooterAimer()));
+
+        if (this.subsystemCollection.isTurretSubsystemAvailable()) {
+            TurretSubsystem turret = this.subsystemCollection.getTurretSubsystem();
+            this.driverController.povUp().onTrue(
+                    new TurretTestPositionCommand(turret, Math.toRadians(90)));
+            this.driverController.povRight().onTrue(
+                    new TurretTestPositionCommand(turret, Math.toRadians(180)));
+            this.driverController.povDown().onTrue(
+                    new TurretTestPositionCommand(turret, Math.toRadians(270)));
+            this.driverController.povLeft().onTrue(
+                    new TurretTestPositionCommand(turret, Math.toRadians(0)));
         }
+    }
+
+    private ShooterAimer getActiveShooterAimer() {
+        if (this.subsystemCollection.isShooterAimerAvailable()) {
+            return this.subsystemCollection.getShooterAimer();
+        }
+        return null;
     }
 
     /**
@@ -280,43 +288,7 @@ public class ManualInputInterfaces {
                             new ButtonPressCommand(
                                     "coDriverController.x()",
                                     "!!!!!!!!!!!!!!!!!!!! ALL STOP !!!!!!!!!!!!!!!!!!!!!")));
-            // POV up/down now only adjust the shooter aimer offset; RPM control
-            // has been removed from the co-driver controller.
-            this.coDriverController.povUp().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
-                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
-                    this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(0.1, 0.0);
-                }
-            }));
-            this.coDriverController.povDown().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
-                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
-                    this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(-0.1, 0.0);
-                }
-            }));
-            this.coDriverController.povLeft().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
-                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
-                    this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(0.10, -0.10);
-                }
-            }));
-            this.coDriverController.povRight().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
-                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
-                    this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer()
-                            .applyTargetAdjustment(0.0, 0.1);
-                }
-            }));
 
-            this.coDriverController.start().onTrue(new InstantCommand(() -> {
-                if (this.subsystemCollection.isDriveTrainSubsystemAvailable()
-                        && this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer() != null) {
-                    this.subsystemCollection.getDriveTrainSubsystem().getShooterAimer().resetTargetAdjustment();
-                }
-            }));
             if (this.subsystemCollection.isClimberSubsystemAvailable()) {
                 this.coDriverController.leftBumper()
                         .onTrue(new ClimberPositionCommand(this.subsystemCollection.getClimberSubsystem(),
@@ -327,6 +299,11 @@ public class ManualInputInterfaces {
                         .and(this.coDriverController.b())
                         .whileTrue(new ClimberVelocityCommand(this.subsystemCollection.getClimberSubsystem(),
                                 () -> this.coDriverController.getRightY()));
+            }
+
+            if (this.subsystemCollection.isTurretSubsystemAvailable()) {
+                                this.coDriverController.start().onTrue(
+                                                new ToggleTurretAimModeCommand(subsystemCollection.getTurretSubsystem()));
             }
             
             // unsure what this should go to

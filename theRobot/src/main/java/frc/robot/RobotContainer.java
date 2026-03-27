@@ -20,6 +20,9 @@ import frc.robot.control.ManualInputInterfaces;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
+import frc.robot.subsystems.IntakeRollerSubsystem;
+import frc.robot.subsystems.IntakeWristSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.control.AutonomousChooser;
 import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
@@ -62,6 +65,9 @@ public class RobotContainer {
     
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
+
+  // init the turret subsystem
+  this.initializeTurretSubsystem();
 
     // init the shooter aimer (needs drivetrain, shooter and hood)
     this.initializeShooterAimer();
@@ -320,12 +326,26 @@ public class RobotContainer {
    */
   private void initializeShooterAimer() {
     if (subsystems.isDriveTrainSubsystemAvailable() && subsystems.isHoodSubsystemAvailable()
-        && subsystems.isShooterSubsystemAvailable()) {
+        && subsystems.isShooterSubsystemAvailable() && subsystems.isTurretSubsystemAvailable()) {
       ShooterAimer aimer = new ShooterAimer(subsystems.getDriveTrainSubsystem(), subsystems);
+      subsystems.setShooterAimer(aimer);
       subsystems.getDriveTrainSubsystem().setShooterAimer(aimer);
       DataLogManager.log("SUCCESS: initializeShooterAimer");
     } else {
       DataLogManager.log("FAIL: initializeShooterAimer");
+    }
+  }
+
+  /**
+   * A method to init the turret subsystem
+   */
+  private void initializeTurretSubsystem() {
+    if (InstalledHardware.turretInstalled) {
+      subsystems.setTurretSubsystem(
+          new TurretSubsystem(Constants.turretMotorCanId));
+      DataLogManager.log("SUCCESS: initializeTurretSubsystem");
+    } else {
+      DataLogManager.log("FAIL: initializeTurretSubsystem");
     }
   }
 
@@ -348,6 +368,12 @@ public class RobotContainer {
    * A method to late binding of default commands
    */
   private void lateBindDefaultCommands() {
+    if (subsystems.isTurretSubsystemAvailable()) {
+      subsystems.getTurretSubsystem().setDefaultCommand(new TurretDefaultCommand(subsystems));
+    }
+    if (subsystems.isShooterSubsystemAvailable()) {
+      //subsystems.getShooterSubsystem().setDefaultCommand(new ShooterDefaultCommand(subsystems));
+    }
   }
 
   private static double deadband(double value, double deadband) {

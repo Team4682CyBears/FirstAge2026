@@ -23,6 +23,7 @@ import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.IntakeRollerSubsystem;
 import frc.robot.subsystems.IntakeWristSubsystem;
+import frc.robot.subsystems.TurretSubsystem;
 
 public class SubsystemCollection {
     // declaring input classes
@@ -42,6 +43,8 @@ public class SubsystemCollection {
     private IntakeWristSubsystem intakeWristSubsystem = null;
     private ShotLogger shotLogger = null;
     private SpindexerSpinner spindexer = null;
+    private TurretSubsystem turretSubsystem = null;
+    private ShooterAimer shooterAimer = null;
 
     /**
      * Default constructor
@@ -215,5 +218,29 @@ public class SubsystemCollection {
 
     public boolean isSpinnerSpindexerSubsystemAvaible(){
         return spindexer != null;
+    }
+
+    public TurretSubsystem getTurretSubsystem() {
+        return turretSubsystem;
+    }
+
+    public void setTurretSubsystem(TurretSubsystem turretSubsystem) {
+        this.turretSubsystem = turretSubsystem;
+    }
+
+    public boolean isTurretSubsystemAvailable() {
+        return turretSubsystem != null;
+    }
+
+    public ShooterAimer getShooterAimer() {
+        return shooterAimer;
+    }
+
+    public void setShooterAimer(ShooterAimer shooterAimer) {
+        this.shooterAimer = shooterAimer;
+    }
+
+    public boolean isShooterAimerAvailable() {
+        return shooterAimer != null;
     }
 }

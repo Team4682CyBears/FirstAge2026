@@ -11,7 +11,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeRollerSubsystem;
 import frc.robot.subsystems.IntakeWristSubsystem;
 import frc.robot.control.IntakeWristMode;
@@ -21,7 +21,7 @@ import frc.robot.control.IntakeWristMode;
  * When deploying, also start the intake roller (RPM read from SmartDashboard "Intake RPM").
  * When retracting, stop the roller.
  */
-public class ToggleIntakeDeployCommand extends InstantCommand {
+public class ToggleIntakeDeployCommand extends Command {
 
     private final IntakeWristSubsystem wrist;
     private final IntakeRollerSubsystem roller;
