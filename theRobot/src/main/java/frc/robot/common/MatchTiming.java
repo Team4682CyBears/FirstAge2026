@@ -13,11 +13,16 @@ import java.util.Optional;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Constants;
+import frc.robot.control.Constants;
 
 public class MatchTiming {
     public MatchTiming(){
+    }
+
+    public enum hubActiveLogic {
+        RedFirst, 
+        BlueFirst,
+        Unknown,
     }
 
     //Returns 'B' if Blue starts and 'R' if red starts
@@ -72,60 +77,66 @@ public class MatchTiming {
         }
     }
 
+    // Returns true if there are five seconds till the end of auto or until endgame
     public static boolean isFiveTillMajorShift(){
         double matchTime = DriverStation.getMatchTime();
 
         if(matchTime < Constants.autoTimeSeconds && matchTime > 25){
             return true;
-        }else if(matchTime < Constants.endGameStartSeconds + 5 && matchTime > Constants.endGameStartSeconds){
+        }else if(matchTime < Constants.endGameStartSeconds + 5 && isEndGame()){
             return true;
         }else{
             return false;
         }
     }
 
+    // Returns true for the first 15 seconds of each shift
     public static boolean isNewShift(){
         double matchTime = DriverStation.getMatchTime();
         double remainder = (matchTime - Constants.autoTimeSeconds)%Constants.shiftDurationSeconds;
 
-        if(remainder < 15 && matchTime < Constants.endGameStartSeconds && matchTime > Constants.autoTimeSeconds){
+        if(remainder < 15 && isTeleopShifts()){
             return true;
         }else{
             return false;
         }
     }
 
+    // Returns true when there are 10-5 seconds left till the next shift
     public static boolean isTenTillShift(){
         double matchTime = DriverStation.getMatchTime();
         double remainder = (matchTime - Constants.autoTimeSeconds)%Constants.shiftDurationSeconds;
 
-        if(remainder < 20 && remainder >= 15 && !isEndGame() && matchTime > Constants.autoTimeSeconds){
+        if(remainder < 20 && remainder >= 15 && isTeleopShifts()){
             return true;
         }else{
             return false;
         }
     }
 
+    // Returns true when there are 5 seconds till the next shift
     public static boolean isFiveTillShift(){
         double matchTime = DriverStation.getMatchTime();
         double remainder = (matchTime - Constants.autoTimeSeconds)%Constants.shiftDurationSeconds;
 
-        if(remainder >= 20 && !isEndGame() && !isAuto()){
+        if(remainder >= 20 && isTeleopShifts()){
             return true;
         }else{
             return false;
         }
     }
 
+    // Returns true if it is endgame or auto
     public static boolean isEndOrAuto(){
         double matchTime = DriverStation.getMatchTime();
-        if(matchTime < Constants.autoTimeSeconds - 5 || Constants.matchTime > 130){
+        if(matchTime < Constants.autoTimeSeconds - 5 || matchTime > 130){
             return true;
         }else{
             return false;
         }
     }
 
+    // Returns true if it is 5 seconds before end game up till the end of the match
     public static boolean isEndGame(){
         double matchTime = DriverStation.getMatchTime();
         if(matchTime >= Constants.endGameStartSeconds){
@@ -135,9 +146,19 @@ public class MatchTiming {
         }
     }
 
+    // returns true if it is auto
     public static boolean isAuto(){
         double matchTime = DriverStation.getMatchTime();
         if(matchTime >= Constants.autoTimeSeconds){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    // Returns true if it is neither auto or 5 seconds before end game
+    public static boolean isTeleopShifts(){
+        if(!isAuto() && !isEndGame()){
             return true;
         }else{
             return false;
