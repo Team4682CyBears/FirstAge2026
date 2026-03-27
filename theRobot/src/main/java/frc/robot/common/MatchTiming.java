@@ -2,12 +2,11 @@
 // Bishop Blanchet Robotics
 // Home of the Cybears
 // FRC - Rebuilt - 2026
-// File: RobotContainer.java
-// Intent: main robot body
+// File: MatchTiming.java
+// Intent: a class to handle all matchtiming functionality
 // ************************************************************
 
 // ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ ʕ •ᴥ•ʔ ʕ•ᴥ•  ʔ ʕ  •ᴥ•ʔ ʕ •`ᴥ´•ʔ ʕ° •° ʔ 
-
 package frc.robot.common;
 
 import java.util.Optional;
@@ -15,12 +14,10 @@ import java.util.Optional;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Constants;
 
 public class MatchTiming {
-    static Timer clock;
     public MatchTiming(){
-        clock = new Timer();
-        clock.start();
     }
 
     //Returns 'B' if Blue starts and 'R' if red starts
@@ -77,11 +74,10 @@ public class MatchTiming {
 
     public static boolean isFiveTillMajorShift(){
         double matchTime = DriverStation.getMatchTime();
-        //double matchTime = clock.get();
 
-        if(matchTime < 30 && matchTime > 25){
+        if(matchTime < Constants.autoTimeSeconds && matchTime > 25){
             return true;
-        }else if(matchTime < 130 && matchTime > 125){
+        }else if(matchTime < Constants.endGameStartSeconds + 5 && matchTime > Constants.endGameStartSeconds){
             return true;
         }else{
             return false;
@@ -90,10 +86,9 @@ public class MatchTiming {
 
     public static boolean isNewShift(){
         double matchTime = DriverStation.getMatchTime();
-        //double matchTime = clock.get();
-        double remainder = (matchTime - 30)%25;
+        double remainder = (matchTime - Constants.autoTimeSeconds)%Constants.shiftDurationSeconds;
 
-        if(remainder < 15 && matchTime < 125 && matchTime > 30){
+        if(remainder < 15 && matchTime < Constants.endGameStartSeconds && matchTime > Constants.autoTimeSeconds){
             return true;
         }else{
             return false;
@@ -102,10 +97,9 @@ public class MatchTiming {
 
     public static boolean isTenTillShift(){
         double matchTime = DriverStation.getMatchTime();
-        //double matchTime = clock.get();
-        double remainder = (matchTime - 30)%25;
+        double remainder = (matchTime - Constants.autoTimeSeconds)%Constants.shiftDurationSeconds;
 
-        if(remainder < 20 && remainder >= 15 && matchTime < 125 && matchTime > 30){
+        if(remainder < 20 && remainder >= 15 && !isEndGame() && matchTime > Constants.autoTimeSeconds){
             return true;
         }else{
             return false;
@@ -114,10 +108,27 @@ public class MatchTiming {
 
     public static boolean isFiveTillShift(){
         double matchTime = DriverStation.getMatchTime();
-        //double matchTime = clock.get();
-        double remainder = (matchTime - 30)%25;
+        double remainder = (matchTime - Constants.autoTimeSeconds)%Constants.shiftDurationSeconds;
 
-        if(remainder >= 20 && matchTime < 125 && matchTime > 30){
+        if(remainder >= 20 && !isEndGame() && !isAuto()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static boolean isEndOrAuto(){
+        double matchTime = DriverStation.getMatchTime();
+        if(matchTime < Constants.autoTimeSeconds - 5 || Constants.matchTime > 130){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public static boolean isEndGame(){
+        double matchTime = DriverStation.getMatchTime();
+        if(matchTime >= Constants.endGameStartSeconds){
             return true;
         }else{
             return false;
@@ -126,8 +137,7 @@ public class MatchTiming {
 
     public static boolean isAuto(){
         double matchTime = DriverStation.getMatchTime();
-        //double matchTime = clock.get();
-        if(matchTime < 25 || matchTime > 130){
+        if(matchTime >= Constants.autoTimeSeconds){
             return true;
         }else{
             return false;

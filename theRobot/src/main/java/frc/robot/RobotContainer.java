@@ -58,9 +58,6 @@ public class RobotContainer {
 
     // init the spindexer subsystem
     this.initializeSpindexerSubsystem();
-
-    // init the climber subsystem
-    this.initializeClimberSubsystem();
     
     // init the various subsystems
     this.initializeDrivetrainSubsystem();
@@ -265,19 +262,6 @@ public class RobotContainer {
   }
 
   /**
-   * A method to init the spindexer subsystem
-   */
-  private void initializeClimberSubsystem() {
-    if (InstalledHardware.climberInstalled) {
-      subsystems.setClimberSubsystem(
-          new ClimberSubsystem(Constants.climberLeadMotorCanID, Constants.climberFollowMotorCanID, Constants.climberHallEffectSensorDIOPort));
-      System.out.println("SUCCESS: initializeSpindexer");
-    } else {
-      System.out.println("FAIL: initializeSpindexer");
-    }
-  }
-
-  /**
    * A method to init the intake subsystems (wrist + roller)
    */
   private void initializeIntakeSubsystems() {
@@ -319,13 +303,10 @@ public class RobotContainer {
   }
 
   private void initializeMatchLED(){
-    //double time = MatchTiming.timeLeftInShift();
-    //System.out.println("THE TIME IS" + time);
-    //double time = 2026;
     subsystems.getLedSubsystem().registerStateAction(LEDState.Green, () -> MatchTiming.isNewShift());
     subsystems.getLedSubsystem().registerStateAction(LEDState.Yellow, () -> MatchTiming.isTenTillShift());
     subsystems.getLedSubsystem().registerStateAction(LEDState.Red, () -> MatchTiming.isFiveTillShift());
-    subsystems.getLedSubsystem().registerStateAction(LEDState.Purple, () -> MatchTiming.isAuto());
+    subsystems.getLedSubsystem().registerStateAction(LEDState.Purple, () -> MatchTiming.isEndOrAuto());
     subsystems.getLedSubsystem().registerStateAction(LEDState.White, () -> MatchTiming.isFiveTillMajorShift());
   }
 
