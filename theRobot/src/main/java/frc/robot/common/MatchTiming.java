@@ -16,9 +16,12 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.control.Constants;
 
 public class MatchTiming {
+
+    // Constructor
     public MatchTiming(){
     }
 
+    // Currently unused enum for when the hub is active will try to get working eventually
     public enum hubActiveLogic {
         RedFirst, 
         BlueFirst,
