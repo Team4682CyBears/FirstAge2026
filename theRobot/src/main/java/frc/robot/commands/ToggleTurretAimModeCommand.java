@@ -10,14 +10,14 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.control.TurretAimMode;
 import frc.robot.subsystems.TurretSubsystem;
 
 /**
  * Toggle the turret aim mode. When switching to MANUAL, hold the current angle.
  */
-public class ToggleTurretAimModeCommand extends InstantCommand {
+public class ToggleTurretAimModeCommand extends Command {
     private final TurretSubsystem turret;
 
     public ToggleTurretAimModeCommand(TurretSubsystem turret) {
