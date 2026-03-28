@@ -240,7 +240,7 @@ public class RobotContainer {
    * A method to init the hood subsystem
    */
   private void initializeHoodSubsystem() {
-    if (InstalledHardware.hoodEncoderInstalled || InstalledHardware.hoodMotorInstalled) {
+    if (InstalledHardware.hoodEncoderInstalled && InstalledHardware.hoodMotorInstalled) {
       subsystems.setHoodSubsystem(new HoodSubsystem(Constants.hoodMotorCanID, Constants.hoodEncoderCanID));
       System.out.println("SUCCESS: initializeHood");
     } else {
@@ -291,7 +291,7 @@ public class RobotContainer {
    */
   private void initializeIntakeSubsystems() {
     try {
-      if (InstalledHardware.intakeWristMotorInstalled || InstalledHardware.intakeWristEncoderInstalled) {
+      if (InstalledHardware.intakeWristMotorInstalled && InstalledHardware.intakeWristEncoderInstalled) {
         subsystems.setIntakeWristSubsystem(
             new IntakeWristSubsystem(Constants.intakeWristMotorCanID, Constants.intakeWristEncoderCanID));
         DataLogManager.log("SUCCESS: initializeIntakeWristSubsystem");

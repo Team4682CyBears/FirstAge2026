@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.493756708407871,
-        "y": 6.78520572450805
+        "x": 3.6457602862254017,
+        "y": 0.6357781753130587
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.3050268336314845,
-        "y": 6.363345259391772
+        "x": 3.191449016100179,
+        "y": 1.4794991055456168
       },
       "isLocked": false,
-      "linkedName": "InABit"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.596627387152778,
-        "y": 0.5571825086805553
+        "x": 3.094096601073345,
+        "y": 1.236118067978532
       },
       "prevControl": {
-        "x": 3.110322003577817,
-        "y": 0.8253846153846159
+        "x": 3.726430607188556,
+        "y": 0.15409664105980303
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "BotTrench"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

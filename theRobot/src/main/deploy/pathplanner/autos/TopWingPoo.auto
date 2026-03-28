@@ -17,12 +17,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "TopTrenchInABit"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -57,19 +51,39 @@
         {
           "type": "path",
           "data": {
-            "pathName": "InABitToTopTrench"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "TopTrenchToPoo"
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "AutoAimOn"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAimOn"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.3
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "SpindexerKickerOn"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         }
       ]
