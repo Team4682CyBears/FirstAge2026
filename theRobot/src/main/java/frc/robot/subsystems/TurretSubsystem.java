@@ -116,7 +116,7 @@ public class TurretSubsystem extends SubsystemBase {
                 hasZeroed = true;
             } else if (isLimitSwitchTriggered()) {
                 stop();
-                turretZeroOffsetRadians = -getRawTurretMechanismPositionRadians();
+                turretZeroOffsetRadians = -getRawTurretMechanismPositionRadians() + Constants.turretSensorPositionRadians;
                 targetTurretAngleRadians = Constants.turretSensorPositionRadians;
                 isAtPosition = true;
                 hasZeroed = true;

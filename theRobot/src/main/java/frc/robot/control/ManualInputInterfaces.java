@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.common.IntakeDirection;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -235,11 +236,9 @@ public class ManualInputInterfaces {
         if (this.subsystemCollection.isKickerSubsystemAvailable()
                 && this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()
                 && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
-            this.driverController.rightTrigger().whileTrue(new KickerSpindexerAgitateCommand(
+            this.driverController.rightTrigger().whileTrue(new KickerSpindexerCommand(
                     this.subsystemCollection.getKickerSubsystem(),
-                    this.subsystemCollection.getSpindexerSpinnerSubsystem(),
-                    this.subsystemCollection.getIntakeWristSubsystem(),
-                    this.subsystemCollection.getIntakeRollerSubsystem()));
+                    this.subsystemCollection.getSpindexerSpinnerSubsystem()));
         }
 
         // Driver B toggles intake deploy/retract and runs/stops roller while deployed

@@ -29,6 +29,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     private TalonFX intakeTalonFX;
     private IntakeWristSubsystem wrist;
     private boolean overrideWristConstraint = false;
+    private boolean shouldStop = true;
     private final VelocityVoltage leaderController = new VelocityVoltage(0.0);
     private double targetRPS = 0.0;
 
@@ -56,10 +57,12 @@ public class IntakeRollerSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        if (wrist.getPosition() <= Constants.intakeWristAngleGoodToRoll || overrideWristConstraint){
+        if ((wrist.getPosition() <= Constants.intakeWristAngleGoodToRoll || overrideWristConstraint) && !shouldStop){
             leaderController.withVelocity(targetRPS);
             intakeTalonFX.setControl(leaderController);
             SmartDashboard.putNumber("Intake Real RPM", getRPM());
+        } else {
+            intakeTalonFX.stopMotor();
         }
     }
 
@@ -67,6 +70,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
      * Sets the target rpm
      */
     public void runRPM(double rpm) {
+        shouldStop = false;
         this.targetRPS = rpmToRPS(rpm);
     }
 
@@ -74,7 +78,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
      * Stop motor and set the targetRPS to 0
      */
     public void stop() {
-        targetRPS = 0.0;
+        shouldStop = true;
         intakeTalonFX.stopMotor();
     }
 
@@ -95,7 +99,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         talonMotorConfig.Voltage.SupplyVoltageTimeConstant = Constants.motorSupplyVoltageTimeConstant;
 
         // maximum current settings
-        talonMotorConfig.CurrentLimits.StatorCurrentLimit = Constants.motorStatorCurrentMaximumAmps;
+        talonMotorConfig.CurrentLimits.StatorCurrentLimit = 70.0;
         talonMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         talonMotorConfig.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
         talonMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;

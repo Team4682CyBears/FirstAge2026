@@ -60,13 +60,13 @@ public class ShooterAimer {
   private final double[][] hoodExtensionLookupTableData = {
       { 1.0000, 0.00 },
       { 1.3037, 0.00 },
-      { 3.4408, 0.25 },
-      { 4.7448, 0.38 },
-      { 8.2705, 0.50 } };
+      { 3.4408, 0.21 },
+      { 4.7448, 0.37 },
+      { 8.2705, 0.54 } };
   private final double[][] shooterRpmLookupTableData = {
       { 1.0, 2912 },
-      { 1.3037, 3000 },
-      { 4.7448, 4200 },
+      { 1.3037, 3200 },
+      { 4.7448, 4600 },
       { 8.2705, 5000 } };
   private final double[][] kickerRpmLookupTableData = {
       { 1.0, 2000 },

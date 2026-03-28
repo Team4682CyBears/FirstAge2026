@@ -118,9 +118,7 @@ public class LEDSubsystem extends SubsystemBase {
       else {
         this.blueSolid();
       }
-      System.out.println("**** UPDATING LED STATE TO " + this.currentLEDState.toString());
     } else if (this.lastBlinkState != this.currentBlinkState && this.currentLEDState == LEDState.OrangeBlink) {
-      System.out.println("**** BLINKING LED STATE TO " + this.currentLEDState.toString());
       this.orangeBlink();
     }
   }

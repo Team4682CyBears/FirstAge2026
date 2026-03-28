@@ -26,6 +26,10 @@ import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.control.AutonomousChooser;
 import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
+
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.revrobotics.util.StatusLogger;
+
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -35,6 +39,9 @@ public class RobotContainer {
   private AutonomousChooser autonomousChooser;
 
   public RobotContainer() {
+    CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
+
+    StatusLogger.disableAutoLogging();
 
     // init the data logging
     this.initializeDataLogging();
