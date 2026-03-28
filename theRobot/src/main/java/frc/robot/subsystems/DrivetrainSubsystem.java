@@ -313,7 +313,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     if (RobotBase.isSimulation()) {
       return simPosition.getRotation();
     }
-    return drivetrain.getStateCopy().Pose.getRotation();
+    return drivetrain.getState().Pose.getRotation();
   }
 
   /**
