@@ -57,7 +57,7 @@ public class IntakeWristSubsystem extends SubsystemBase {
     private double desiredExtension = Constants.intakeWristDefensivePositionRotations;
 
     // position voltage PID
-    private Slot0Configs slot0Configs = new Slot0Configs().withKP(6.0).withKI(0.0).withKD(0.0);
+    private Slot0Configs slot0Configs = new Slot0Configs().withKP(8.0).withKI(0.0).withKD(0.0);
 
     public IntakeWristSubsystem(int motorCanID, int encoderCanID) {
         if (InstalledHardware.intakeWristEncoderInstalled) {

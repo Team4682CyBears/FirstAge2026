@@ -105,6 +105,7 @@ public class ShooterSubsystem extends SubsystemBase {
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .apply(new FeedForwardConfig().kS(0.065).kV(.00172));
         
+        //LeadConfig.closedLoopRampRate(0.5);
 
         REVLibError error = LeadMotor.configure(LeadConfig, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
