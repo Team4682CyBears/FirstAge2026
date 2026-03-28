@@ -216,4 +216,11 @@ public final class Constants {
     public static final double intakeWristAngleGoodToRoll = .1; 
 
     public static final int intakeRollerCanId = 16;
+
+    //********************************************************************
+    // Match Timing Constants
+    public static final double autoTimeSeconds = 30.0;
+    public static final double shiftDurationSeconds = 25.0;
+    public static final double endGameStartSeconds = 125.0;
+
 }

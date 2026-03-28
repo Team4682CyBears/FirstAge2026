@@ -77,7 +77,7 @@ public class LEDSubsystem extends SubsystemBase {
       Map.Entry<LEDState, LEDStateAction> entry = iter.next();
       currentActions.put(entry.getKey(), entry.getValue().getRecentState());
     }
-    // find the states in precidence order
+        // find the states in precidence order
     targetLedState = LEDState.Blue;
     if (currentActions.containsKey(LEDState.Green) && currentActions.get(LEDState.Green).booleanValue()) {
       targetLedState = LEDState.Green;
@@ -91,6 +91,18 @@ public class LEDSubsystem extends SubsystemBase {
     } else if (currentActions.containsKey(LEDState.OrangeBlink)
         && currentActions.get(LEDState.OrangeBlink).booleanValue()) {
       targetLedState = LEDState.OrangeBlink;
+    } else if (currentActions.containsKey(LEDState.RedBlink)
+        && currentActions.get(LEDState.RedBlink).booleanValue()) {
+      targetLedState = LEDState.RedBlink;
+    } else if (currentActions.containsKey(LEDState.GreenBlink)
+        && currentActions.get(LEDState.GreenBlink).booleanValue()) {
+      targetLedState = LEDState.GreenBlink;
+    } else if (currentActions.containsKey(LEDState.Purple)
+      && currentActions.get(LEDState.Purple).booleanValue()) {
+      targetLedState = LEDState.Purple;
+    }else if (currentActions.containsKey(LEDState.White)
+       && currentActions.get(LEDState.White).booleanValue()) {
+       targetLedState = LEDState.White;
     }
     // update the LED state when the target state has changed
     if (this.currentLEDState != targetLedState) {
@@ -109,6 +121,12 @@ public class LEDSubsystem extends SubsystemBase {
         this.redBlink();
       } else if (this.currentLEDState == LEDState.GreenBlink) {
         this.greenBlink();
+      } else if (this.currentLEDState == LEDState.White) {
+        this.White();
+      } else if (this.currentLEDState == LEDState.WhiteBlink) {
+        this.WhiteBlink();
+      } else if (this.currentLEDState == LEDState.Purple) {
+        this.Purple();
       }
       /*
        * else if(this.currentLEDState == LEDState.Blue){
@@ -164,7 +182,7 @@ public class LEDSubsystem extends SubsystemBase {
 
   // Sets leds to yellow solid
   private void yellowSolid() {
-    this.setLedStringColor(150, 150, 0);
+    this.setLedStringColor(252, 252, 0);
   }
 
   // Sets leds to yellow solid
@@ -176,6 +194,22 @@ public class LEDSubsystem extends SubsystemBase {
   private void greenSolid() {
     this.setLedStringColor(0, 200, 0);
   }
+
+    private void Purple() {
+    this.setLedStringColor(102, 0, 204);
+  }
+
+  private void WhiteBlink() {
+    if (this.currentBlinkState) {
+        this.setLedStringColor(255, 255, 255);
+    } else {
+       this.setLedStringColor(0, 0, 0);
+    } 
+   }
+   
+   private void White() {
+    this.setLedStringColor(255, 255, 255);
+   }
 
   // Turns off leds
   private void offState() {

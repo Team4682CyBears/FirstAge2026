@@ -22,5 +22,8 @@ public enum LEDState {
     Red,
     Yellow,
     Green,
-    Blue
+    Blue,
+    Purple,
+    WhiteBlink,
+    White
 }
