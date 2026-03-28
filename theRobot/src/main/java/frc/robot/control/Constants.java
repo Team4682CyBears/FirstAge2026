@@ -89,7 +89,7 @@ public final class Constants {
     public static final double turretMinAngleDegrees = 0.0;
     public static final double turretMaxAngleDegrees = 355.0;
     public static final Rotation2d turretManualShootAngleDegrees = Rotation2d.fromDegrees(90.0); // TODO set desired fixed angle
-    public static final double turretZeroingVoltage = -.5; // tuned for a steady homing speed
+    public static final double turretZeroingVoltage = -0.52; // tuned for a steady homing speed
     public static final double turretToleranceRadians = 0.018;
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.

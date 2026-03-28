@@ -118,6 +118,7 @@ public class ShooterAimer {
       SmartDashboard.putString("SA desired target", desiredTarget.toString());
       SmartDashboard.putString("SA Predicted Target", predictedTarget.toString());
       SmartDashboard.putNumber("SA Turret Angle", desiredTurretAngle.getDegrees());
+      SmartDashboard.putNumber("SA desired RPM", shooterRPM);
       if (displayDiagnostics) {
       System.out.println("Shooter Aimer updated!");
       System.out.println("Predicted Target " + predictedTarget);

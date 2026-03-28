@@ -52,8 +52,8 @@ public class TurretSubsystem extends SubsystemBase {
     private double turretProfileConstraintsMaxVoltageDelta = 50;
     private TrapezoidProfile.Constraints turretProfileConstraints = new TrapezoidProfile.Constraints(
             turretProfileConstraintsMaxVoltage, turretProfileConstraintsMaxVoltageDelta);
-    private ProfiledPIDController turretPID = new ProfiledPIDController(0.19, 0.03, 0.00, turretProfileConstraints);
-    private double minTurretVoltage = 0.42;
+    private ProfiledPIDController turretPID = new ProfiledPIDController(0.40, 0.01, 0.00, turretProfileConstraints);
+    private double minTurretVoltage = 0.40;
     private double turretLowVelocityTol = 20.0;
     private double turretPidDeadband = 0.005;
 

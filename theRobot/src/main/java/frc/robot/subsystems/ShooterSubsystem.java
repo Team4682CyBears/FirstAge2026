@@ -94,13 +94,17 @@ public class ShooterSubsystem extends SubsystemBase {
         LeadConfig.voltageCompensation(HardwareConstants.nominalVoltageCompensationVolts);
         LeadConfig.inverted(true);
 
+        LeadConfig.signals.primaryEncoderVelocityPeriodMs(20).appliedOutputPeriodMs(50).busVoltagePeriodMs(250)
+                .primaryEncoderPositionPeriodMs(1000).motorTemperaturePeriodMs(1000).faultsPeriodMs(100);
+
         // Derived values from testing on tardi
         LeadConfig.closedLoop
                 .p(.00025)
                 .i(0.0)
-                .d(0.001)
+                .d(0.000)
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .apply(new FeedForwardConfig().kS(0.065).kV(.00172));
+        
 
         REVLibError error = LeadMotor.configure(LeadConfig, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
@@ -116,6 +120,9 @@ public class ShooterSubsystem extends SubsystemBase {
         FollowerConfig.idleMode(IdleMode.kCoast);
         FollowerConfig.smartCurrentLimit(HardwareConstants.shooterSmartCurrentLimitAmps);
         FollowerConfig.follow(LeadMotor, true); // invert the follower motors
+
+        FollowerConfig.signals.primaryEncoderVelocityPeriodMs(500).appliedOutputPeriodMs(200).busVoltagePeriodMs(1000)
+                .primaryEncoderPositionPeriodMs(1000).motorTemperaturePeriodMs(1000).faultsPeriodMs(100);
 
         error = FollowMotor.configure(FollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         if (error != REVLibError.kOk) {
