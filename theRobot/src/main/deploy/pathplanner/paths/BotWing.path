@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 9.081270125223615,
-        "y": 0.241270125223615
+        "y": 0.24127012522361502
       },
       "isLocked": false,
       "linkedName": "BotTrench"
@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 7.913820521339126,
-        "y": 1.490231561461794
+        "y": 1.4902315614617938
       },
       "nextControl": {
         "x": 7.949557183574615,
@@ -37,7 +37,7 @@
       },
       "prevControl": {
         "x": 9.164398930794821,
-        "y": -0.331748345564911
+        "y": -0.33174834556491106
       },
       "nextControl": null,
       "isLocked": false,
@@ -83,7 +83,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 2.0,
+    "velocity": 0.0,
     "rotation": 90.0
   },
   "reversed": false,
