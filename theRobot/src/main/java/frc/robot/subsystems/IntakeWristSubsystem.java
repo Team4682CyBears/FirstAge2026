@@ -52,7 +52,7 @@ public class IntakeWristSubsystem extends SubsystemBase {
     private boolean isManualMode = false;
     private VoltageOut voltageOut = new VoltageOut(0.0);
 
-    private boolean intakeWristIsAtDesiredExtension = true;
+    private boolean intakeWristIsAtDesiredExtension = false;
     private IntakeWristMode intakeWristMode = IntakeWristMode.RETRACTED;
     private double desiredExtension = Constants.intakeWristDefensivePositionRotations;
 
@@ -243,7 +243,7 @@ public class IntakeWristSubsystem extends SubsystemBase {
      */
     private boolean isPositionWithinTolerance() {
         //if deployed never asume within tolerance to keep driving
-        if (intakeWristMode == IntakeWristMode.DEPLOYED){
+        if (true){//intakeWristMode == IntakeWristMode.DEPLOYED
             return false;
         }
         // check both the position and velocity. To allow PID to not stop before

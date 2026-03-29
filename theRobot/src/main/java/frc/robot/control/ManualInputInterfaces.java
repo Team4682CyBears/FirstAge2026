@@ -236,9 +236,11 @@ public class ManualInputInterfaces {
         if (this.subsystemCollection.isKickerSubsystemAvailable()
                 && this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()
                 && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
-            this.driverController.rightTrigger().whileTrue(new KickerSpindexerCommand(
+            this.driverController.rightTrigger().whileTrue(new KickerSpindexerAgitateCommand(
                     this.subsystemCollection.getKickerSubsystem(),
-                    this.subsystemCollection.getSpindexerSpinnerSubsystem()));
+                    this.subsystemCollection.getSpindexerSpinnerSubsystem(),
+                    this.subsystemCollection.getIntakeWristSubsystem(),
+                    this.subsystemCollection.getIntakeRollerSubsystem()));
         }
 
         // Driver B toggles intake deploy/retract and runs/stops roller while deployed
