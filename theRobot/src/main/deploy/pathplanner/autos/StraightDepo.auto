@@ -7,13 +7,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeToggle"
+            "waitTime": 1.0
           }
         },
         {
@@ -21,15 +15,9 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "TopBumpToDepo"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
-                  "name": "AutoAimOnAndOn"
+                  "name": "AutoAimOn"
                 }
               },
               {
@@ -45,7 +33,57 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "SpindexerKickerOnAndOn"
+                        "name": "SpindexerKickerNoIntake"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeToggle"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "TopBumpToDepo"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CornerToMid"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoAimOn"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.5
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "SpindexerKickerOn"
                       }
                     }
                   ]

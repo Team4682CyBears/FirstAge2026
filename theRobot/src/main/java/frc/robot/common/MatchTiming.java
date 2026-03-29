@@ -170,4 +170,69 @@ public class MatchTiming {
             return false;
         }
     }
+
+    private static class MatchPeriod {
+        public final double startSeconds;
+        public final double endSeconds;
+
+        public MatchPeriod(double startSeconds, double endSeconds) {
+            this.startSeconds = startSeconds;
+            this.endSeconds = endSeconds;
+        }
+    }
+
+    private static final MatchPeriod[] PERIODS = new MatchPeriod[] {
+        new MatchPeriod(150.0, 130.0),
+        new MatchPeriod(140.0, 130.0),
+        new MatchPeriod(130.0, 105.0),
+        new MatchPeriod(105.0, 80.0),
+        new MatchPeriod(80.0, 55.0),
+        new MatchPeriod(55.0, 30.0),
+        new MatchPeriod(30.0, 0.0),
+    };
+
+    /**
+     * Returns 1 if the match clock is within 10-5 seconds before the start of any
+     * defined period.
+     * Returns 2 if within 5-0 seconds before the start of any defined period.
+     * Returns 3 otherwise.
+     */
+    public static int getPeriodWarningState() {
+        double matchTime = DriverStation.getMatchTime();
+        for (MatchPeriod period : PERIODS) {
+            // Only act during the period (inclusive range) and evaluate the final 10/5 seconds
+            if (matchTime <= period.startSeconds && matchTime >= period.endSeconds) {
+                double secondsUntilEnd = matchTime - period.endSeconds;
+                // Return 4 during the entire last period (30-0)
+                if (period.startSeconds == 30.0 && period.endSeconds == 0.0) {
+                    return 4;
+                }
+                // Special-case: second to last period (55-30) 5-second warning should return 4
+                if (period.startSeconds == 55.0 && period.endSeconds == 30.0 && secondsUntilEnd <= 5.0) {
+                    return 4;
+                }
+                if (secondsUntilEnd <= 5.0) {
+                    return 2;
+                }
+                if (secondsUntilEnd <= 10.0) {
+                    return 1;
+                }
+            }
+        }
+        return 3;
+    }
+
+    /**
+     * Returns 1 for 10-second warning before each shift, 2 for 5-second warning,
+     * and 3 for all other times.
+     */
+    public static int getShiftWarningState() {
+        if (isTenTillShift()) {
+            return 1;
+        }
+        if (isFiveTillShift()) {
+            return 2;
+        }
+        return 3;
+    }
 }

@@ -188,10 +188,10 @@ public class AutonomousChooser {
                             subsystems.getShooterAimer()).withTimeout(15.0));
         }
 
-        if (subsystems.isSpinnerSpindexerSubsystemAvaible()
-                && subsystems.isKickerSubsystemAvailable() 
-                && subsystems.isIntakeRollerSubsystemAvailable()
-                && subsystems.isIntakeWristSubsystemAvailable()) {
+        if (InstalledHardware.spindexerInstalled
+                && InstalledHardware.kickerInstalled
+                && InstalledHardware.intakeRollerInstalled
+                && InstalledHardware.intakeWristMotorInstalled) {
             NamedCommands.registerCommand(
                     "SpindexerKickerOn",
                     new KickerSpindexerAgitateCommand(
@@ -200,13 +200,19 @@ public class AutonomousChooser {
                             subsystems.getIntakeWristSubsystem(),
                             subsystems.getIntakeRollerSubsystem()).withTimeout(4.8));
         }
-        if (subsystems.isSpinnerSpindexerSubsystemAvaible()
-            && subsystems.isKickerSubsystemAvailable()){
+        if (InstalledHardware.spindexerInstalled
+            && InstalledHardware.kickerInstalled) {
             NamedCommands.registerCommand(
                     "SpindexerKickerOnAndOn",
                     new KickerSpindexerCommand(
                             subsystems.getKickerSubsystem(),
                             subsystems.getSpindexerSpinnerSubsystem()).withTimeout(14.7));
+            NamedCommands.registerCommand(
+                "SpindexerKickerNoIntake",
+                    new KickerSpindexerCommand(
+                            subsystems.getKickerSubsystem(),
+                            subsystems.getSpindexerSpinnerSubsystem()).withTimeout(4.8));
+                        
         }
 
         if (subsystems.isIntakeWristSubsystemAvailable()

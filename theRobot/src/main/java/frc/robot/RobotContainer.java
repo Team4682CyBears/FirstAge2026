@@ -329,11 +329,14 @@ public class RobotContainer {
   }
 
   private void initializeMatchLED() {
-    subsystems.getLedSubsystem().registerStateAction(LEDState.Green, () -> MatchTiming.isNewShift());
-    subsystems.getLedSubsystem().registerStateAction(LEDState.Yellow, () -> MatchTiming.isTenTillShift());
-    subsystems.getLedSubsystem().registerStateAction(LEDState.Red, () -> MatchTiming.isFiveTillShift());
-    subsystems.getLedSubsystem().registerStateAction(LEDState.Purple, () -> MatchTiming.isEndOrAuto());
-    subsystems.getLedSubsystem().registerStateAction(LEDState.White, () -> MatchTiming.isFiveTillMajorShift());
+  subsystems.getLedSubsystem().registerStateAction(LEDState.White,
+    () -> MatchTiming.getPeriodWarningState() == 1);
+  subsystems.getLedSubsystem().registerStateAction(LEDState.Red,
+    () -> MatchTiming.getPeriodWarningState() == 2);
+  subsystems.getLedSubsystem().registerStateAction(LEDState.Green,
+    () -> MatchTiming.getPeriodWarningState() == 3);
+  subsystems.getLedSubsystem().registerStateAction(LEDState.Blue,
+    () -> MatchTiming.getPeriodWarningState() == 4);
   }
 
   /**

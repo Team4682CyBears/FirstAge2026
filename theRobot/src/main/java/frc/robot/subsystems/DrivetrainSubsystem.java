@@ -358,6 +358,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    */
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Match Timer", DriverStation.getMatchTime());
     /*
      * Periodically try to apply the operator perspective.
      * If we haven't applied the operator perspective before, then we should apply
