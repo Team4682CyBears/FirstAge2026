@@ -88,7 +88,8 @@ public class CameraSubsystem extends SubsystemBase {
     VisionMeasurement visionMeasurement = new VisionMeasurement(null, 0.0);
     // As of 2024, we only use wpiblue
     LimelightHelpers.PoseEstimate pe = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-    if (pe != null && pe.pose != null && pe.pose.getTranslation().getDistance(new Translation2d(0, 0)) > .1) {
+    // must check that tagCount > 0 for MT2, otherwise MT2 can confidently return a location of (0, 0)
+    if (pe != null && pe.pose != null && pe.tagCount > 0) {
       double fpgaTime = Utils.fpgaToCurrentTime(pe.timestampSeconds);
       visionMeasurement = new VisionMeasurement(pe.pose, fpgaTime);
     }
