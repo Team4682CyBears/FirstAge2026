@@ -88,7 +88,7 @@ public final class Constants {
     public static final int secondTurretSensorDIOChannel = 2;
     public static final double turretMinAngleDegrees = 0.0;
     public static final double turretMaxAngleDegrees = 355.0;
-    public static final Rotation2d turretManualShootAngleDegrees = Rotation2d.fromDegrees(0.0); // TODO set desired fixed angle
+    public static final Rotation2d turretManualShootAngleDegrees = Rotation2d.fromDegrees(0.0);
     public static final double turretZeroingVoltage = -0.4; // tuned for a steady homing speed
     public static final double turretToleranceRadians = 0.018;
     // *****************************************************************
