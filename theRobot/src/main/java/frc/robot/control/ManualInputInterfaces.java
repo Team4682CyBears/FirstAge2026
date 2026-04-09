@@ -24,6 +24,10 @@ import frc.robot.subsystems.TurretSubsystem;
 
 public class ManualInputInterfaces {
 
+    // Should we bind the pit limit to the driver controller (this is false because
+    // driver controller is currently using left trigger to auto aim)
+    private final boolean enablePitLimiterBind = false;
+
     // sets joystick variables to joysticks
     private CommandXboxController driverController = new CommandXboxController(Constants.portDriverController);
     private XboxController driverControllerForRumbleOnly = new XboxController(Constants.portDriverController);
@@ -188,30 +192,30 @@ public class ManualInputInterfaces {
 
             }
 
-            if (this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()) {
+            if (this.subsystemCollection.isDriveTrainPowerSubsystemAvailable() && enablePitLimiterBind) {
                 // Enable pit limiter
-                // this.driverController.leftTrigger().onTrue(
-                //         new ParallelCommandGroup(
-                //                 new InstantCommand(
-                //                         subsystemCollection
-                //                                 .getDriveTrainPowerSubsystem()::setReducedPowerReductionFactor,
-                //                         subsystemCollection
-                //                                 .getDriveTrainPowerSubsystem()),
-                //                 new ButtonPressCommand(
-                //                         "driverController.leftTrigger()",
-                //                         "ramp down to reduced speed")));
+                this.driverController.leftTrigger().onTrue(
+                        new ParallelCommandGroup(
+                                new InstantCommand(
+                                        subsystemCollection
+                                                .getDriveTrainPowerSubsystem()::setReducedPowerReductionFactor,
+                                        subsystemCollection
+                                                .getDriveTrainPowerSubsystem()),
+                                new ButtonPressCommand(
+                                        "driverController.leftTrigger()",
+                                        "ramp down to reduced speed")));
 
-                // // Disable pit limiter
-                // this.driverController.leftTrigger().onFalse(
-                //         new ParallelCommandGroup(
-                //                 new InstantCommand(
-                //                         subsystemCollection
-                //                                 .getDriveTrainPowerSubsystem()::resetPowerReductionFactor,
-                //                         subsystemCollection
-                //                                 .getDriveTrainPowerSubsystem()),
-                //                 new ButtonPressCommand(
-                //                         "driverController.leftTrigger()",
-                //                         "ramp up to default speed")));
+                // Disable pit limiter
+                this.driverController.leftTrigger().onFalse(
+                        new ParallelCommandGroup(
+                                new InstantCommand(
+                                        subsystemCollection
+                                                .getDriveTrainPowerSubsystem()::resetPowerReductionFactor,
+                                        subsystemCollection
+                                                .getDriveTrainPowerSubsystem()),
+                                new ButtonPressCommand(
+                                        "driverController.leftTrigger()",
+                                        "ramp up to default speed")));
             }
 
             // x button press will stop all
