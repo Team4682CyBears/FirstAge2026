@@ -216,6 +216,7 @@ public final class Constants {
     public static final double intakeWristAngleGoodToRoll = .1; 
 
     public static final int intakeRollerCanId = 16;
+    public static final double intakeRollerSpeedRPM = 5000.0;
 
     //********************************************************************
     // Match Timing Constants

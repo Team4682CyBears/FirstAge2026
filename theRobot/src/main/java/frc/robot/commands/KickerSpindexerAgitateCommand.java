@@ -81,7 +81,7 @@ public class KickerSpindexerAgitateCommand extends Command {
         spindexerSpinner.runRPMContinus();
         wristIsDeployed = true;
         intakeWristSubsystem.setPosition(Constants.intakeWristDeployedPositionRotations);
-        intakeRollerSubsystem.runRPM(5000);
+        intakeRollerSubsystem.runRPM(Constants.intakeRollerSpeedRPM);
         timer.reset();
         timer.start();
     nextToggleTimeSeconds = togglePeriodSeconds;
