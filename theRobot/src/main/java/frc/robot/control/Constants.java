@@ -217,6 +217,8 @@ public final class Constants {
 
     public static final int intakeRollerCanId = 16;
     public static final double intakeRollerSpeedRPM = 5000.0;
+    public static final double intakeRollerStatorCurrentAmps = 70.0; // the intake uses a lower stator current limit
+                                                                     // than our other motors
 
     //********************************************************************
     // Match Timing Constants

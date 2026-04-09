@@ -99,7 +99,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         talonMotorConfig.Voltage.SupplyVoltageTimeConstant = Constants.motorSupplyVoltageTimeConstant;
 
         // maximum current settings
-        talonMotorConfig.CurrentLimits.StatorCurrentLimit = 70.0;
+        talonMotorConfig.CurrentLimits.StatorCurrentLimit = Constants.intakeRollerStatorCurrentAmps;
         talonMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         talonMotorConfig.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
         talonMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
