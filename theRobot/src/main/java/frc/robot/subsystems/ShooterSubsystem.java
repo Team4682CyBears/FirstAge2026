@@ -94,6 +94,8 @@ public class ShooterSubsystem extends SubsystemBase {
         LeadConfig.voltageCompensation(HardwareConstants.nominalVoltageCompensationVolts);
         LeadConfig.inverted(true);
 
+        // TODO: this attempts to limit the CAN bus messages. it should be tested to
+        // make sure this does not cause any problems down the road
         LeadConfig.signals.primaryEncoderVelocityPeriodMs(20).appliedOutputPeriodMs(50).busVoltagePeriodMs(250)
                 .primaryEncoderPositionPeriodMs(1000).motorTemperaturePeriodMs(1000).faultsPeriodMs(100);
 

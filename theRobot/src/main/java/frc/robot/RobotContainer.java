@@ -37,6 +37,7 @@ public class RobotContainer {
   private AutonomousChooser autonomousChooser;
 
   public RobotContainer() {
+    // this reduces the delay when starting a path in auto
     CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
 
     StatusLogger.disableAutoLogging();

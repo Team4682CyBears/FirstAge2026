@@ -45,7 +45,7 @@ public class IntakeWristSubsystem extends SubsystemBase {
 
     private TalonFX motor;
     private CANcoder encoder;
-    // can't figure out feedforward direction. When set to positive value, seems to drive in the wrong direction
+    // TODO: can't figure out feedforward direction. When set to positive value, seems to drive in the wrong direction
     // when set to negative value, seems to not work at all. 
     private PositionVoltage voltageController = new PositionVoltage(0.0).withFeedForward(0.0);
     // For manual mode;
