@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.control.Constants;
 
+// TODO: The functionality in this file has never been fully tested. Consider everything here experimental
 public class MatchTiming {
 
     // Constructor
@@ -197,6 +198,7 @@ public class MatchTiming {
      * Returns 2 if within 5-0 seconds before the start of any defined period.
      * Returns 3 otherwise.
      */
+    // TODO: This should return an enum, not an int
     public static int getPeriodWarningState() {
         double matchTime = DriverStation.getMatchTime();
         for (MatchPeriod period : PERIODS) {
@@ -226,6 +228,7 @@ public class MatchTiming {
      * Returns 1 for 10-second warning before each shift, 2 for 5-second warning,
      * and 3 for all other times.
      */
+    // TODO: This should return an enum, not an int
     public static int getShiftWarningState() {
         if (isTenTillShift()) {
             return 1;
