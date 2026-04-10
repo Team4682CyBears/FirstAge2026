@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeRollerSubsystem;
 import frc.robot.common.IntakeDirection;
+import frc.robot.control.Constants;
 
 public class IntakeRollerManualCommand extends Command {
     private final IntakeRollerSubsystem intakeRollerSubsystem;
@@ -28,7 +29,7 @@ public class IntakeRollerManualCommand extends Command {
     @Override
     public void execute() {
         double directionFactor = intakeDirection == IntakeDirection.INTAKE ? 1 : -1;
-        double rpm = SmartDashboard.getNumber("Intake RPM", 5000);
+        double rpm = SmartDashboard.getNumber("Intake RPM", Constants.intakeRollerSpeedRPM);
         intakeRollerSubsystem.runRPM(rpm * directionFactor);
     }
 

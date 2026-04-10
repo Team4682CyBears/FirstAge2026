@@ -31,6 +31,8 @@ public class AutonomousChooser {
     private Command BotWingPoo;
     private Command TopWingPoo;
     private Command HubOutpostDepo;
+    private Command Bump;
+    private Command StraightDepo;
 
     /**
      * Constructor for AutonomousChooser
@@ -46,6 +48,8 @@ public class AutonomousChooser {
             autonomousPathChooser.addOption("Bot Poo", AutonomousPath.BOTWINGPOO);
             autonomousPathChooser.addOption("Top Poo", AutonomousPath.TOPWINGPOO);
             autonomousPathChooser.addOption("Hub Outpost Depo", AutonomousPath.HUBOUTPOSTDEPO);
+            autonomousPathChooser.addOption("Bump", AutonomousPath.BUMP);
+            autonomousPathChooser.addOption("StraightDepo", AutonomousPath.STRAIGHTDEPO);
             SmartDashboard.putData(autonomousPathChooser);
 
             this.DoNothing = getDoNothing();
@@ -53,6 +57,8 @@ public class AutonomousChooser {
             this.BotWingPoo = getBotWingPoo();
             this.TopWingPoo = getTopWingPoo();
             this.HubOutpostDepo = getHubOutpostDepo();
+            this.Bump = getBumpAuto();
+            this.StraightDepo = getStraightDepo();
         } else {
             DataLogManager.log(">>>>> NO auto routine becuase missing subsystems");
         }
@@ -75,6 +81,10 @@ public class AutonomousChooser {
                 return this.TopWingPoo;
             case HUBOUTPOSTDEPO:
                 return this.HubOutpostDepo;
+            case BUMP:
+                return this.Bump;
+            case STRAIGHTDEPO:
+                return this.StraightDepo;
         }
         return new InstantCommand();
     }
@@ -93,13 +103,13 @@ public class AutonomousChooser {
         if (InstalledHardware.shooterInstalled && InstalledHardware.hoodMotorInstalled
                 && InstalledHardware.hoodEncoderInstalled) {
             Command aim = new ShooterManualCommand(
-                    subsystems).withTimeout(5.0);
+                    subsystems).withTimeout(15.0);
             Command shoot = new SequentialCommandGroup(
-                    new WaitCommand(0.7),
+                    new WaitCommand(1),
                     new KickerSpindexerCommand(
                             subsystems.getKickerSubsystem(),
                             subsystems.getSpindexerSpinnerSubsystem())
-                            .withTimeout(5.0));
+                            .withTimeout(14.0));
             return new ParallelCommandGroup(aim, shoot);
         } else {
             return new InstantCommand();
@@ -118,6 +128,14 @@ public class AutonomousChooser {
         return AutoBuilder.buildAuto("HubOutpostDepo");
     }
 
+    private Command getBumpAuto(){
+        return AutoBuilder.buildAuto("Bump");
+    }
+
+    private Command getStraightDepo(){
+        return AutoBuilder.buildAuto("StraightDepo");
+    }
+
     private Command getDoNothing() {
         return new InstantCommand();
     }
@@ -128,6 +146,8 @@ public class AutonomousChooser {
         TOPWINGPOO,
         HUBOUTPOSTDEPO,
         DONOTHING,
+        BUMP,
+        STRAIGHTDEPO
     }
 
     /**
@@ -160,16 +180,39 @@ public class AutonomousChooser {
                     new AutoAimCommand(
                             subsystems,
                             subsystems.getShooterAimer()).withTimeout(5.0));
+            
+            NamedCommands.registerCommand(
+                    "AutoAimOnAndOn",
+                    new AutoAimCommand(
+                            subsystems,
+                            subsystems.getShooterAimer()).withTimeout(15.0));
         }
 
-        if (subsystems.isSpinnerSpindexerSubsystemAvaible()
-                && subsystems.isKickerSubsystemAvailable()) {
+        if (InstalledHardware.spindexerInstalled
+                && InstalledHardware.kickerInstalled
+                && InstalledHardware.intakeRollerInstalled
+                && InstalledHardware.intakeWristMotorInstalled) {
             NamedCommands.registerCommand(
                     "SpindexerKickerOn",
                     new KickerSpindexerAgitateCommand(
                             subsystems.getKickerSubsystem(),
                             subsystems.getSpindexerSpinnerSubsystem(),
-                            subsystems.getIntakeWristSubsystem()).withTimeout(4.8));
+                            subsystems.getIntakeWristSubsystem(),
+                            subsystems.getIntakeRollerSubsystem()).withTimeout(4.8));
+        }
+        if (InstalledHardware.spindexerInstalled
+            && InstalledHardware.kickerInstalled) {
+            NamedCommands.registerCommand(
+                    "SpindexerKickerOnAndOn",
+                    new KickerSpindexerCommand(
+                            subsystems.getKickerSubsystem(),
+                            subsystems.getSpindexerSpinnerSubsystem()).withTimeout(14.7));
+            NamedCommands.registerCommand(
+                "SpindexerKickerNoIntake",
+                    new KickerSpindexerCommand(
+                            subsystems.getKickerSubsystem(),
+                            subsystems.getSpindexerSpinnerSubsystem()).withTimeout(4.8));
+                        
         }
 
         if (subsystems.isIntakeWristSubsystemAvailable()

@@ -66,5 +66,5 @@ public class InstalledHardware {
     // the other TOF sensors that are installed will not work.
 
     // LED Hardware
-    public static final boolean LEDSInstalled = false;
+    public static final boolean LEDSInstalled = true;
 }

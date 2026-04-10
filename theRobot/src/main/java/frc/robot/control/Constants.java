@@ -78,18 +78,18 @@ public final class Constants {
     // *****************************************************************
     // Turret Constants
     public static final int turretMotorCanId = 23;
-    public static final double turretGearRatio = 136.0/24.0;
+    public static final double turretGearRatio = 3.0*136.0/24.0;
 
     // Turret mechanism angle when the limit switch is triggered.
     // should be relative to robot 0 yaw, with the intake side as the front. 
-    public static final double turretSensorPositionRadians = Math.toRadians(7.0);
+    public static final double turretSensorPositionRadians = Math.toRadians(2.0) - Math.toRadians(-8.0);
     public static final double turretSecondPositionRadians = turretSensorPositionRadians + Math.toRadians(-15.0);
     public static final int turretSensorDIOChannel = 1;
     public static final int secondTurretSensorDIOChannel = 2;
     public static final double turretMinAngleDegrees = 0.0;
     public static final double turretMaxAngleDegrees = 355.0;
-    public static final Rotation2d turretManualShootAngleDegrees = Rotation2d.fromDegrees(90.0); // TODO set desired fixed angle
-    public static final double turretZeroingVoltage = -.5; // tuned for a steady homing speed
+    public static final Rotation2d turretManualShootAngleDegrees = Rotation2d.fromDegrees(0.0);
+    public static final double turretZeroingVoltage = -0.4; // tuned for a steady homing speed
     public static final double turretToleranceRadians = 0.018;
     // *****************************************************************
     // standard stuff constants - motors rotation, etc.
@@ -187,12 +187,12 @@ public final class Constants {
     public static final int hoodMotorCanID = 30;
     public static final int hoodEncoderCanID = 31;
 
-    public static final double hoodEncoderAbsoluteOffset = 0.7220;
+    public static final double hoodEncoderAbsoluteOffset = 0.7220 + .0774;
     public static final double hoodExtendoTolerance = 0.01;
     public static final double hoodMinPositionRotations = 0.0;
     public static final double hoodMaxPositionRotations = 0.635; 
 
-    public static final double HOOD_CLOSE_EXTENDO_POSITION = 0.12;
+    public static final double HOOD_CLOSE_EXTENDO_POSITION = 0.0;
 
 
     /// ******************************
@@ -206,13 +206,24 @@ public final class Constants {
     public static final int intakeWristMotorCanID = 17;
     public static final int intakeWristEncoderCanID = 32;
 
-    public static final double intakeWristEncoderAbsoluteOffset = -0.17789 + 0.0386;
+    public static final double intakeWristEncoderAbsoluteOffset = -0.17789 + 0.0386 - .113;
 
     public static final double intakeWristTolerance = 0.05;
     public static final double intakeWristStartingPositionRotations = 0.586;
     public static final double intakeWristDefensivePositionRotations = 0.511;
     public static final double intakeWristAgitateStowPositionRotations = 0.3439;
-    public static final double intakeWristDeployedPositionRotations = 0.0; 
+    public static final double intakeWristDeployedPositionRotations = 0.0;
+    public static final double intakeWristAngleGoodToRoll = .1; 
 
     public static final int intakeRollerCanId = 16;
+    public static final double intakeRollerSpeedRPM = 5000.0;
+    public static final double intakeRollerStatorCurrentAmps = 70.0; // the intake uses a lower stator current limit
+                                                                     // than our other motors
+
+    //********************************************************************
+    // Match Timing Constants
+    public static final double autoTimeSeconds = 30.0;
+    public static final double shiftDurationSeconds = 25.0;
+    public static final double endGameStartSeconds = 125.0;
+
 }

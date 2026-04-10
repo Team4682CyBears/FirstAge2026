@@ -14,18 +14,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.common.LEDState;
+import frc.robot.common.MatchTiming;
 import frc.robot.common.TestTrajectories;
 import frc.robot.control.InstalledHardware;
 import frc.robot.control.ManualInputInterfaces;
 import frc.robot.control.SubsystemCollection;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
-import frc.robot.subsystems.IntakeRollerSubsystem;
-import frc.robot.subsystems.IntakeWristSubsystem;
-import frc.robot.subsystems.TurretSubsystem;
 import frc.robot.control.AutonomousChooser;
 import frc.robot.control.Constants;
 import frc.robot.control.ShooterAimer;
+
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.revrobotics.util.StatusLogger;
+
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -35,6 +37,10 @@ public class RobotContainer {
   private AutonomousChooser autonomousChooser;
 
   public RobotContainer() {
+    // this reduces the delay when starting a path in auto
+    CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
+
+    StatusLogger.disableAutoLogging();
 
     // init the data logging
     this.initializeDataLogging();
@@ -84,6 +90,9 @@ public class RobotContainer {
 
     // do late binding of default commands
     this.lateBindDefaultCommands();
+
+    // initialize the match timing LEDs
+    this.initializeMatchLED();
 
     if (subsystems.isDriveTrainSubsystemAvailable()) {
       AutonomousChooser.configureAutoBuilder(subsystems);
@@ -233,7 +242,7 @@ public class RobotContainer {
    * A method to init the hood subsystem
    */
   private void initializeHoodSubsystem() {
-    if (InstalledHardware.hoodEncoderInstalled || InstalledHardware.hoodMotorInstalled) {
+    if (InstalledHardware.hoodEncoderInstalled && InstalledHardware.hoodMotorInstalled) {
       subsystems.setHoodSubsystem(new HoodSubsystem(Constants.hoodMotorCanID, Constants.hoodEncoderCanID));
       System.out.println("SUCCESS: initializeHood");
     } else {
@@ -284,7 +293,7 @@ public class RobotContainer {
    */
   private void initializeIntakeSubsystems() {
     try {
-      if (InstalledHardware.intakeWristMotorInstalled || InstalledHardware.intakeWristEncoderInstalled) {
+      if (InstalledHardware.intakeWristMotorInstalled && InstalledHardware.intakeWristEncoderInstalled) {
         subsystems.setIntakeWristSubsystem(
             new IntakeWristSubsystem(Constants.intakeWristMotorCanID, Constants.intakeWristEncoderCanID));
         DataLogManager.log("SUCCESS: initializeIntakeWristSubsystem");
@@ -293,7 +302,7 @@ public class RobotContainer {
       }
 
       if (InstalledHardware.intakeRollerInstalled) {
-        subsystems.setIntakeRollerSubsystem(new IntakeRollerSubsystem(Constants.intakeRollerCanId));
+        subsystems.setIntakeRollerSubsystem(new IntakeRollerSubsystem(Constants.intakeRollerCanId, subsystems.getIntakeWristSubsystem()));
         DataLogManager.log("SUCCESS: initializeIntakeRollerSubsystem");
       } else {
         DataLogManager.log("FAIL: initializeIntakeRollerSubsystem");
@@ -318,6 +327,17 @@ public class RobotContainer {
     } else {
       DataLogManager.log("FAIL: initializeManualInputInterfaces");
     }
+  }
+
+  private void initializeMatchLED() {
+  subsystems.getLedSubsystem().registerStateAction(LEDState.White,
+    () -> MatchTiming.getPeriodWarningState() == 1);
+  subsystems.getLedSubsystem().registerStateAction(LEDState.Red,
+    () -> MatchTiming.getPeriodWarningState() == 2);
+  subsystems.getLedSubsystem().registerStateAction(LEDState.Green,
+    () -> MatchTiming.getPeriodWarningState() == 3);
+  subsystems.getLedSubsystem().registerStateAction(LEDState.Blue,
+    () -> MatchTiming.getPeriodWarningState() == 4);
   }
 
   /**

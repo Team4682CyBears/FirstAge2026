@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeRollerSubsystem;
 import frc.robot.subsystems.IntakeWristSubsystem;
+import frc.robot.control.Constants;
 import frc.robot.control.IntakeWristMode;
 
 /**
@@ -39,7 +40,7 @@ public class ToggleIntakeDeployCommand extends Command {
             // currently retracted -> deploy + start roller
             wrist.setMode(IntakeWristMode.DEPLOYED);
             // TODO make this a constant after testing complete
-            double rpm = SmartDashboard.getNumber("Intake RPM", 5000);
+            double rpm = SmartDashboard.getNumber("Intake RPM", Constants.intakeRollerSpeedRPM);
             roller.runRPM(rpm);
         } else {
             // currently deployed -> retract + stop roller

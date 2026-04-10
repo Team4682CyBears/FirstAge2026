@@ -21,7 +21,6 @@ import frc.robot.control.CameraMode;
 import frc.robot.control.Constants;
 import frc.robot.control.InstalledHardware;
 import frc.robot.generated.TardiTunerConstants;
-import frc.robot.generated.Telemetry;
 import frc.robot.control.SwerveDriveMode;
 import frc.robot.control.SwerveYawMode;
 import frc.robot.generated.BareTunerConstants;
@@ -65,7 +64,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
   // TODO change this to something reasonable. Was 12 in TED
   public static final double MAX_DECELERATION_METERS_PER_SECOND_SQUARED = 100.0;
 
-  private final Telemetry logger = new Telemetry(MAX_VELOCITY_METERS_PER_SECOND);
   /**.
    * The maximum angular velocity of the robot in radians per second.
    * This is a measure of how fast the robot can rotate in place.
@@ -128,8 +126,6 @@ public class DrivetrainSubsystem extends SubsystemBase {
     if (subsystems.isCameraSubsystemAvailable()) {
       cameraSubsystem = subsystems.getCameraSubsystem();
     }
-
-    drivetrain.registerTelemetry(logger::telemeterize);
 
     publisher = NetworkTableInstance.getDefault().getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
 
@@ -313,7 +309,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
     if (RobotBase.isSimulation()) {
       return simPosition.getRotation();
     }
-    return drivetrain.getStateCopy().Pose.getRotation();
+    return drivetrain.getState().Pose.getRotation();
   }
 
   /**
@@ -358,6 +354,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
    */
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Match Timer", DriverStation.getMatchTime());
     /*
      * Periodically try to apply the operator perspective.
      * If we haven't applied the operator perspective before, then we should apply

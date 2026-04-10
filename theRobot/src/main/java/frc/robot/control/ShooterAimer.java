@@ -60,23 +60,27 @@ public class ShooterAimer {
   private final double[][] hoodExtensionLookupTableData = {
       { 1.0000, 0.00 },
       { 1.3037, 0.00 },
-      { 3.4408, 0.25 },
-      { 4.7448, 0.38 },
-      { 8.2705, 0.50 } };
+      { 3.4408, 0.21 },
+      { 4.7448, 0.37 },
+      { 8.2705, 0.54 },
+      { 12.0, Constants.hoodMaxPositionRotations} };
   private final double[][] shooterRpmLookupTableData = {
       { 1.0, 2912 },
-      { 1.3037, 3000 },
-      { 4.7448, 4200 },
-      { 8.2705, 5000 } };
+      { 1.3037, 3200 },
+      { 4.7448, 4600 },
+      { 8.2705, 5000 },
+      { 12.0, Constants.SHOOTER_MAX_RPM} };
   private final double[][] kickerRpmLookupTableData = {
       { 1.0, 2000 },
-      { 8.2705, 2000 } };
+      { 8.2705, 2000 },
+      { 12.0, 2000} };
   private final double[][] tofLookupTableData = {
       { 1.0000, 0.913 },
       { 1.3037, 0.960 },
       { 3.4408, 1.222 },
       { 4.7448, 1.332 },
-      { 8.2705, 1.729 } };
+      { 8.2705, 1.729 },
+      { 12.0, 2.1} };
 
   private final LookupTableDouble hoodExtensionLookupTable = new LookupTableDouble(hoodExtensionLookupTableData);
   private final LookupTableDouble shooterRpmLookupTable = new LookupTableDouble(shooterRpmLookupTableData);
@@ -118,6 +122,7 @@ public class ShooterAimer {
       SmartDashboard.putString("SA desired target", desiredTarget.toString());
       SmartDashboard.putString("SA Predicted Target", predictedTarget.toString());
       SmartDashboard.putNumber("SA Turret Angle", desiredTurretAngle.getDegrees());
+      SmartDashboard.putNumber("SA desired RPM", shooterRPM);
       if (displayDiagnostics) {
       System.out.println("Shooter Aimer updated!");
       System.out.println("Predicted Target " + predictedTarget);

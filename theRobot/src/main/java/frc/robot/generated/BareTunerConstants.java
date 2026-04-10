@@ -51,7 +51,8 @@ public class BareTunerConstants {
 
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
-    private static final Current kSlipCurrent = Amps.of(120);
+    private static final Current kSlipCurrent = Amps.of(90); // this was lowered from 120A to 90A to limit current
+                                                             // spikes that could cause brownouts.
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.

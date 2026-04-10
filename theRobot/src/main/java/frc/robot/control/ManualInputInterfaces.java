@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.common.IntakeDirection;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -22,6 +23,10 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.TurretSubsystem;
 
 public class ManualInputInterfaces {
+
+    // Should we bind the pit limit to the driver controller (this is false because
+    // driver controller is currently using left trigger to auto aim)
+    private final boolean enablePitLimiterBind = false;
 
     // sets joystick variables to joysticks
     private CommandXboxController driverController = new CommandXboxController(Constants.portDriverController);
@@ -187,7 +192,7 @@ public class ManualInputInterfaces {
 
             }
 
-            if (this.subsystemCollection.isDriveTrainPowerSubsystemAvailable()) {
+            if (this.subsystemCollection.isDriveTrainPowerSubsystemAvailable() && enablePitLimiterBind) {
                 // Enable pit limiter
                 this.driverController.leftTrigger().onTrue(
                         new ParallelCommandGroup(
@@ -227,7 +232,7 @@ public class ManualInputInterfaces {
                     && this.subsystemCollection.isHoodSubsystemAvailable()
                     && this.subsystemCollection.isShooterSubsystemAvailable()
                     && shooterAimer != null) {
-        this.driverController.y().whileTrue(
+        this.driverController.leftTrigger().whileTrue(
             new AutoAimCommand(subsystemCollection, shooterAimer));
             }
         }
@@ -235,10 +240,9 @@ public class ManualInputInterfaces {
         if (this.subsystemCollection.isKickerSubsystemAvailable()
                 && this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()
                 && this.subsystemCollection.isIntakeWristSubsystemAvailable()) {
-            this.driverController.rightTrigger().whileTrue(new KickerSpindexerAgitateCommand(
+            this.driverController.rightTrigger().whileTrue(new KickerSpindexerCommand(
                     this.subsystemCollection.getKickerSubsystem(),
-                    this.subsystemCollection.getSpindexerSpinnerSubsystem(),
-                    this.subsystemCollection.getIntakeWristSubsystem()));
+                    this.subsystemCollection.getSpindexerSpinnerSubsystem()));
         }
 
         // Driver B toggles intake deploy/retract and runs/stops roller while deployed

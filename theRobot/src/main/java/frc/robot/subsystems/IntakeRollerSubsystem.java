@@ -27,6 +27,9 @@ import frc.robot.control.Constants;
  */
 public class IntakeRollerSubsystem extends SubsystemBase {
     private TalonFX intakeTalonFX;
+    private IntakeWristSubsystem wrist;
+    private boolean overrideWristConstraint = false;
+    private boolean shouldStop = true;
     private final VelocityVoltage leaderController = new VelocityVoltage(0.0);
     private double targetRPS = 0.0;
 
@@ -36,8 +39,9 @@ public class IntakeRollerSubsystem extends SubsystemBase {
     /*
      * Initialize the intake roller and configure the motor
      */
-    public IntakeRollerSubsystem(int motorCanID) {
+    public IntakeRollerSubsystem(int motorCanID, IntakeWristSubsystem wrist) {
         intakeTalonFX = new TalonFX(motorCanID);
+        this.wrist = wrist;
         configureMotor();
     }
 
@@ -53,15 +57,20 @@ public class IntakeRollerSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        leaderController.withVelocity(targetRPS);
-        intakeTalonFX.setControl(leaderController);
-        SmartDashboard.putNumber("Intake Real RPM", getRPM());
+        if ((wrist.getPosition() <= Constants.intakeWristAngleGoodToRoll || overrideWristConstraint) && !shouldStop){
+            leaderController.withVelocity(targetRPS);
+            intakeTalonFX.setControl(leaderController);
+            SmartDashboard.putNumber("Intake Real RPM", getRPM());
+        } else {
+            intakeTalonFX.stopMotor();
+        }
     }
 
     /*
      * Sets the target rpm
      */
     public void runRPM(double rpm) {
+        shouldStop = false;
         this.targetRPS = rpmToRPS(rpm);
     }
 
@@ -69,7 +78,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
      * Stop motor and set the targetRPS to 0
      */
     public void stop() {
-        targetRPS = 0.0;
+        shouldStop = true;
         intakeTalonFX.stopMotor();
     }
 
@@ -90,7 +99,7 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         talonMotorConfig.Voltage.SupplyVoltageTimeConstant = Constants.motorSupplyVoltageTimeConstant;
 
         // maximum current settings
-        talonMotorConfig.CurrentLimits.StatorCurrentLimit = Constants.motorStatorCurrentMaximumAmps;
+        talonMotorConfig.CurrentLimits.StatorCurrentLimit = Constants.intakeRollerStatorCurrentAmps;
         talonMotorConfig.CurrentLimits.StatorCurrentLimitEnable = true;
         talonMotorConfig.CurrentLimits.SupplyCurrentLimit = Constants.motorSupplyCurrentMaximumAmps;
         talonMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -109,4 +118,11 @@ public class IntakeRollerSubsystem extends SubsystemBase {
         return rpm / 60.0;
     }
 
+    public void setOverrideWristConstraint(boolean shouldOverrideWristConstraint){
+        this.overrideWristConstraint = shouldOverrideWristConstraint;
+    }
+
+    public boolean getOverrideWristConstraint(){
+        return overrideWristConstraint;
+    }
 }
