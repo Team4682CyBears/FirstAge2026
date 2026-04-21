@@ -21,6 +21,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -57,7 +58,8 @@ public class IntakeWristSubsystem extends SubsystemBase {
     private double desiredExtension = Constants.intakeWristDefensivePositionRotations;
 
     // position voltage PID
-    private Slot0Configs slot0Configs = new Slot0Configs().withKP(8.0).withKI(0.0).withKD(0.0);
+    private Slot0Configs slot0Configs = new Slot0Configs().withKP(18.0).withKI(0.0).withKD(0.0).withKG(0.375)
+            .withGravityType(GravityTypeValue.Arm_Cosine);
 
     public IntakeWristSubsystem(int motorCanID, int encoderCanID) {
         if (InstalledHardware.intakeWristEncoderInstalled) {
