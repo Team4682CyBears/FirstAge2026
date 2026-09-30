@@ -32,18 +32,18 @@ public class InstalledHardware {
     public static final boolean coDriverXboxControllerInstalled = true;
 
     // DriveTrain Related Hardware
-    public static final boolean drivetrainInstalled = true;
-    public static final boolean bareDrivetrainInstalled = true;
+    public static final boolean drivetrainInstalled = false;
+    public static final boolean bareDrivetrainInstalled = false;
 
     // Shooter related hardware
     public static final boolean shooterInstalled = true;
     public static final boolean hoodMotorInstalled = true;
     public static final boolean hoodEncoderInstalled = true;
-    public static final boolean turretInstalled = true;
-    public static final boolean turretSensorInstalled = true;
-    public static final boolean turretSecondSensorInstalled = true;
+    public static final boolean turretInstalled = false;
+    public static final boolean turretSensorInstalled = false;
+    public static final boolean turretSecondSensorInstalled = false;
     // Aiming mode toggle: true uses turret for aiming, false uses legacy swerve yaw.
-    public static boolean useTurretForAiming = true;
+    public static boolean useTurretForAiming = false;
 
     // Spindexer
     public static final boolean spindexerInstalled = true;
@@ -53,9 +53,9 @@ public class InstalledHardware {
     public static final boolean kickerInstalled = true;
 
     // Intake wrist encoder
-    public static final boolean intakeWristEncoderInstalled = true;
-    public static final boolean intakeWristMotorInstalled = true;
-    public static final boolean intakeRollerInstalled = true;
+    public static final boolean intakeWristEncoderInstalled = false;
+    public static final boolean intakeWristMotorInstalled = false;
+    public static final boolean intakeRollerInstalled = false;
 
     // Climber
     public static final boolean climberInstalled = false;

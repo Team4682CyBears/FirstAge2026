@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "IntakeToggle"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -40,12 +46,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeToggle"
           }
         },
         {
