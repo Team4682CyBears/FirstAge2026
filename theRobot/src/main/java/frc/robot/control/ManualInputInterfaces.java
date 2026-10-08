@@ -244,7 +244,7 @@ public class ManualInputInterfaces {
         if (this.subsystemCollection.isShooterSubsystemAvailable()
                 && this.subsystemCollection.isHoodSubsystemAvailable()
                 && this.subsystemCollection.isKickerSubsystemAvailable()) {
-            this.driverController.rightTrigger().whileTrue(new BallEaterCommand(subsystemCollection));
+            this.driverController.rightTrigger().whileTrue(new PonderCommand(subsystemCollection));
         }
 
         // Driver B toggles intake deploy/retract and runs/stops roller while deployed

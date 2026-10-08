@@ -17,11 +17,11 @@ import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.control.Constants;
 
-public class BallEaterCommand extends Command {
+public class PonderCommand extends Command {
     private ShooterSubsystem shooter;
     private HoodSubsystem hood;
 
-    public BallEaterCommand(SubsystemCollection subsystemCollection) {
+    public PonderCommand(SubsystemCollection subsystemCollection) {
         shooter = subsystemCollection.getShooterSubsystem();
         hood = subsystemCollection.getHoodSubsystem();
 
