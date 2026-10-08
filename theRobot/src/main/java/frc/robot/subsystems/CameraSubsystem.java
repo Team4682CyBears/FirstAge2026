@@ -51,10 +51,16 @@ public class CameraSubsystem extends SubsystemBase {
 
   private CameraMode cameraMode = CameraMode.TRACKING;
 
+  public boolean personDetected = false;
+  public double personAngle = 0.0;
+
   /**
    * a constructor for the camera subsystem class
    */
   public CameraSubsystem() {
+    System.out.println("CameraSubsystem constructor");
+    LimelightHelpers.setPipelineIndex("limelight", 1);
+
   }
 
   /**
@@ -323,8 +329,31 @@ public class CameraSubsystem extends SubsystemBase {
    * A method to run during periodic for the camera subsystem
    * it displays camera-based position to the shuffleboard
    */
-  @Override
-  public void periodic() {
-    // nothing in here. drivetrainSubsystem should call getLatestVisionMeasurement in its periodic
-  }
+ @Override
+public void periodic() {
+  
+    personDetected = false;
+
+    LimelightHelpers.RawDetection[] detections =
+            LimelightHelpers.getRawDetections("limelight");
+
+    for (LimelightHelpers.RawDetection detection : detections) {
+
+        if (detection.classId != 0) {
+            continue;
+        }
+
+        personDetected = true;
+
+        // Convert normalized X to degrees
+        personAngle = detection.txnc;
+
+        if (personDetected) {
+            System.out.println("Person is " + personAngle + " degrees away");
+        }
+
+        break;
+    }
+}
+
 }

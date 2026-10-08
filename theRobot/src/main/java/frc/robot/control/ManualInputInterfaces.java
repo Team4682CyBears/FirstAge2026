@@ -233,18 +233,22 @@ public class ManualInputInterfaces {
             }
         }
 
-        if (this.subsystemCollection.isKickerSubsystemAvailable()
-                && this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()
-               ) {
-            this.driverController.rightTrigger().whileTrue(new KickerSpindexerCommand(
-                    this.subsystemCollection.getKickerSubsystem(),
-                    this.subsystemCollection.getSpindexerSpinnerSubsystem()));
-        }
+        // if (this.subsystemCollection.isKickerSubsystemAvailable()
+        //         && this.subsystemCollection.isSpinnerSpindexerSubsystemAvaible()
+        //        ) {
+        //     this.driverController.rightTrigger().whileTrue(new KickerSpindexerCommand(
+        //             this.subsystemCollection.getKickerSubsystem(),
+        //             this.subsystemCollection.getSpindexerSpinnerSubsystem()));
+        // }
 
-        if (this.subsystemCollection.isShooterSubsystemAvailable()
-                && this.subsystemCollection.isHoodSubsystemAvailable()
-                && this.subsystemCollection.isKickerSubsystemAvailable()) {
-            this.driverController.rightTrigger().whileTrue(new PonderCommand(subsystemCollection));
+        // if (this.subsystemCollection.isShooterSubsystemAvailable()
+        //         && this.subsystemCollection.isHoodSubsystemAvailable()
+        //         && this.subsystemCollection.isKickerSubsystemAvailable()) {
+        //     this.driverController.rightTrigger().whileTrue(new PonderCommand(subsystemCollection));
+        // }
+
+        if (this.subsystemCollection.isCameraSubsystemAvailable() && this.subsystemCollection.isTurretSubsystemAvailable()) {
+            this.driverController.rightTrigger().whileTrue(new TurretPersonCommand(subsystemCollection));
         }
 
         // Driver B toggles intake deploy/retract and runs/stops roller while deployed

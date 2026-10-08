@@ -39,9 +39,9 @@ public class InstalledHardware {
     public static final boolean shooterInstalled = true;
     public static final boolean hoodMotorInstalled = true;
     public static final boolean hoodEncoderInstalled = true;
-    public static final boolean turretInstalled = false;
-    public static final boolean turretSensorInstalled = false;
-    public static final boolean turretSecondSensorInstalled = false;
+    public static final boolean turretInstalled = true;
+    public static final boolean turretSensorInstalled = true;
+    public static final boolean turretSecondSensorInstalled = true;
     // Aiming mode toggle: true uses turret for aiming, false uses legacy swerve yaw.
     public static boolean useTurretForAiming = false;
 
