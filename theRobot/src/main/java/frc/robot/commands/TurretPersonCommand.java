@@ -50,7 +50,20 @@ public class TurretPersonCommand extends Command {
         // shooter.runRPM(Constants.SHOOTER_CLOSE_RPM);
         // hood.setExtendoPosition(Constants.HOOD_CLOSE_EXTENDO_POSITION);
         if (turret != null && limelight.personDetected) {
-            turret.setTargetAngleRadians(Math.toRadians(MathUtil.clamp(-limelight.personAngle + 90, Constants.turretMinAngleDegrees, Constants.turretMaxAngleDegrees)));
+            double cameraRayAngleDegrees = -limelight.personAngle + 90.0 + Constants.personAimCameraYawOffsetDegrees;
+            double cameraRayAngleRadians = Math.toRadians(cameraRayAngleDegrees);
+
+            double targetXFromCamera = Constants.personAimAssumedDistance * Math.cos(cameraRayAngleRadians);
+            double targetYFromCamera = Constants.personAimAssumedDistance * Math.sin(cameraRayAngleRadians);
+
+            double targetXFromTurret = Constants.personAimCameraOffsetX + targetXFromCamera;
+            double targetYFromTurret = Constants.personAimCameraOffsetY + targetYFromCamera;
+
+            double turretAngleDegrees = Math.toDegrees(Math.atan2(targetYFromTurret, targetXFromTurret));
+            if (turretAngleDegrees < 0.0) {
+                turretAngleDegrees += 360.0;
+            }
+            turret.setTargetAngleRadians(Math.toRadians(MathUtil.clamp(turretAngleDegrees, Constants.turretMinAngleDegrees, Constants.turretMaxAngleDegrees)));
         }
     }
 
