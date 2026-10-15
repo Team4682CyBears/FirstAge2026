@@ -145,11 +145,11 @@ public final class Constants {
     // Person-aim camera calibration constants
     // Camera is rotated left relative to turret forward axis.
     public static final double personAimCameraYawOffsetDegrees = 17.23;
-    // Camera center position relative to turret center (x, y).
-    public static final double personAimCameraOffsetX = 2.133;
-    public static final double personAimCameraOffsetY = -20.18;
-    // Assumed target distance used to project camera ray for turret-offset compensation.
-    public static final double personAimAssumedDistance = 120.0;
+    // Camera center position relative to turret center (x, y), in inches.
+    public static final double personAimCameraOffsetXInches = 2.133;
+    public static final double personAimCameraOffsetYInches = -20.18;
+    // Assumed target distance in inches used to project camera ray for turret-offset compensation.
+    public static final double personAimAssumedDistanceInches = 120.0;
 
     // ********************************************************************
     // Controller Constants

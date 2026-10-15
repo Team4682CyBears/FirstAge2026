@@ -53,11 +53,11 @@ public class TurretPersonCommand extends Command {
             double cameraRayAngleDegrees = -limelight.personAngle + 90.0 + Constants.personAimCameraYawOffsetDegrees;
             double cameraRayAngleRadians = Math.toRadians(cameraRayAngleDegrees);
 
-            double targetXFromCamera = Constants.personAimAssumedDistance * Math.cos(cameraRayAngleRadians);
-            double targetYFromCamera = Constants.personAimAssumedDistance * Math.sin(cameraRayAngleRadians);
+            double targetXFromCamera = Constants.personAimAssumedDistanceInches * Math.cos(cameraRayAngleRadians);
+            double targetYFromCamera = Constants.personAimAssumedDistanceInches * Math.sin(cameraRayAngleRadians);
 
-            double targetXFromTurret = Constants.personAimCameraOffsetX + targetXFromCamera;
-            double targetYFromTurret = Constants.personAimCameraOffsetY + targetYFromCamera;
+            double targetXFromTurret = Constants.personAimCameraOffsetXInches + targetXFromCamera;
+            double targetYFromTurret = Constants.personAimCameraOffsetYInches + targetYFromCamera;
 
             double turretAngleDegrees = Math.toDegrees(Math.atan2(targetYFromTurret, targetXFromTurret));
             if (turretAngleDegrees < 0.0) {
